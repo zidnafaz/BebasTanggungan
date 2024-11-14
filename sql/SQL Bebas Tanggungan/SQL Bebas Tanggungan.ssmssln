@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# SQL Server Management Studio Solution File, Format Version 20.00
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "SQL Bebas Tanggungan", "SQL Bebas Tanggungan\SQL Bebas Tanggungan.ssmssqlproj", "{94FBA107-505E-4B87-A6E5-0102A514C7DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94FBA107-505E-4B87-A6E5-0102A514C7DD}.Default|Default.ActiveCfg = Default
+		{4C031F23-B1FD-4386-B219-0775B422744F}.Default|Default.ActiveCfg = Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {909D7A88-B81A-48CA-85A5-74AFCEB18B70}
+	EndGlobalSection
+EndGlobal

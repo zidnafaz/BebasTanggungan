@@ -168,3 +168,16 @@ CREATE TABLE [dbo].[skripsi] (
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
     CONSTRAINT [PK_skripsi] PRIMARY KEY CLUSTERED ([id_skripsi] ASC)
 );
+
+--LOGIN
+CREATE TABLE [dbo].[login] (
+    [id_login] INT IDENTITY (1, 1) NOT NULL,
+    username NVARCHAR(50) NOT NULL,
+    password NVARCHAR(50) NOT NULL,
+    [status] NVARCHAR (20) NULL,
+    CONSTRAINT [PK_login] PRIMARY KEY CLUSTERED ([id_login] ASC)
+);
+
+INSERT INTO dbo.[login] (username, password, [status]) VALUES ('1', 'admin', 'admin')
+
+SELECT * FROM dbo.admin

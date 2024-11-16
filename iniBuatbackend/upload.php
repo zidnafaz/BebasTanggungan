@@ -29,3 +29,5 @@ if (isset($_POST["submit"])) {
     }
 }
 ?>
+
+// Ini nanti dibuat per item bisa ga kem?

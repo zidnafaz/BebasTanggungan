@@ -47,7 +47,7 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        
+
         <div id="navbar"></div>
 
         <!-- End of Sidebar -->
@@ -59,9 +59,9 @@
             <div id="content">
 
                 <!-- Topbar -->
-                
+
                 <div id="topbar"></div>
-                
+
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -102,7 +102,8 @@
                                             <td>$320,800</td>
                                             <td class="status"><span>Belum Terverifikasi</span></td>
                                             <td>
-                                                <button id="<?php echo $id; ?>" class="btn btn-success btn-sm edit-data">
+                                                <button class="btn btn-success btn-sm edit-data" data-pdf="1.pdf"
+                                                    data-toggle="modal" data-target="#verifikasiModal">
                                                     <i class="fa fa-edit"></i> Verifikasi
                                                 </button>
                                             </td>
@@ -116,23 +117,10 @@
                                             <td>$170,750</td>
                                             <td class="status"><span>Sudah Terverifikasi</span></td>
                                             <td>
-                                                <button id="<?php echo $id; ?>" class="btn btn-success btn-sm edit-data">
+                                                <button class="btn btn-success btn-sm edit-data" data-pdf="2.pdf"
+                                                    data-toggle="modal" data-target="#verifikasiModal">
                                                     <i class="fa fa-edit"></i> Verifikasi
                                                 </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ashton Cox</td>
-                                            <td>Junior Technical Author</td>
-                                            <td>San Francisco</td>
-                                            <td>66</td>
-                                            <td>2009/01/12</td>
-                                            <td>$86,000</td>
-                                            <td class="status"><span>Belum Terverifikasi</span></td>
-                                            <td>
-                                                <button id="<?php echo $id; ?>" class="btn btn-success btn-sm edit-data">
-                                                    <i class="fa fa-edit"></i> Verifikasi
-                                                </button>                        
                                             </td>
                                         </tr>
                                     </tbody>
@@ -189,33 +177,47 @@
     </div>
 
     <!-- Modal untuk Verifikasi -->
-<div class="modal fade" id="verifikasiModal" tabindex="-1" role="dialog" aria-labelledby="verifikasiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="verifikasiModalLabel">Verifikasi Berkas</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Menampilkan PDF -->
-                <embed id="pdfViewer" src="" type="application/pdf" width="100%" height="600px">
-                <br><br>
-                <!-- Radio Button untuk Verifikasi -->
-                <label for="verificationStatus">Status Verifikasi:</label>
-                <div>
-                    <input type="radio" id="verifikasiTrue" name="verification" value="true"> Terverifikasi
-                    <input type="radio" id="verifikasiFalse" name="verification" value="false"> Belum Terverifikasi
+    <div class="modal fade" id="verifikasiModal" tabindex="-1" role="dialog" aria-labelledby="verifikasiModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="verifikasiModalLabel">Verifikasi Berkas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" id="saveVerification">Simpan</button>
+                <div class="modal-body">
+                    <div>
+                        <label>Nama:</label>
+                        <input type="text" id="nama" class="form-control" readonly>
+                    </div>
+                    <div>
+                        <label>NIM:</label>
+                        <input type="text" id="nim" class="form-control" readonly>
+                    </div>
+                    <div>
+                        <label>Nama Berkas:</label>
+                        <input type="text" id="namaBerkas" class="form-control" readonly>
+                    </div>
+                    <br>
+                    <!-- Menampilkan PDF -->
+                    <object id="pdfViewer" data="" type="application/pdf" width="100%" height="500px"></object>
+                    <br><br>
+                    <!-- Radio Button untuk Verifikasi -->
+                    <label for="verificationStatus">Status Verifikasi:</label>
+                    <div>
+                        <input type="radio" id="verifikasiTrue" name="verification" value="true"> Terverifikasi
+                        <input type="radio" id="verifikasiFalse" name="verification" value="false"> Belum Terverifikasi
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="saveVerification">Simpan</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
@@ -266,6 +268,23 @@
                 document.getElementById('topbar').innerHTML = data;
             })
             .catch(error => console.error('Error loading topbar:', error));
+
+        $('.edit-data').click(function () {
+            var pdfFile = $(this).data('pdf'); // Get PDF file name correctly
+            var pdfUrl = '../contohPDF/1.pdf'; // Set PDF path dynamically
+            $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
+        });
+
+
+        // $(document).ready(function () {
+        //     // Handle Verifikasi button click
+        //     $('.edit-data').click(function () {
+        //         var id = $(this).data('id'); // Get the ID of the row
+        //         var pdfFile = id + '.pdf'; // Generate the PDF file name based on ID
+        //         var pdfUrl = '../contohPDF/' + pdfFile; // Set PDF path dynamically
+        //         $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
+        //     });
+        // });
 
     </script>
 

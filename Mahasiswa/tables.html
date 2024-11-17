@@ -22,6 +22,23 @@
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
+    <!-- jQuery -->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- jQuery (from CDN) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables (from CDN) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+
     <style>
         .status span {
             padding: 5px 10px;
@@ -79,7 +96,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <!-- Ini nanti table nya pake js buat di pakein ajax -->
+
                                 <div id="table"></div>
 
                             </div>
@@ -225,17 +242,19 @@
             })
             .catch(error => console.error('Error loading topbar:', error));
 
-        // Ajax buat data.php
+        // Ajax untuk mengambil data dan menginisialisasi DataTables
         $(document).ready(function () {
             // Memuat data dari data.php
             $.ajax({
                 url: 'data.php', // File PHP untuk memuat data
                 type: 'GET', // Gunakan metode GET
                 success: function (response) {
-                    // Masukkan data ke dalam tbody di tabel
+                    // Masukkan data ke dalam tabel
                     $('#table').html(`<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th>No</th>
+                        <th>Nama Berkas</th>
                         <th>Status Pengumpulan</th>
                         <th>Keterangan</th>
                         <th>Action</th>
@@ -243,13 +262,20 @@
                 </thead>
                 <tbody>${response}</tbody>
             </table>`);
+
+                    // Inisialisasi DataTables setelah data dimasukkan
+                    $('#dataTable').DataTable({
+                        "paging": true, // Menampilkan pagination
+                        "searching": true, // Menambahkan fitur pencarian
+                        "ordering": true, // Menambahkan fitur sorting
+                        "info": true // Menampilkan informasi jumlah data
+                    });
                 },
                 error: function (xhr, status, error) {
                     console.error('Error:', error);
                 }
             });
         });
-
 
         // $('.edit-data').click(function () {
         //     var pdfFile = $(this).data('pdf'); // Get PDF file name correctly

@@ -7,7 +7,7 @@ try {
         $password = $_POST['password'];
 
         // Query untuk memeriksa username dan password
-        $sql = "SELECT status FROM dbo.login WHERE username = ? AND password = ?";
+        $sql = "SELECT status FROM [dbo].[login] WHERE username = ? AND password = ?";
         $params = array($username, $password);
         $stmt = sqlsrv_query($conn, $sql, $params);
 
@@ -26,7 +26,7 @@ try {
                     header("Location: AdminLt6/home.html");
                     break;
                 case 'mahasiswa':
-                    header("Location: mahasiswa.html");
+                    header("Location: Mahasiswa/home.html");
                     break;
                 default:
                     echo "Status tidak dikenal.";

@@ -225,11 +225,37 @@
             })
             .catch(error => console.error('Error loading topbar:', error));
 
-        $('.edit-data').click(function () {
-            var pdfFile = $(this).data('pdf'); // Get PDF file name correctly
-            var pdfUrl = '../contohPDF/1.pdf'; // Set PDF path dynamically
-            $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
+        // Ajax buat data.php
+        $(document).ready(function () {
+            // Memuat data dari data.php
+            $.ajax({
+                url: 'data.php', // File PHP untuk memuat data
+                type: 'GET', // Gunakan metode GET
+                success: function (response) {
+                    // Masukkan data ke dalam tbody di tabel
+                    $('#table').html(`<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Status Pengumpulan</th>
+                        <th>Keterangan</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>${response}</tbody>
+            </table>`);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
         });
+
+
+        // $('.edit-data').click(function () {
+        //     var pdfFile = $(this).data('pdf'); // Get PDF file name correctly
+        //     var pdfUrl = '../contohPDF/1.pdf'; // Set PDF path dynamically
+        //     $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
+        // });
 
         // $(document).ready(function () {
         //     // Handle Verifikasi button click

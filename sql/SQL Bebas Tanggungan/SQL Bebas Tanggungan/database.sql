@@ -172,3 +172,13 @@ VALUES
 ('tidak terkonfirmasi', 'Format salah', '20230004'),
 ('terkonfirmasi', 'Skripsi valid', '20230005');
 
+-- TAMBAH ADMIN PERPUS DAN ADMIN PUSAT
+use Bebas_Tanggungan;
+INSERT into dbo.[login] (username, password, status) VALUES(
+    '20230006', 'admin', 'adminPerpus'
+)
+INSERT into dbo.[login] (username, password, status) VALUES(
+    '20230007', 'admin', 'adminPusat'
+)
+
+SELECT * from dbo.[login] 

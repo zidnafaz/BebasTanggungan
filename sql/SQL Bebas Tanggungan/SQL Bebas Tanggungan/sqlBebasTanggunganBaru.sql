@@ -23,10 +23,9 @@ CREATE TABLE [dbo].[admin] (
     [alamat_karyawan]         NVARCHAR (50) NULL,
     [tanggal_lahir_karyawan]  DATE          NULL,
     [jenis_kelamin_karyawan] CHAR(1) CHECK (jenis_kelamin_karyawan IN ('L', 'P')),
-	[tanda_tangan_karyawan]	  VARCHAR(MAX),
     CONSTRAINT [PK_karyawan] PRIMARY KEY CLUSTERED ([id_karyawan] ASC)
 );
-
+ALTER TABLE dbo.admin ALTER COLUMN tanda_tangan_karyawan VARCHAR(MAX);
 --INSERT DATA ADMIN
 INSERT INTO admin (id_karyawan, nama_karyawan, nomor_telfon_karyawan, 
     alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan, tanda_tangan_karyawan)

@@ -180,4 +180,26 @@ CREATE TABLE [dbo].[login] (
 
 INSERT INTO dbo.[login] (username, password, [status]) VALUES ('1', 'admin', 'admin')
 
+SELECT * FROM data_alumni;
+SELECT * FROM skkm;
+SELECT * FROM foto_ijazah;
+SELECT * FROM ukt;
+SELECT * FROM penyerahan_hardcopy;
+SELECT * FROM tugas_akhir_softcopy;
+SELECT * FROM bebas_pinjam_buku_perpustakaan;
+SELECT * FROM hasil_kuisioner;
+SELECT * FROM penyerahan_skripsi;
+SELECT * FROM penyerahan_pkl;
+SELECT * FROM toeic;
+SELECT * FROM bebas_kompen;
+SELECT * FROM penyerahan_kebenaran_data;
+SELECT * FROM publikasi_jurnal;
+SELECT * FROM aplikasi;
+SELECT * FROM skripsi;
+
 SELECT * FROM dbo.admin
+delete from dbo.admin
+SELECT * FROM dbo.mahasiswa
+delete from dbo.mahasiswa
+SELECT * FROM dbo.login
+delete from dbo.login

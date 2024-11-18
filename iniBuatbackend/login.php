@@ -27,6 +27,8 @@ try {
         $inputUsername = $_POST['username'];
         $inputPassword = $_POST['password'];
 
+        setcookie('id',$inputUsername, time() + 3600, "/");
+
         // Query untuk memeriksa username dan password
         $sql = "SELECT status FROM dbo.login WHERE username = ? AND password = ?";
         $params = array($inputUsername, $inputPassword);
@@ -48,7 +50,7 @@ try {
             }elseif ($row['status'] === 'adminPusat') {
                 header("Location: tampilStatusUploaadPusat.php");
             }elseif ($row['status'] === 'mahasiswa') {
-                header("Location: mahasiswa.html");
+                header("Location: upload.php");
             } else {
                 echo "Status tidak dikenal.";
             }

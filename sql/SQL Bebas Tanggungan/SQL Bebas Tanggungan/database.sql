@@ -180,5 +180,11 @@ INSERT into dbo.[login] (username, password, status) VALUES(
 INSERT into dbo.[login] (username, password, status) VALUES(
     '20230007', 'admin', 'adminPusat'
 )
+INSERT into dbo.[login] (username, password, status) VALUES(
+    '20230008', 'admin', 'adminLt6'
+)
+INSERT into dbo.[login] (username, password, status) VALUES(
+    '20230009', 'admin', 'adminLt7'
+)
 
-SELECT * from dbo.[login] 
+SELECT * from dbo.[login]

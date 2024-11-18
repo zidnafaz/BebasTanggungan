@@ -1,89 +1,66 @@
 <?php
 include '../koneksi.php';
 
-// Memeriksa apakah cookie 'nim' sudah ada
-if (isset($_COOKIE['nim'])) {
-    // Mengambil nim dari cookie
-    $nim = $_COOKIE['nim'];
+if (isset($_COOKIE['id'])) {
+    $nim = $_COOKIE['id'];
 
-    // Query untuk mengambil data dari tabel skripsi
-    $query_skripsi = "SELECT status_pengumpulan_skripsi, keterangan_pengumpulan_skripsi FROM skripsi WHERE nim = ?";
-    $params = array($nim);
-    $stmt_skripsi = sqlsrv_query($conn, $query_skripsi, $params);
+    if (isset($_GET['table'])) {
+        $currentTable = $_GET['table']; // Nama tabel dari parameter URL
+    }    
 
-    // Query untuk mengambil data dari tabel aplikasi
-    $query_aplikasi = "SELECT status_pengumpulan_aplikasi, keterangan_pengumpulan_aplikasi FROM aplikasi WHERE nim = ?";
-    $stmt_aplikasi = sqlsrv_query($conn, $query_aplikasi, $params);
+    $query = [
+        'skripsi' => "SELECT 'Skripsi' AS nama, status_pengumpulan_skripsi AS status, keterangan_pengumpulan_skripsi AS keterangan FROM skripsi WHERE nim = ?",
+        'aplikasi' => "SELECT 'Aplikasi' AS nama, status_pengumpulan_aplikasi AS status, keterangan_pengumpulan_aplikasi AS keterangan FROM aplikasi WHERE nim = ?",
+        'publikasi' => "SELECT 'Publikasi Jurnal' AS nama, status_pengumpulan_publikasi_jurnal AS status, keterangan_pengumpulan_publikasi_jurnal AS keterangan FROM publikasi_jurnal WHERE nim = ?"
+    ];
 
-    // Query untuk mengambil data dari tabel publikasi_jurnal
-    $query_publikasi_jurnal = "SELECT status_pengumpulan_publikasi_jurnal, keterangan_pengumpulan_publikasi_jurnal FROM publikasi_jurnal WHERE nim = ?";
-    $stmt_publikasi_jurnal = sqlsrv_query($conn, $query_publikasi_jurnal, $params);
-
-    if ($stmt_skripsi === false || $stmt_aplikasi === false || $stmt_publikasi_jurnal === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-
-    // Inisialisasi nomor urut
     $no = 1;
+    foreach ($query as $key => $sql) {
+        $stmt = sqlsrv_query($conn, $sql, [$nim]);
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true));
+        }
 
-    // Menampilkan data dari tabel skripsi
-    while ($row_skripsi = sqlsrv_fetch_array($stmt_skripsi, SQLSRV_FETCH_ASSOC)) {
-        echo "<tr>
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            switch ($row['status']) {
+                case 'belum upload':
+                    $statusClass = 'bg-secondary text-white'; // Abu-abu
+                    break;
+                case 'pending':
+                    $statusClass = 'bg-warning text-dark'; // Kuning
+                    break;
+                case 'tidak terkonfirmasi':
+                    $statusClass = 'bg-danger text-white'; // Merah
+                    break;
+                case 'terkonfirmasi':
+                    $statusClass = 'bg-success text-white'; // Hijau
+                    break;
+                default:
+                    $statusClass = 'bg-light text-dark'; // Default
+            }
+
+            $button = ($row['status'] === 'belum upload' || $row['status'] === 'tidak terkonfirmasi') ?
+                "<button onclick=\"$('#uploadDir').val('uploads/{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
+                    <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
+                </button>" :
+                "<button class=\"btn btn-secondary btn-sm\" disabled>Disable</button>";
+
+            echo "<tr>
                 <td>{$no}</td>
-                <td>Skripsi</td>
-                <td>{$row_skripsi['status_pengumpulan_skripsi']}</td>
-                <td>{$row_skripsi['keterangan_pengumpulan_skripsi']}</td>
-                <td>
-                    <button class='btn btn-success btn-sm edit-data' data-pdf='document.pdf' data-toggle='modal' data-target='#uploadModal'>
-                        <i class='fa fa-solid fa-cloud-arrow-up'></i> Upload
-                    </button>
-                </td>
+                <td>{$row['nama']}</td>
+                <td><span class='badge {$statusClass} p-2 rounded text-uppercase fs-5' style='cursor: pointer;' title='{$row['status']}'>
+                        {$row['status']}
+                    </span></td>
+                <td>{$row['keterangan']}</td>
+                <td>{$button}</td>
             </tr>";
-        $no++;
+            $no++;
+        }
+        sqlsrv_free_stmt($stmt);
     }
-
-    // Menampilkan data dari tabel aplikasi
-    while ($row_aplikasi = sqlsrv_fetch_array($stmt_aplikasi, SQLSRV_FETCH_ASSOC)) {
-        echo "<tr>
-                <td>{$no}</td>
-                <td>Aplikasi</td>
-                <td>{$row_aplikasi['status_pengumpulan_aplikasi']}</td>
-                <td>{$row_aplikasi['keterangan_pengumpulan_aplikasi']}</td>
-                <td>
-                    <button class='btn btn-success btn-sm edit-data' data-pdf='document.pdf' data-toggle='modal' data-target='#uploadModal'>
-                        <i class='fa fa-solid fa-cloud-arrow-up'></i> Upload
-                    </button>
-                </td>
-            </tr>";
-        $no++;
-    }
-
-    // Menampilkan data dari tabel publikasi_jurnal
-    while ($row_publikasi_jurnal = sqlsrv_fetch_array($stmt_publikasi_jurnal, SQLSRV_FETCH_ASSOC)) {
-        echo "<tr>
-                <td>{$no}</td>
-                <td>Publikasi Jurnal</td>
-                <td>{$row_publikasi_jurnal['status_pengumpulan_publikasi_jurnal']}</td>
-                <td>{$row_publikasi_jurnal['keterangan_pengumpulan_publikasi_jurnal']}</td>
-                <td>
-                    <button class='btn btn-success btn-sm edit-data' data-pdf='document.pdf' data-toggle='modal' data-target='#uploadModal'>
-                        <i class='fa fa-solid fa-cloud-arrow-up'></i> Upload
-                    </button>
-                </td>
-            </tr>";
-        $no++;
-    }
-
-    echo "</tbody></table>";
-
-    // Menutup statement
-    sqlsrv_free_stmt($stmt_skripsi);
-    sqlsrv_free_stmt($stmt_aplikasi);
-    sqlsrv_free_stmt($stmt_publikasi_jurnal);
 } else {
-    echo "NIM belum diatur, silakan login terlebih dahulu.";
+    echo "<tr><td colspan='5'>NIM belum diatur. Silakan login terlebih dahulu.</td></tr>";
 }
 
-// Tutup koneksi
 sqlsrv_close($conn);
 ?>

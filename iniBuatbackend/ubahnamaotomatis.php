@@ -1,40 +1,48 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Direktori tempat file akan disimpan
-    $target_dir = "uploads/";
+    // Validasi ID dari cookie
+    if (!isset($_COOKIE['id'])) {
+        echo "ID tidak ditemukan dalam cookie.";
+        exit;
+    }
     
+    $id = htmlspecialchars($_COOKIE['id']); // Amankan data dari cookie
+    
+    // Mendapatkan direktori dari input hidden
+    $uploadDir = htmlspecialchars($_POST['uploadDir']);
+    $uploadDir = rtrim($uploadDir, '/'); // Pastikan tidak ada trailing slash
+    
+    // Buat direktori jika belum ada
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
     // Ambil nama file asli
-    $originalFileName = basename($_FILES["fileToUpload"]["name"]);
+    $originalFileName = basename($_FILES["file"]["name"]);
     
     // Dapatkan ekstensi file
     $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
     
-    // Buat nama file baru (misalnya, menggunakan timestamp)
-    $newFileName = 'NIM ijazah' . '.' . $fileExtension; // Menggunakan uniqid untuk nama unik
-    
+    // Ambil label dari nama direktori
+    $directoryLabel = basename($uploadDir); // Bagian terakhir dari path direktori
+
+    // Buat nama file baru
+    $newFileName = $id . '_' . $directoryLabel . '.' . $fileExtension;
+
     // Tentukan path lengkap untuk menyimpan file
-    $target_file = $target_dir . $newFileName;
+    $target_file = $uploadDir . '/' . $newFileName;
 
     // Cek apakah file sudah ada
     if (file_exists($target_file)) {
-        echo "Maaf, file sudah ada.";
-        exit;
-    }
-
-    // Cek ukuran file (misalnya, maksimum 5MB)
-
-    // Cek apakah file adalah gambar (opsional)
-    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-    if ($check === false) {
-        echo "Maaf, file yang diupload bukan gambar.";
+        echo "Maaf, file dengan nama yang sama sudah ada.";
         exit;
     }
 
     // Pindahkan file ke direktori tujuan
-    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-        echo "File " . htmlspecialchars($newFileName) . " telah diupload.";
+    if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
+        echo "File berhasil diupload ke: $target_file";
     } else {
-        echo "Maaf, terjadi kesalahan saat mengupload file.";
+        echo "Terjadi kesalahan saat mengupload file.";
     }
 } else {
     echo "Tidak ada file yang diupload.";

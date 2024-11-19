@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Memeriksa apakah ada hasil
     if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
         // Pastikan cookie 'nim' diset sebelum header
-        setcookie('nim', $row['username'], time() + 3600, "/"); // Mengatur path cookie agar dapat diakses di seluruh aplikasi
+        setcookie('id', $row['username'], time() + 3600, "/"); // Mengatur path cookie agar dapat diakses di seluruh aplikasi
 
         // Pengalihan berdasarkan status
         switch ($row['status']) {

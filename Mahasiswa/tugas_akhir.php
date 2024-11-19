@@ -192,7 +192,7 @@
                         <!-- Submit Button -->
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadDir"
-                                name="uploadDir">Create</button>
+                                name="uploadDir">Upload</button>
                         </div>
                     </form>
                 </div>

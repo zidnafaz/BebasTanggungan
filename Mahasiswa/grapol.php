@@ -192,7 +192,7 @@
                         <!-- Submit Button -->
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadDir"
-                                name="uploadDir">Create</button>
+                                name="uploadDir">Upload</button>
                         </div>
                     </form>
                 </div>
@@ -269,17 +269,7 @@
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const statusCells = document.querySelectorAll(".status span");
-            statusCells.forEach(cell => {
-                if (cell.textContent.trim() === "Sudah Terverifikasi") {
-                    cell.classList.add("badge-success");
-                } else if (cell.textContent.trim() === "Belum Terverifikasi") {
-                    cell.classList.add("badge-danger");
-                }
-            });
-        });
-
+        
         document.addEventListener("DOMContentLoaded", function () {
             fetch('navbar.html')
                 .then(response => {

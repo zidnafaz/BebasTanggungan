@@ -188,3 +188,31 @@ INSERT into dbo.[login] (username, password, status) VALUES(
 )
 
 SELECT * from dbo.[login]
+
+IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
+DROP TRIGGER dbo.autoAddLoginMahasiswa;
+GO;
+CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
+AFTER INSERT
+AS
+    PRINT 'Trigger autoAddLoginMahasiswa dipanggil!';
+    DECLARE @username VARCHAR = (SELECT nim FROM inserted);
+    DECLARE @password varchar = (SELECT nim FROM inserted);
+    DECLARE @status varchar = 'mahasiswa';
+    INSERT INTO dbo.login(username, [password], [status])
+    VALUES (@username, @password, @status);
+    PRINT 'Data kosong ditambahkan secara otomatis ke tabel sales.OrderDetails!';
+
+IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
+DROP TRIGGER dbo.autoAddLoginMahasiswa;
+GO;
+CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
+AFTER INSERT
+AS
+    PRINT 'Trigger autoAddLoginMahasiswa dipanggil!';
+    DECLARE @username VARCHAR = (SELECT nim FROM inserted);
+    DECLARE @password varchar = (SELECT nim FROM inserted);
+    DECLARE @status varchar = 'mahasiswa';
+    INSERT INTO dbo.login(username, [password], [status])
+    VALUES (@username, @password, @status);
+    PRINT 'Data kosong ditambahkan secara otomatis ke tabel sales.OrderDetails!';

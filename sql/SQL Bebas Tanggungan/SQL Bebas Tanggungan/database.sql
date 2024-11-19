@@ -201,3 +201,104 @@ AS
     DECLARE @status varchar = 'mahasiswa';
     INSERT INTO dbo.login(username, [password], [status])
     VALUES (@username, @password, @status);
+
+-- Query Konfirmasi Admin Tiap User
+
+SELECT 
+    m.nim,
+    m.nama_mahasiswa AS nama,
+    skr.status_pengumpulan_skripsi AS status_pengumpulan_skripsi,
+    apl.status_pengumpulan_aplikasi AS status_pengumpulan_aplikasi,
+    pj.status_pengumpulan_publikasi_jurnal AS status_pengumpulan_publikasi_jurnal
+FROM 
+    mahasiswa m
+LEFT JOIN 
+    skripsi skr ON m.nim = skr.nim
+LEFT JOIN 
+    aplikasi apl ON m.nim = apl.nim
+LEFT JOIN 
+    publikasi_jurnal pj ON m.nim = pj.nim
+WHERE 
+    skr.status_pengumpulan_skripsi = 'pending' 
+    OR apl.status_pengumpulan_aplikasi = 'pending' 
+    OR pj.status_pengumpulan_publikasi_jurnal = 'pending';
+
+-- Union UNTUK SURAT REKOMENDASI -- Query untuk menampilkan data mahasiswa yang sudah terkonfirmasi pada semua tabel atau berkas
+
+SELECT nim, nama_mahasiswa, nomor_telfon_mahasiswa
+FROM mahasiswa
+WHERE nim IN (
+    SELECT nim FROM data_alumni WHERE status_pengumpulan_data_alumni = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM skkm WHERE status_pengumpulan_skkm = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM foto_ijazah WHERE status_pengumpulan_foto_ijazah = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM ukt WHERE status_pengumpulan_ukt = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM penyerahan_hardcopy WHERE status_pengumpulan_penyerahan_hardcopy = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM tugas_akhir_softcopy WHERE status_pengumpulan_tugas_akhir_softcopy = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM bebas_pinjam_buku_perpustakaan WHERE status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM hasil_kuisioner WHERE status_pengumpulan_hasil_kuisioner = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM penyerahan_skripsi WHERE status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM penyerahan_pkl WHERE status_pengumpulan_penyerahan_pkl = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM toeic WHERE status_pengumpulan_toeic = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM bebas_kompen WHERE status_pengumpulan_bebas_kompen = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM penyerahan_kebenaran_data WHERE status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM publikasi_jurnal WHERE status_pengumpulan_publikasi_jurnal = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM aplikasi WHERE status_pengumpulan_aplikasi = 'terkonfirmasi'
+    UNION
+    SELECT nim FROM skripsi WHERE status_pengumpulan_skripsi = 'terkonfirmasi'
+) 
+
+-- UNION ALL
+
+SELECT 
+    m.nim,
+    m.nama_mahasiswa AS nama,
+    'skripsi' AS jenis_status,
+    skr.status_pengumpulan_skripsi AS status_pengumpulan
+FROM 
+    mahasiswa m
+JOIN 
+    skripsi skr ON m.nim = skr.nim
+WHERE 
+    skr.status_pengumpulan_skripsi = 'pending'
+
+UNION
+
+SELECT 
+    m.nim,
+    m.nama_mahasiswa AS nama,
+    'aplikasi' AS jenis_status,
+    apl.status_pengumpulan_aplikasi AS status_pengumpulan
+FROM 
+    mahasiswa m
+JOIN 
+    aplikasi apl ON m.nim = apl.nim
+WHERE 
+    apl.status_pengumpulan_aplikasi = 'pending'
+
+UNION
+
+SELECT 
+    m.nim,
+    m.nama_mahasiswa AS nama,
+    'publikasi_jurnal' AS jenis_status,
+    pj.status_pengumpulan_publikasi_jurnal AS status_pengumpulan
+FROM 
+    mahasiswa m
+JOIN 
+    publikasi_jurnal pj ON m.nim = pj.nim
+WHERE 
+    pj.status_pengumpulan_publikasi_jurnal = 'pending';

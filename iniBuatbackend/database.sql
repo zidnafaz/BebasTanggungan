@@ -60,3 +60,6 @@ JOIN dbo.data_alumni da ON m.nim = da.nim
 JOIN dbo.foto_ijazah fi ON m.nim = fi.nim
 JOIN dbo.skkm ON m.nim = skkm.nim
 JOIN dbo.ukt ON m.nim = ukt.nim;
+
+use Bebas_Tanggungan
+SELECT * FROM dbo.mahasiswa

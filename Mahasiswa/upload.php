@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = htmlspecialchars($_COOKIE['id']); // Amankan data dari cookie
 
     // Mendapatkan direktori dari input hidden
-    $uploadDir = htmlspecialchars($_POST['uploadDir']);
+    $uploadDir = '../Documents/' . htmlspecialchars($_POST['uploadDir']);
     $uploadDir = rtrim($uploadDir, '/'); // Pastikan tidak ada trailing slash
 
     // Tentukan tabel berdasarkan direktori
@@ -34,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'skripsi' => 'skripsi'
     ];
 
-
     $directoryLabel = basename($uploadDir);
     $tableName = isset($tableMap[$directoryLabel]) ? $tableMap[$directoryLabel] : null;
 
@@ -43,16 +42,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    // Validasi file
+    $allowedExtensions = ['pdf', 'zip', 'rar'];
+    $maxFileSize = 2 * 1024 * 1024; // Default: 2 MB
+
+    if ($directoryLabel === 'skripsi') {
+        $allowedExtensions = ['pdf'];
+        $maxFileSize = 20 * 1024 * 1024; // 20 MB
+    } elseif ($directoryLabel === 'aplikasi') {
+        $allowedExtensions = ['zip', 'rar'];
+        $maxFileSize = 30 * 1024 * 1024; // 30 MB
+    }
+
+    $originalFileName = basename($_FILES["file"]["name"]);
+    $fileExtension = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+    $fileSize = $_FILES["file"]["size"];
+
+    if (!in_array($fileExtension, $allowedExtensions)) {
+        echo "Tipe file tidak diizinkan. Hanya diperbolehkan: " . implode(', ', $allowedExtensions) . ".";
+        exit;
+    }
+
+    if ($fileSize > $maxFileSize) {
+        echo "Ukuran file terlalu besar. Maksimal: " . ($maxFileSize / (1024 * 1024)) . " MB.";
+        exit;
+    }
+
     // Buat direktori jika belum ada
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
-
-    // Ambil nama file asli
-    $originalFileName = basename($_FILES["file"]["name"]);
-
-    // Dapatkan ekstensi file
-    $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
 
     // Buat nama file baru
     $newFileName = $id . '_' . $directoryLabel . '.' . $fileExtension;
@@ -71,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Pindahkan file ke direktori tujuan
     if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-        
         // Query untuk memperbarui status
         $sql = "UPDATE {$tableName} 
         SET status_pengumpulan_{$directoryLabel} = 'pending', 

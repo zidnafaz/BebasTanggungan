@@ -4,16 +4,13 @@ include '../koneksi.php';
 if (isset($_COOKIE['id'])) {
     $nim = $_COOKIE['id'];
 
-    if (isset($_GET['table'])) {
-        $currentTable = $_GET['table']; // Nama tabel dari parameter URL
-    } 
-
+    // Query untuk tiap tabel
     $query = [
         'data_alumni' => "SELECT 'Data Alumni' AS nama, status_pengumpulan_data_alumni AS status, keterangan_pengumpulan_data_alumni AS keterangan FROM data_alumni WHERE nim = ?",
         'skkm' => "SELECT 'SKKM' AS nama, status_pengumpulan_skkm AS status, keterangan_pengumpulan_skkm AS keterangan FROM skkm WHERE nim = ?",
         'foto_ijazah' => "SELECT 'Foto Ijazah' AS nama, status_pengumpulan_foto_ijazah AS status, keterangan_pengumpulan_foto_ijazah AS keterangan FROM foto_ijazah WHERE nim = ?",
         'ukt' => "SELECT 'UKT' AS nama, status_pengumpulan_ukt AS status, keterangan_pengumpulan_ukt AS keterangan FROM ukt WHERE nim = ?"
-    ];       
+    ];
 
     $no = 1;
     foreach ($query as $key => $sql) {
@@ -23,25 +20,16 @@ if (isset($_COOKIE['id'])) {
         }
 
         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            switch ($row['status']) {
-                case 'belum upload':
-                    $statusClass = 'bg-secondary text-white'; // Abu-abu
-                    break;
-                case 'pending':
-                    $statusClass = 'bg-warning text-dark'; // Kuning
-                    break;
-                case 'tidak terkonfirmasi':
-                    $statusClass = 'bg-danger text-white'; // Merah
-                    break;
-                case 'terkonfirmasi':
-                    $statusClass = 'bg-success text-white'; // Hijau
-                    break;
-                default:
-                    $statusClass = 'bg-light text-dark'; // Default
-            }
+            $statusClass = match ($row['status']) {
+                'belum upload' => 'bg-secondary text-white',
+                'pending' => 'bg-warning text-dark',
+                'tidak terkonfirmasi' => 'bg-danger text-white',
+                'terkonfirmasi' => 'bg-success text-white',
+                default => 'bg-light text-dark'
+            };
 
             $button = ($row['status'] === 'belum upload' || $row['status'] === 'tidak terkonfirmasi') ?
-                "<button onclick=\"$('#uploadDir').val('uploads/{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
+                "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
                 </button>" :
                 "<button class=\"btn btn-secondary btn-sm\" disabled>Disable</button>";

@@ -54,6 +54,27 @@
         .status .badge-danger {
             background-color: red;
         }
+
+        #uploadModalHeader.bg-success {
+            background-color: #28a745 !important;
+            /* Hijau terang */
+        }
+
+        #uploadModalHeader.bg-danger {
+            background-color: #dc3545 !important;
+            /* Merah terang */
+        }
+
+        #uploadMessage {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .modal-footer .btn-secondary {
+            background-color: #6c757d !important;
+            /* Abu-abu lebih terang */
+        }
     </style>
 
 </head>
@@ -157,9 +178,7 @@
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white d-flex justify-content-center align-items-center">
-                    <h5 class="modal-title" id="uploadModalLabel">
-                        Add Documents
-                    </h5>
+                    <h5 class="modal-title" id="uploadModalLabel">Add Documents</h5>
                     <button type="button" class="close text-white ml-auto" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -167,7 +186,10 @@
 
                 <!-- Body -->
                 <div class="modal-body">
-                    <form action="upload.php" method="post" enctype="multipart/form-data">
+                    <form id="uploadForm" method="post" enctype="multipart/form-data">
+                        <!-- Hidden Input for uploadDir -->
+                        <input type="hidden" name="uploadDir" id="uploadDir">
+
                         <!-- File Upload Input -->
                         <div class="form-group">
                             <label for="file" class="col-form-label">Attachments:</label>
@@ -177,7 +199,7 @@
                                     Attach your files here <br> or <br>
                                     <label for="file" class="text-primary" style="cursor: pointer;">Browse files</label>
                                 </p>
-                                <input type="file" class="form-control-file d-none" id="file" name="file"
+                                <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
                             <small class="form-text text-muted">Accepted file type: .doc only</small>
@@ -191,8 +213,7 @@
 
                         <!-- Submit Button -->
                         <div class="form-group text-center">
-                            <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadDir"
-                                name="uploadDir">Upload</button>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Upload</button>
                         </div>
                     </form>
                 </div>
@@ -200,51 +221,24 @@
         </div>
     </div>
 
-    <!-- Modal untuk sukses upload -->
-    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+    <!-- Modal untuk Status Upload -->
+    <div class="modal fade" id="uploadModalStatus" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <!-- Header -->
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="successModalLabel">Upload Berhasil</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header" id="uploadModalHeader">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload Status</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <!-- Body -->
-                <div class="modal-body">
-                    File berhasil diupload.
+                <div class="modal-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-success" id="successIcon" style="display: none;"></i>
+                    <i class="fas fa-times-circle fa-3x text-danger" id="errorIcon" style="display: none;"></i>
+                    <p id="uploadMessage" class="mt-3"></p>
                 </div>
-                <!-- Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal"
-                        onclick="window.location.href='jurusan.php'">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal untuk gagal upload -->
-    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <!-- Header -->
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="errorModalLabel">Upload Gagal</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <!-- Body -->
-                <div class="modal-body">
-                    Terjadi kesalahan saat mengupload file. Silakan coba lagi.
-                </div>
-                <!-- Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                        onclick="window.history.back()">Tutup</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -326,50 +320,76 @@
             });
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            // Mengecek status upload dari URL
-            const status = new URLSearchParams(window.location.search).get('status');
-            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-
-            // Tampilkan modal sesuai dengan status
-            if (status === "success") {
-                successModal.show();
-            } else if (status === "error") {
-                errorModal.show();
-            }
-        });
-
         $(document).ready(function () {
-            // Menangani submit form
             $('#uploadForm').submit(function (e) {
-                e.preventDefault();  // Mencegah form submit secara default
-
-                // Menyiapkan form data
+                e.preventDefault();
                 var formData = new FormData(this);
 
-                // Melakukan request AJAX
                 $.ajax({
-                    url: 'upload.php',  // Ganti dengan URL PHP untuk menangani upload
+                    url: 'upload.php',
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        // Jika berhasil, ubah URL dan tampilkan modal sukses
-                        if (response == 'success') {
-                            window.location.href = '?status=success'; // Ganti URL untuk menampilkan modal sukses
+                        // Tutup modal upload
+                        $('#uploadModal').modal('hide');
+
+                        // Tampilkan ikon dan teks berdasarkan respons
+                        if (response.includes("berhasil")) {
+                            $('#successIcon').show();
+                            $('#errorIcon').hide();
+                            $('#uploadModalHeader')
+                                .removeClass('bg-danger')
+                                .addClass('bg-success text-white');
+                            $('#uploadMessage').css('color', '#155724'); // Hijau tua untuk teks
                         } else {
-                            window.location.href = '?status=error'; // Ganti URL untuk menampilkan modal error
+                            $('#successIcon').hide();
+                            $('#errorIcon').show();
+                            $('#uploadModalHeader')
+                                .removeClass('bg-success')
+                                .addClass('bg-danger text-white');
+                            $('#uploadMessage').css('color', '#721c24'); // Merah tua untuk teks
                         }
+
+                        // Tampilkan respons
+                        $('#uploadMessage').html(response);
+
+                        // Tampilkan modal status
+                        $('#uploadModalStatus').modal('show');
+
+                        loadTableData();
                     },
-                    error: function () {
-                        // Gagal dalam AJAX request, tampilkan modal error
-                        window.location.href = '?status=error'; // Ganti URL untuk menampilkan modal error
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
                     }
                 });
             });
         });
+
+        function loadTableData() {
+            $.ajax({
+                url: 'data_jurusan.php', // Endpoint untuk mengambil data tabel
+                type: 'GET',
+                success: function (data) {
+                    // Perbarui isi tabel dengan data yang diterima
+                    $('#table tbody').html(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading table data:', error);
+                }
+            });
+        }
+
+        function setUploadDir(directory) {
+            $('#uploadDir').val(directory);
+        }
+
+        function updateFileName() {
+            var fileName = document.getElementById('file').files[0]?.name || "No file chosen";
+            document.getElementById('fileName').value = fileName;
+        }
+
 
         document.addEventListener("DOMContentLoaded", function () {
             // Menangani perubahan input file

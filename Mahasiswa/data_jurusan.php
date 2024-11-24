@@ -4,16 +4,13 @@ include '../koneksi.php';
 if (isset($_COOKIE['id'])) {
     $nim = $_COOKIE['id'];
 
-    if (isset($_GET['table'])) {
-        $currentTable = $_GET['table']; // Nama tabel dari parameter URL
-    } 
-
+    // Query untuk tiap tabel
     $query = [
         'penyerahan_skripsi' => "SELECT 'Penyerahan Skripsi' AS nama, status_pengumpulan_penyerahan_skripsi AS status, keterangan_pengumpulan_penyerahan_skripsi AS keterangan FROM penyerahan_skripsi WHERE nim = ?",
         'penyerahan_pkl' => "SELECT 'Penyerahan PKL' AS nama, status_pengumpulan_penyerahan_pkl AS status, keterangan_pengumpulan_penyerahan_pkl AS keterangan FROM penyerahan_pkl WHERE nim = ?",
         'toeic' => "SELECT 'TOEIC' AS nama, status_pengumpulan_toeic AS status, keterangan_pengumpulan_toeic AS keterangan FROM toeic WHERE nim = ?",
         'bebas_kompen' => "SELECT 'Bebas Kompen' AS nama, status_pengumpulan_bebas_kompen AS status, keterangan_pengumpulan_bebas_kompen AS keterangan FROM bebas_kompen WHERE nim = ?",
-        'kebenaran_data' => "SELECT 'Penyerahan Kebenaran Data' AS nama, status_pengumpulan_penyerahan_kebenaran_data AS status, keterangan_pengumpulan_penyerahan_kebenaran_data AS keterangan FROM penyerahan_kebenaran_data WHERE nim = ?"
+        'penyerahan_kebenaran_data' => "SELECT 'Penyerahan Kebenaran Data' AS nama, status_pengumpulan_penyerahan_kebenaran_data AS status, keterangan_pengumpulan_penyerahan_kebenaran_data AS keterangan FROM penyerahan_kebenaran_data WHERE nim = ?"
     ];
 
     $no = 1;
@@ -24,26 +21,16 @@ if (isset($_COOKIE['id'])) {
         }
 
         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-
-            switch ($row['status']) {
-                case 'belum upload':
-                    $statusClass = 'bg-secondary text-white'; // Abu-abu
-                    break;
-                case 'pending':
-                    $statusClass = 'bg-warning text-dark'; // Kuning
-                    break;
-                case 'tidak terkonfirmasi':
-                    $statusClass = 'bg-danger text-white'; // Merah
-                    break;
-                case 'terkonfirmasi':
-                    $statusClass = 'bg-success text-white'; // Hijau
-                    break;
-                default:
-                    $statusClass = 'bg-light text-dark'; // Default
-            }
+            $statusClass = match ($row['status']) {
+                'belum upload' => 'bg-secondary text-white',
+                'pending' => 'bg-warning text-dark',
+                'tidak terkonfirmasi' => 'bg-danger text-white',
+                'terkonfirmasi' => 'bg-success text-white',
+                default => 'bg-light text-dark'
+            };
 
             $button = ($row['status'] === 'belum upload' || $row['status'] === 'tidak terkonfirmasi') ?
-                "<button onclick=\"$('#uploadDir').val('uploads/{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
+                "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
                 </button>" :
                 "<button class=\"btn btn-secondary btn-sm\" disabled>Disable</button>";

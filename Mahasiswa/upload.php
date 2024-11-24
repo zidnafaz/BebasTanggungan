@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = htmlspecialchars($_COOKIE['id']); // Amankan data dari cookie
 
     // Mendapatkan direktori dari input hidden
-    $uploadDir = '../Documents/' . htmlspecialchars($_POST['uploadDir']);
+    $uploadDir = '../Documents/Uploads/' . htmlspecialchars($_POST['uploadDir']);
     $uploadDir = rtrim($uploadDir, '/'); // Pastikan tidak ada trailing slash
 
     // Tentukan tabel berdasarkan direktori
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $allowedExtensions = ['pdf', 'zip', 'rar'];
     $maxFileSize = 2 * 1024 * 1024; // Default: 2 MB
 
-    if ($directoryLabel === 'skripsi') {
+    if ($directoryLabel !== 'aplikasi') {
         $allowedExtensions = ['pdf'];
         $maxFileSize = 20 * 1024 * 1024; // 20 MB
     } elseif ($directoryLabel === 'aplikasi') {
@@ -90,24 +90,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Pindahkan file ke direktori tujuan
     if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-        // Query untuk memperbarui status
         $sql = "UPDATE {$tableName} 
-        SET status_pengumpulan_{$directoryLabel} = 'pending', 
-            keterangan_pengumpulan_{$directoryLabel} = 'Menunggu Proses Verifikasi' 
-        WHERE nim = ?";
+                SET status_pengumpulan_{$directoryLabel} = 'pending', 
+                    keterangan_pengumpulan_{$directoryLabel} = 'Menunggu Proses Verifikasi' 
+                WHERE nim = ?";
         $params = [$id];
 
-        // Eksekusi query
         $stmt = sqlsrv_query($conn, $sql, $params);
         if ($stmt === false) {
-            die(print_r(sqlsrv_errors(), true));
+            echo 'Gagal memperbarui status di database.';
+            exit;
         }
 
-        // Redirect ke halaman dengan status sukses
-        header('Location: ' . $_SERVER['HTTP_REFERER'] . '?status=success');
+        echo 'File berhasil diupload.';
     } else {
-        // Redirect ke halaman dengan status error
-        header('Location: ' . $_SERVER['HTTP_REFERER'] . '?status=error');
+        echo 'Gagal mengupload file.';
     }
 } else {
     echo "Tidak ada file yang diupload.";

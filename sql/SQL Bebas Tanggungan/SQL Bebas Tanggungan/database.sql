@@ -18,10 +18,6 @@ update dbo.login
 set status = 'adminlt7'
 WHERE id_login = 1;
 
-update dbo.aplikasi
-set status_pengumpulan_aplikasi = 'tidak terkonfirmasi'
-where nim = '20230002';
-
 select * from dbo.mahasiswa
 
 insert into dbo.[login](username, [password], [status]) VALUES(
@@ -185,15 +181,11 @@ INSERT into dbo.[login] (username, password, status) VALUES(
     '20230007', 'admin', 'adminPusat'
 )
 INSERT into dbo.[login] (username, password, status) VALUES(
-    '20230008', 'admin', 'adminlt6'
+    '20230008', 'admin', 'adminLt6'
 )
 INSERT into dbo.[login] (username, password, status) VALUES(
-    '20230009', 'admin', 'adminlt7'
+    '20230009', 'admin', 'adminLt7'
 )
-
-update dbo.login
-set status = 'adminlt6'
-where username = '20230008'
 
 SELECT * from dbo.[login]
 
@@ -310,4 +302,3 @@ JOIN
     publikasi_jurnal pj ON m.nim = pj.nim
 WHERE 
     pj.status_pengumpulan_publikasi_jurnal = 'pending';
-

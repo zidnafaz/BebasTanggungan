@@ -67,6 +67,9 @@ try {
                 <th>Status Skripsi</th>
                 <th>Status Aplikasi</th>
                 <th>Status Publikasi Jurnal</th>
+                <form action="coba.html" method="post">
+        <button type="submit">Panggil File PHP</button>
+    </form>
             </tr>
         </thead>
         <tbody>
@@ -79,6 +82,8 @@ try {
                     <td><?= htmlspecialchars($row['status_pengumpulan_publikasi_jurnal']) ?></td>
                 </tr>
             <?php endforeach; ?>
+            <form action="generatePdf.html" method="post">
+            <button type="submit">Generate PDF</button>
         </tbody>
     </table>
 </body>

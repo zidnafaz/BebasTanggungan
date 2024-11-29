@@ -50,7 +50,7 @@ try {
             }elseif ($row['status'] === 'adminPusat') {
                 header("Location: tampilStatusUploaadPusat.php");
             }elseif ($row['status'] === 'mahasiswa') {
-                header("Location: upload.php");
+                header("Location: generatePdf.php");
             } else {
                 echo "Status tidak dikenal.";
             }

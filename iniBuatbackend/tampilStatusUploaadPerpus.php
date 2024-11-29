@@ -81,8 +81,10 @@ try {
                     <td><?= htmlspecialchars($row['status_pengumpulan_bebas_pinjam_buku_perpustakaan']) ?></td>
                     <td><?= htmlspecialchars($row['status_pengumpulan_penyerahan_hardcopy']) ?></td>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
+                <?php endforeach; ?>
+            </tbody>
+            <form action="generatePdf.html" method="post">
+            <button type="submit">Generate PDF</button>
     </table>
 </body>
 </html>

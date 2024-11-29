@@ -95,6 +95,8 @@ try {
                     <td><?= htmlspecialchars($row['status_pengumpulan_penyerahan_kebenaran_data']) ?></td>
                 </tr>
             <?php endforeach; ?>
+            <form action="generatePdf.html" method="post">
+            <button type="submit">Generate PDF</button>
         </tbody>
     </table>
 </body>

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: AdminPerpus/home.html");
                 break;
             case 'mahasiswa':
-                header("Location: Mahasiswa/home.html");
+                header("Location: Mahasiswa/home.php");
                 break;
             default:
                 echo "Status tidak dikenal.";

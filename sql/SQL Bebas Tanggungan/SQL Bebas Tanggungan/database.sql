@@ -302,3 +302,51 @@ JOIN
     publikasi_jurnal pj ON m.nim = pj.nim
 WHERE 
     pj.status_pengumpulan_publikasi_jurnal = 'pending';
+
+--MEMBUAT DATABASE UNTUK TANGGAL KONFIRMASI DAN TRIGGER
+CREATE TABLE [dbo].[adminlt6_konfirmasi] (
+    [id_adminlt6_konfirmasi] INT IDENTITY (1, 1) NOT NULL,
+    [nim]        NVARCHAR (10) NULL,
+    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+    [tanggal_adminlt6_konfirmasi] DATETIME NULL,
+    CONSTRAINT [PK_adminlt6_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminlt6_konfirmasi] ASC)
+);
+CREATE TABLE [dbo].[adminlt7_konfirmasi] (
+    [id_adminlt7_konfirmasi] INT IDENTITY (1, 1) NOT NULL,
+    [nim]        NVARCHAR (10) NULL,
+    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+    [tanggal_adminlt7_konfirmasi] DATETIME NULL,
+    CONSTRAINT [PK_adminlt7_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminlt7_konfirmasi] ASC)
+);
+CREATE TABLE [dbo].[adminPusat_konfirmasi] (
+    [id_adminPusat_konfirmasi] INT IDENTITY (1, 1) NOT NULL,
+    [nim]        NVARCHAR (10) NULL,
+    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+    [tanggal_adminPusat_konfirmasi] DATETIME NULL,
+    CONSTRAINT [PK_adminPusat_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminPusat_konfirmasi] ASC)
+);
+CREATE TABLE [dbo].[adminPerpus_konfirmasi] (
+    [id_adminPerpus_konfirmasi] INT IDENTITY (1, 1) NOT NULL,
+    [nim]        NVARCHAR (10) NULL,
+    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+    [tanggal_adminPerpus_konfirmasi] DATETIME NULL,
+    CONSTRAINT [PK_adminPerpus_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminPerpus_konfirmasi] ASC)
+);
+
+IF OBJECT_ID('dbo.autoAddKonfirmasiMahasiswa') IS NOT NULL 
+DROP TRIGGER dbo.autoAddKonfirmasiMahasiswa;
+GO;
+CREATE TRIGGER autoAddKonfirmasi ON dbo.mahasiswa
+AFTER INSERT
+AS
+    PRINT 'Trigger autoAddKonfirmasiMahasiswa dipanggil!';
+    DECLARE @nim VARCHAR = (SELECT nim FROM inserted);
+    DECLARE @tanggal DATETIME = GETDATE();
+    INSERT INTO dbo.adminlt6_konfirmasi(nim, tanggal_adminlt6_konfirmasi)
+    VALUES (@nim, @tanggal);
+    INSERT INTO dbo.adminlt7_konfirmasi(nim, tanggal_adminlt7_konfirmasi)
+    VALUES (@nim, @tanggal);
+    INSERT INTO dbo.adminPusat_konfirmasi(nim, tanggal_adminPusat_konfirmasi)
+    VALUES (@nim, @tanggal);
+    INSERT INTO dbo.adminPerpus_konfirmasi(nim, tanggal_adminPerpus_konfirmasi)
+    VALUES (@nim, @tanggal);

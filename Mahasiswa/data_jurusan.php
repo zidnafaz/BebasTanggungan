@@ -30,7 +30,7 @@ if (isset($_COOKIE['id'])) {
             };
 
             $button = ($row['status'] === 'belum upload' || $row['status'] === 'tidak terkonfirmasi') ?
-                "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-success btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
+                "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
                 </button>" :
                 "<button class=\"btn btn-secondary btn-sm\" disabled>Disable</button>";

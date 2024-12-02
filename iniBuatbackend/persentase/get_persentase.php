@@ -1,15 +1,11 @@
 <?php
 header('Content-Type: application/json');
 
-include '../koneksi.php';
+include '../../koneksi.php';
 
-if (!isset($_COOKIE['id'])) {
-    header("Location: ../index.html");
-    exit();
-}
+$nim = 20230002; // Nim dari mahasiswa
 
-$nim = $_COOKIE['id'];
-
+// Query untuk menghitung jumlah masing-masing status
 $query = "
     SELECT 
         SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'terkonfirmasi' THEN 1 ELSE 0 END +
@@ -96,31 +92,32 @@ $query = "
     LEFT JOIN publikasi_jurnal pj ON m.nim = pj.nim
     LEFT JOIN aplikasi apl ON m.nim = apl.nim
     LEFT JOIN skripsi ON m.nim = skripsi.nim
-    WHERE m.nim = ?
-";
+    WHERE m.nim = ?";
 
-// Prepare statement
 $params = array($nim);
+
 $stmt = sqlsrv_query($conn, $query, $params);
 
-// Check for query failure
 if ($stmt === false) {
-    echo json_encode(["error" => "Query failed", "details" => sqlsrv_errors()]);
-    exit;
+    die(json_encode(["error" => "Query failed: " . print_r(sqlsrv_errors(), true)]));
 }
 
-// Fetch the result
 $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
-// Return the result as JSON
+// Total status
+$total_status = 16;
+
+// Kalkulasi persentase
+$persentase = round(($row['terkonfirmasi'] / $total_status) * 100, 2);
+
 echo json_encode([
     "terkonfirmasi" => $row['terkonfirmasi'],
     "belum_upload" => $row['belum_upload'],
     "pending" => $row['pending'],
-    "tidak_terkonfirmasi" => $row['tidak_terkonfirmasi']
+    "tidak_terkonfirmasi" => $row['tidak_terkonfirmasi'],
+    "persentase" => $persentase
 ]);
 
-// Close the connection
 sqlsrv_free_stmt($stmt);
 sqlsrv_close($conn);
 ?>

@@ -2,7 +2,7 @@
 include 'koneksi.php';
 try {
     // Query untuk mengambil data skripsi
-    $sql = "SELECT m.nim, m.nama_mahasiswa
+    $sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
             FROM dbo.mahasiswa m
             WHERE m.nim = ?";
     if (isset($_COOKIE['id'])) {

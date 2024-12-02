@@ -1,3 +1,51 @@
+<?php
+include '../koneksi.php';
+
+if (!isset($_COOKIE['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$nim = $_COOKIE['id'];
+
+$query = "
+    SELECT 
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi
+    FROM dbo.penyerahan_skripsi
+    LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
+    LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
+    LEFT JOIN dbo.bebas_kompen ON penyerahan_skripsi.nim = bebas_kompen.nim
+    LEFT JOIN dbo.publikasi_jurnal ON penyerahan_skripsi.nim = publikasi_jurnal.nim
+    LEFT JOIN dbo.aplikasi ON penyerahan_skripsi.nim = aplikasi.nim
+    LEFT JOIN dbo.skripsi ON penyerahan_skripsi.nim = skripsi.nim
+    WHERE penyerahan_skripsi.nim = '$nim'
+";
+
+// Eksekusi query
+$stmt = sqlsrv_query($conn, $query);
+if (!$stmt) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Ambil hasil query
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
+sqlsrv_free_stmt($stmt);
+
+// Mengecek apakah semua status sudah terkonfirmasi
+$allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'];
+
+// Tutup koneksi
+sqlsrv_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -105,22 +153,97 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Tables</h1>
-                    <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
-                        For more information about DataTables, please visit the <a target="_blank"
-                            href="https://datatables.net">official DataTables documentation</a>.</p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
+                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 7) yang akan diverifikasi oleh ibu Widya (<a target="_blank"
+                    href="https://wa.me/6282232867789">082232867789</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Berkas Yang Perlu Diunggah</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-
                                 <div id="table"></div>
-
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Download Dokumen -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dokumenTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Dokumen</th>
+                                            <th>Keterangan</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Tanda Terima Laporan Skripsi</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Form] Tanda Terima Laporan Skripsi_SIB.docx"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Tanda Terima Laporan PKL / Magang</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Form] Tanda Terima Laporan PKL_Magang_SIB.docx"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Surat Keterangan Bebas Kompen</td>
+                                            <td>Apabila ada kompen, lampiran bukti kompennya pada halaman berikutnya</td>
+                                            <td><a href="../Documents/downloads/template/[Form] Bebas Kompen_SIB.docx"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Surat Keterangan TOEIC</td>
+                                            <td>Surat ini dibutuhkan apabila skor kurang dari 450 untuk D4 dan 400 untuk D3</td>
+                                            <td><a href="../Documents/downloads/template/Surat Keterangan mengikuti TOIEC.pdf"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Surat Pernyataan Kebenaran Data Diri</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Template] Surat Kebenaran Data Diri_SIB.doc"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Bebas Tanggungan -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Jurusan</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>Surat ini meliputi Bebas Tanggungan Jurusan lantai 6 dan 7.</p>
+                            <?php if ($allConfirmed): ?>
+                                <a href="uploads/surat_bebas_tanggungan.pdf" class="btn btn-success" download><i class="fas fa-download"></i> Download</a>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

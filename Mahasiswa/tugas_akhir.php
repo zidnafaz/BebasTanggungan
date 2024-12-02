@@ -1,3 +1,74 @@
+<?php
+include '../koneksi.php';
+
+if (!isset($_COOKIE['id'])) {
+    header("Location: ../index.html");
+    exit();
+} else {
+    $username = $_COOKIE['id'];
+}
+
+$nim = $_COOKIE['id'];
+
+$query = "
+    SELECT 
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi
+    FROM dbo.penyerahan_skripsi
+    LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
+    LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
+    LEFT JOIN dbo.bebas_kompen ON penyerahan_skripsi.nim = bebas_kompen.nim
+    LEFT JOIN dbo.publikasi_jurnal ON penyerahan_skripsi.nim = publikasi_jurnal.nim
+    LEFT JOIN dbo.aplikasi ON penyerahan_skripsi.nim = aplikasi.nim
+    LEFT JOIN dbo.skripsi ON penyerahan_skripsi.nim = skripsi.nim
+    WHERE penyerahan_skripsi.nim = '$nim'
+";
+
+// Eksekusi query
+$stmt = sqlsrv_query($conn, $query);
+if (!$stmt) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Ambil hasil query
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
+sqlsrv_free_stmt($stmt);
+
+// Mengecek apakah semua status sudah terkonfirmasi
+$allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'];
+
+// $sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
+//             FROM dbo.mahasiswa m
+//             WHERE m.nim = ?";
+
+// $params = array($username);
+// $result = sqlsrv_query($conn, $sql, $params);
+
+// if ($result === false) {
+//     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
+// }
+
+// $nama_mahasiswa = "";
+
+// // Ambil data dan cek apakah ada
+// if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+//     $nama_mahasiswa = $row['nama_mahasiswa'];
+//     $nim = $row['nim'];
+//     $jurusan = $row['jurusan_mahasiswa'];
+//     $prodi = $row['prodi_mahasiswa'];
+// }
+
+// sqlsrv_free_stmt($result);
+sqlsrv_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,6 +109,107 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
+    <!-- <script type="module">
+        import {
+            PDFDocument,
+            rgb
+        } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('downloadButton');
+
+            button.addEventListener('click', async () => {
+
+                function getCookie(name) {
+                    let cookieArr = document.cookie.split(";");
+
+                    for (let i = 0; i < cookieArr.length; i++) {
+                        let cookie = cookieArr[i].trim();
+                        if (cookie.indexOf(name + "=") == 0) {
+                            return cookie.substring(name.length + 1);
+                        }
+                    }
+                    return "";
+                }
+
+                const username = getCookie('id');
+                const pdfPath = '../Documents/downloads/generate/Bebas_Tanggungan_Jurusan.pdf';
+                const fontPath = './TimesNewRoman/TimesNewRoman.ttf';
+
+                // Muat PDF
+                const pdfResponse = await fetch(pdfPath);
+                if (!pdfResponse.ok) throw new Error(`Could not load PDF: ${pdfResponse.statusText}`);
+                const pdfArrayBuffer = await pdfResponse.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
+
+                // Registrasikan fontkit
+                pdfDoc.registerFontkit(window.fontkit);
+
+                // Muat font kustom
+                const fontResponse = await fetch(fontPath);
+                if (!fontResponse.ok) throw new Error(`Could not load font: ${fontResponse.statusText}`);
+                const fontArrayBuffer = await fontResponse.arrayBuffer();
+                const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
+
+                // Tambahkan teks ke halaman pertama
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
+                const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
+                const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
+                const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
+
+                // Tentukan posisi teks untuk setiap field
+                firstPage.drawText(`${nama}`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 468,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${nim}`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 446,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${prodi}`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 404,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${jurusan}`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 382,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                // Simpan PDF baru
+                const modifiedPdf = await pdfDoc.save();
+                const blob = new Blob([modifiedPdf], {
+                    type: 'application/pdf'
+                });
+
+                // Unduh PDF yang sudah diedit
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${nim}_Rekomendasi_Pengambilan_Ijazah.pdf`;
+                link.click();
+            });
+        });
+
+
+    </script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
 
     <style>
         .status span {
@@ -56,12 +228,12 @@
         }
 
         #uploadModalHeader.bg-success {
-            background-color: #28a745 !important;
+            background-color: #1cc88a !important;
             /* Hijau terang */
         }
 
         #uploadModalHeader.bg-danger {
-            background-color: #dc3545 !important;
+            background-color: #e74a3b !important;
             /* Merah terang */
         }
 
@@ -105,22 +277,65 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Tables</h1>
-                    <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
-                        For more information about DataTables, please visit the <a target="_blank"
-                            href="https://datatables.net">official DataTables documentation</a>.</p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
+                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 6) yang akan diverifikasi oleh ibu Ila (<a target="_blank"
+                    href="https://wa.me/6281232245969">081232245969</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Berkas Yang Perlu Diunggah</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-
                                 <div id="table"></div>
-
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Download Dokumen -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dokumenTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Dokumen</th>
+                                            <th>Keterangan</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Surat Pernyataan Publikasi</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Template] Surat Pernyataan Publikasi_SIB.docx"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Bebas Tanggungan -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Jurusan</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>Surat ini meliputi Bebas Tanggungan Jurusan lantai 6 dan 7.</p>
+                            <?php if ($allConfirmed): ?>
+                                <a href="uploads/surat_bebas_tanggungan.pdf" class="btn btn-success" id="downloadButton" download><i class="fas fa-download"></i> Download</a>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

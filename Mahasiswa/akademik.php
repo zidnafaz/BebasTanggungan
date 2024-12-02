@@ -1,3 +1,45 @@
+<?php
+include '../koneksi.php';
+
+if (!isset($_COOKIE['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$nim = $_COOKIE['id'];
+
+$query = "
+    SELECT 
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_data_alumni = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS data_alumni,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skkm = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skkm,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_foto_ijazah = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS foto_ijazah,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_ukt = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS ukt
+    FROM dbo.data_alumni
+    LEFT JOIN dbo.skkm ON data_alumni.nim = skkm.nim
+    LEFT JOIN dbo.foto_ijazah ON data_alumni.nim = foto_ijazah.nim
+    LEFT JOIN dbo.ukt ON data_alumni.nim = ukt.nim
+    WHERE data_alumni.nim = '$nim'
+";
+
+// Eksekusi query
+$stmt = sqlsrv_query($conn, $query);
+if (!$stmt) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Ambil hasil query
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
+sqlsrv_free_stmt($stmt);
+
+// Mengecek apakah semua status sudah terkonfirmasi
+$allConfirmed = $row['data_alumni'] && $row['skkm'] && $row['foto_ijazah'] && $row['ukt'];
+
+// Tutup koneksi
+sqlsrv_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -105,22 +147,73 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Tables</h1>
-                    <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
-                        For more information about DataTables, please visit the <a target="_blank"
-                            href="https://datatables.net">official DataTables documentation</a>.</p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
+                    <p class="mb-4">Verifikasi berkas pada Akademik Pusat (Gedung AW) yang akan diverifikasi oleh ibu Merry (<a target="_blank"
+                    href="https://wa.me/6282247723596">082247723596</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Berkas Yang Perlu Diunggah</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-
                                 <div id="table"></div>
-
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Download Dokumen -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dokumenTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Dokumen</th>
+                                            <th>Keterangan</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Panduan Alur Bebas Tanggungan Akademik Pusat</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Panduan] Alur Bebas Tanggungan Akademik Pusat.pdf"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Panduan Upload Foto Ijazah</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Panduan] Upload Foto Ijazah.pdf"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Bebas Tanggungan -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Akademik Pusat</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>Surat ini meliputi Bebas Tanggungan Akademik Pusat.</p>
+                            <?php if ($allConfirmed): ?>
+                                <a href="uploads/surat_bebas_tanggungan.pdf" class="btn btn-success" download><i class="fas fa-download"></i> Download</a>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

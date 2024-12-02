@@ -1,3 +1,45 @@
+<?php
+include '../koneksi.php';
+
+if (!isset($_COOKIE['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$nim = $_COOKIE['id'];
+
+$query = "
+    SELECT 
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS tugas_akhir_softcopy,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_pinjam_buku_perpustakaan,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS hasil_kuisioner
+    FROM dbo.penyerahan_hardcopy
+    LEFT JOIN dbo.tugas_akhir_softcopy ON penyerahan_hardcopy.nim = tugas_akhir_softcopy.nim
+    LEFT JOIN dbo.bebas_pinjam_buku_perpustakaan ON penyerahan_hardcopy.nim = bebas_pinjam_buku_perpustakaan.nim
+    LEFT JOIN dbo.hasil_kuisioner ON penyerahan_hardcopy.nim = hasil_kuisioner.nim
+    WHERE penyerahan_hardcopy.nim = '$nim'
+";
+
+// Eksekusi query
+$stmt = sqlsrv_query($conn, $query);
+if (!$stmt) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Ambil hasil query
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
+sqlsrv_free_stmt($stmt);
+
+// Mengecek apakah semua status sudah terkonfirmasi
+$allConfirmed = $row['penyerahan_hardcopy'] && $row['tugas_akhir_softcopy'] && $row['bebas_pinjam_buku_perpustakaan'] && $row['hasil_kuisioner'];
+
+// Tutup koneksi
+sqlsrv_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -105,22 +147,65 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Tables</h1>
-                    <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
-                        For more information about DataTables, please visit the <a target="_blank"
-                            href="https://datatables.net">official DataTables documentation</a>.</p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
+                    <p class="mb-4">Verifikasi berkas pada perpustakaan Polinema (Grapol lantai 3) yang akan diverifikasi oleh ibu Safrilia (<a target="_blank"
+                    href="https://wa.me/6281333213023">081333213023</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Berkas Yang Perlu Diunggah</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-
                                 <div id="table"></div>
-
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Download Dokumen -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dokumenTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Dokumen</th>
+                                            <th>Keterangan</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Panduan Alur Bebas Tanggungan Perpustakaan Grapol</td>
+                                            <td>-</td>
+                                            <td><a href="../Documents/downloads/template/[Panduan] Alur Bebas Tanggungan Perpustakaan Pusat.pdf"
+                                                    class="btn btn-success" download><i class="fas fa-download"></i>
+                                                    Download</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Bebas Tanggungan -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Perpustakaan Polinema</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>Surat ini meliputi Bebas Tanggungan Perpustakaan Polinema.</p>
+                            <?php if ($allConfirmed): ?>
+                                <a href="uploads/surat_bebas_tanggungan.pdf" class="btn btn-success" download><i class="fas fa-download"></i> Download</a>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

@@ -22,16 +22,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Pengalihan berdasarkan status
         switch ($row['status']) {
             case 'adminlt7':
-                header("Location: AdminLt7/home.html");
+                header("Location: AdminLt7/home.php");
                 break;
             case 'adminlt6':
-                header("Location: AdminLt6/home.html");
+                header("Location: AdminLt6/home.php");
                 break;
             case 'adminPusat':
-                header("Location: AdminPusat/home.html");
+                header("Location: AdminPusat/home.php");
                 break;
             case 'adminPerpus':
-                header("Location: AdminPerpus/home.html");
+                header("Location: AdminPerpus/home.php");
                 break;
             case 'mahasiswa':
                 header("Location: Mahasiswa/home.php");

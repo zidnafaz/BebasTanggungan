@@ -18,7 +18,8 @@ $query = "
         (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
         (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
         (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
     FROM dbo.penyerahan_skripsi
     LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
     LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
@@ -26,46 +27,105 @@ $query = "
     LEFT JOIN dbo.publikasi_jurnal ON penyerahan_skripsi.nim = publikasi_jurnal.nim
     LEFT JOIN dbo.aplikasi ON penyerahan_skripsi.nim = aplikasi.nim
     LEFT JOIN dbo.skripsi ON penyerahan_skripsi.nim = skripsi.nim
+    LEFT JOIN dbo.penyerahan_kebenaran_data ON penyerahan_skripsi.nim = penyerahan_kebenaran_data.nim
     WHERE penyerahan_skripsi.nim = '$nim'
 ";
 
-// Eksekusi query
-$stmt = sqlsrv_query($conn, $query);
-if (!$stmt) {
-    die(print_r(sqlsrv_errors(), true));
+// Eksekusi query dengan parameterized query untuk menghindari SQL Injection
+$params = array($nim);
+$stmt = sqlsrv_query($conn, $query, $params);
+
+if ($stmt === false) {
+    die("Kesalahan pada eksekusi query: " . print_r(sqlsrv_errors(), true));
 }
 
 // Ambil hasil query
 $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-
-// Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
 sqlsrv_free_stmt($stmt);
 
+if (!$row) {
+    die("Gagal mengambil data: " . print_r(sqlsrv_errors(), true));
+}
+
 // Mengecek apakah semua status sudah terkonfirmasi
-$allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'];
+$allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'] && $row['penyerahan_kebenaran_data'];
 
-// $sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
-//             FROM dbo.mahasiswa m
-//             WHERE m.nim = ?";
+// Query untuk mengambil data mahasiswa
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
+        FROM dbo.mahasiswa m
+        WHERE m.nim = ?";
+$result = sqlsrv_query($conn, $sql, $params);
 
-// $params = array($username);
-// $result = sqlsrv_query($conn, $sql, $params);
+if ($result === false) {
+    die("Kesalahan saat menjalankan query mahasiswa: " . print_r(sqlsrv_errors(), true));
+}
 
-// if ($result === false) {
-//     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
-// }
+// Ambil data mahasiswa
+$nama_mahasiswa = "";
+if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+    $nama_mahasiswa = $row['nama_mahasiswa'];
+    $nim = $row['nim'];
+    $jurusan = $row['jurusan_mahasiswa'];
+    $prodi = $row['prodi_mahasiswa'];
+}
+sqlsrv_free_stmt($result);
 
-// $nama_mahasiswa = "";
+// Query untuk mengambil tanggal konfirmasi dari tabel adminlt7_konfirmasi
+$sqlTanggal = "SELECT tanggal_adminlt7_konfirmasi FROM dbo.adminlt7_konfirmasi WHERE nim = ?";
+$resultTanggal = sqlsrv_query($conn, $sqlTanggal, $params);
 
-// // Ambil data dan cek apakah ada
-// if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-//     $nama_mahasiswa = $row['nama_mahasiswa'];
-//     $nim = $row['nim'];
-//     $jurusan = $row['jurusan_mahasiswa'];
-//     $prodi = $row['prodi_mahasiswa'];
-// }
+if ($resultTanggal === false) {
+    die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+}
 
-// sqlsrv_free_stmt($result);
+// Mengecek apakah tanggal hanya diambil jika semua status sudah terkonfirmasi
+$tanggalLt7 = null;
+$tanggalLt6 = null;
+if ($allConfirmed) {
+    // Query untuk mengambil tanggal konfirmasi dari tabel adminlt7_konfirmasi
+    $sqlTanggalLt7 = "SELECT tanggal_adminlt7_konfirmasi FROM dbo.adminlt7_konfirmasi WHERE nim = ?";
+    $resultTanggalLt7 = sqlsrv_query($conn, $sqlTanggalLt7, $params);
+
+    if ($resultTanggalLt7 === false) {
+        die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+    }
+
+    if ($row = sqlsrv_fetch_array($resultTanggal, SQLSRV_FETCH_ASSOC)) {
+        $tanggalLt7 = $row['tanggal_adminlt7_konfirmasi'];
+    }
+
+    // Jika $tanggal adalah objek DateTime, ubah menjadi string
+    if ($tanggalLt7 instanceof DateTime) {
+        $tanggalLt7 = $tanggalLt7->format('Y-m-d');  // Atur format sesuai kebutuhan
+    }
+
+    // Gunakan htmlspecialchars untuk mencegah XSS
+    $tanggalLt7 = htmlspecialchars($tanggalLt7, ENT_QUOTES, 'UTF-8');
+
+    sqlsrv_free_stmt($resultTanggalLt7);
+
+    $sqlTanggalLt6 = "SELECT tanggal_adminlt6_konfirmasi FROM dbo.adminlt6_konfirmasi WHERE nim = ?";
+    $resultTanggalLt6 = sqlsrv_query($conn, $sqlTanggalLt6, $params);
+
+    if ($resultTanggalLt6 === false) {
+        die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+    }
+
+    if ($row = sqlsrv_fetch_array($resultTanggalLt6, SQLSRV_FETCH_ASSOC)) {
+        $tanggalLt6 = $row['tanggal_adminlt6_konfirmasi'];
+    }
+
+    // Jika $tanggal adalah objek DateTime, ubah menjadi string
+    if ($tanggalLt6 instanceof DateTime) {
+        $tanggalLt6 = $tanggalLt6->format('Y-m-d');  // Atur format sesuai kebutuhan
+    }
+
+    // Gunakan htmlspecialchars untuk mencegah XSS
+    $tanggalLt6 = htmlspecialchars($tanggalLt6, ENT_QUOTES, 'UTF-8');
+
+    sqlsrv_free_stmt($resultTanggalLt6);
+}
+
 sqlsrv_close($conn);
 ?>
 
@@ -109,20 +169,16 @@ sqlsrv_close($conn);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
-    <!-- <script type="module">
-        import {
-            PDFDocument,
-            rgb
-        } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+    <script type="module">
+        import { PDFDocument, rgb } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
 
         document.addEventListener('DOMContentLoaded', () => {
             const button = document.getElementById('downloadButton');
 
             button.addEventListener('click', async () => {
-
+                // Fungsi untuk mengambil nilai cookie
                 function getCookie(name) {
                     let cookieArr = document.cookie.split(";");
-
                     for (let i = 0; i < cookieArr.length; i++) {
                         let cookie = cookieArr[i].trim();
                         if (cookie.indexOf(name + "=") == 0) {
@@ -132,82 +188,127 @@ sqlsrv_close($conn);
                     return "";
                 }
 
-                const username = getCookie('id');
-                const pdfPath = '../Documents/downloads/generate/Bebas_Tanggungan_Jurusan.pdf';
-                const fontPath = './TimesNewRoman/TimesNewRoman.ttf';
+                const username = getCookie('id');  // Ambil cookie 'id' (jika ada)
+                const pdfPath = '../Documents/downloads/generate/Bebas_Tanggungan_Jurusan.pdf';  // Path ke file PDF
+                const fontPath = './TimesNewRoman/TimesNewRoman.ttf';  // Path ke font kustom
 
-                // Muat PDF
-                const pdfResponse = await fetch(pdfPath);
-                if (!pdfResponse.ok) throw new Error(`Could not load PDF: ${pdfResponse.statusText}`);
-                const pdfArrayBuffer = await pdfResponse.arrayBuffer();
-                const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
+                try {
+                    // Muat PDF
+                    const pdfResponse = await fetch(pdfPath);
+                    if (!pdfResponse.ok) {
+                        console.error('Failed to load PDF:', pdfResponse.statusText);
+                        return;
+                    }
+                    
+                    const pdfArrayBuffer = await pdfResponse.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
 
-                // Registrasikan fontkit
-                pdfDoc.registerFontkit(window.fontkit);
+                    // Registrasikan fontkit (periksa apakah window.fontkit ada)
+                    if (typeof window.fontkit === 'undefined') {
+                        console.error('fontkit is not available!');
+                        return;
+                    }
+                    pdfDoc.registerFontkit(window.fontkit);
 
-                // Muat font kustom
-                const fontResponse = await fetch(fontPath);
-                if (!fontResponse.ok) throw new Error(`Could not load font: ${fontResponse.statusText}`);
-                const fontArrayBuffer = await fontResponse.arrayBuffer();
-                const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
+                    // Muat font kustom
+                    const fontResponse = await fetch(fontPath);
+                    if (!fontResponse.ok) {
+                        console.error('Failed to load font:', fontResponse.statusText);
+                        return;
+                    }
+                    
+                    const fontArrayBuffer = await fontResponse.arrayBuffer();
+                    const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
 
-                // Tambahkan teks ke halaman pertama
-                const pages = pdfDoc.getPages();
-                const firstPage = pages[0];
-                const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
-                const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
-                const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
-                const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
+                    // Ambil data dari PHP untuk dimasukkan ke PDF
+                    const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
+                    const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
+                    const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
+                    const tanggalLt7 = "<?php echo htmlspecialchars($tanggalLt7, ENT_QUOTES, 'UTF-8'); ?>";
+                    const tanggalLt6 = "<?php echo htmlspecialchars($tanggalLt6, ENT_QUOTES, 'UTF-8'); ?>";
 
-                // Tentukan posisi teks untuk setiap field
-                firstPage.drawText(`${nama}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 468,  // Ganti dengan koordinat Y yang sesuai
-                    size: 12,
-                    font: timesFont,
-                    color: rgb(0, 0, 0),
-                });
+                    // Pastikan data PHP sudah terisi
+                    if (!nama || !nim || !prodi || !tanggalLt7 || !tanggalLt6) {
+                        console.error('Some PHP variables are not properly set');
+                        return;
+                    }
 
-                firstPage.drawText(`${nim}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 446,  // Ganti dengan koordinat Y yang sesuai
-                    size: 12,
-                    font: timesFont,
-                    color: rgb(0, 0, 0),
-                });
+                    // Tambahkan teks ke halaman pertama
+                    const pages = pdfDoc.getPages();
+                    const firstPage = pages[0];
 
-                firstPage.drawText(`${prodi}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 404,  // Ganti dengan koordinat Y yang sesuai
-                    size: 12,
-                    font: timesFont,
-                    color: rgb(0, 0, 0),
-                });
+                    // Tentukan posisi teks untuk setiap field
+                    firstPage.drawText(`${nama}`, {
+                        x: 190,  // Koordinat X
+                        y: 626,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
 
-                firstPage.drawText(`${jurusan}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 382,  // Ganti dengan koordinat Y yang sesuai
-                    size: 12,
-                    font: timesFont,
-                    color: rgb(0, 0, 0),
-                });
+                    firstPage.drawText(`${nim}`, {
+                        x: 190,  // Koordinat X
+                        y: 605,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
 
-                // Simpan PDF baru
-                const modifiedPdf = await pdfDoc.save();
-                const blob = new Blob([modifiedPdf], {
-                    type: 'application/pdf'
-                });
+                    firstPage.drawText(`${prodi}`, {
+                        x: 190,  // Koordinat X
+                        y: 584,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
 
-                // Unduh PDF yang sudah diedit
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${nim}_Rekomendasi_Pengambilan_Ijazah.pdf`;
-                link.click();
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 296,  // Koordinat X
+                        y: 511,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    firstPage.drawText(`${tanggalLt7}`, {
+                        x: 296,  // Koordinat X
+                        y: 413,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // TTD penanggung Jawab (Ketua Prodi)
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 462,  // Koordinat X
+                        y: 474,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // TTD Ketua Jurusan
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 332,  // Koordinat X
+                        y: 298,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // Unduh PDF yang telah dimodifikasi
+                    const pdfBytes = await pdfDoc.save();
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${nim}_Bebas_Tanggungan_Jurusan.pdf`;
+                    link.click();
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                }
             });
         });
-
-
-    </script> -->
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
 
@@ -217,14 +318,6 @@ sqlsrv_close($conn);
             border-radius: 15px;
             color: white;
             font-weight: bold;
-        }
-
-        .status .badge-success {
-            background-color: green;
-        }
-
-        .status .badge-danger {
-            background-color: red;
         }
 
         #uploadModalHeader.bg-success {
@@ -278,8 +371,8 @@ sqlsrv_close($conn);
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
-                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 6) yang akan diverifikasi oleh ibu Ila (<a target="_blank"
-                    href="https://wa.me/6281232245969">081232245969</a> - <i>Chat Only</i>) </p>
+                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 6) yang akan diverifikasi oleh ibu Ila (<a
+                            target="_blank" href="https://wa.me/6281232245969">081232245969</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
@@ -332,7 +425,8 @@ sqlsrv_close($conn);
                         <div class="card-body">
                             <p>Surat ini meliputi Bebas Tanggungan Jurusan lantai 6 dan 7.</p>
                             <?php if ($allConfirmed): ?>
-                                <a href="uploads/surat_bebas_tanggungan.pdf" class="btn btn-success" id="downloadButton" download><i class="fas fa-download"></i> Download</a>
+                                <button class="btn btn-success" id="downloadButton" download><i class="fas fa-download"></i>
+                                    Download</button>
                             <?php else: ?>
                                 <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
                             <?php endif; ?>
@@ -458,7 +552,6 @@ sqlsrv_close($conn);
             </div>
         </div>
     </div>
-
 
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>

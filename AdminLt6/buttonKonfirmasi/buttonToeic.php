@@ -1,45 +1,35 @@
-<?php 
+<?php
 include '../../koneksi.php';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nim'])) {
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nim = $_POST['nim'];
-    $status = $_POST['status'];
 
-    $sql = "UPDATE dbo.toeic SET status_pengumpulan_toeic = ? WHERE NIM = ?";
-    $params = array($status, $nim);
+    // Pastikan status verifikasi terpilih
+    if (!isset($_POST['status_verifikasi'])) {
+        echo json_encode(['success' => false, 'error' => 'Status verifikasi tidak dipilih.']);
+        exit();
+    }
+    $statusVerifikasi = $_POST['status_verifikasi'];
 
+    // Cek apakah keterangan dikirim atau tidak, jika tidak maka set default "-"
+    $keterangan = isset($_POST['keterangan']) && $_POST['keterangan'] !== '' ? $_POST['keterangan'] : '-';
+
+    // Query untuk update status
+    $sql = "UPDATE dbo.toeic
+            SET status_pengumpulan_toeic = ?, keterangan_pengumpulan_toeic = ?
+            WHERE nim = ?";
+    $params = [$statusVerifikasi, $keterangan, $nim];
+
+    // Mengeksekusi query
     $stmt = sqlsrv_query($conn, $sql, $params);
 
-    if ($stmt === false) {
-        // Redirect ke index.php dengan pesan error
-        header(header: "Location: ../toeic.php?message=Terjadi+kesalahan+saat+memperbarui+data&type=danger");
-    } else {
-        // Redirect ke index.php dengan pesan sukses
+    if ($stmt) {
+        // Redirect setelah update berhasil
         header("Location: ../toeic.php?message=Status+berhasil+diperbarui!&type=success");
-    if ($status === 'terkonfirmasi'){
-        $sqlConfirm ="UPDATE dbo.toeic SET keterangan_pengumpulan_toeic = 'Skor valid' WHERE NIM = ?";
-        $paramsConfirm = array($nim);
-        $stmtConfirm = sqlsrv_query($conn, $sqlConfirm,$paramsConfirm);
+        exit(); // Pastikan eksekusi script berhenti setelah redirect
+    } else {
+        // Jika query gagal, tampilkan error
+        echo json_encode(['success' => false, 'error' => sqlsrv_errors()]);
     }
-    //else if($status === 'tidak terkonfirmasi'){
-
-    // }
-    }
-    exit();
-} else {
-    // Redirect ke index.php dengan pesan error
-    header("Location: ../toeic.php?message=Data+tidak+valid&type=danger");
-    exit();
 }
-    // if ($stmt === false) {
-    //     die(print_r(sqlsrv_errors(), true));
-    // }else{
-    //     echo "<script>
-    //     alert('Status berhasil diperbarui!');
-    //     window.location.href = '../AdminPerpus/toeic.php';
-    //     </script>";
-    //     exit();
-    // }
-
-    
-//}
 ?>

@@ -142,6 +142,8 @@ sqlsrv_free_stmt($result);
                     color: rgb(0, 0, 0),
                 });
 
+                // Kurang tanggal untuk kaprodi
+
                 // Simpan PDF baru
                 const modifiedPdf = await pdfDoc.save();
                 const blob = new Blob([modifiedPdf], {

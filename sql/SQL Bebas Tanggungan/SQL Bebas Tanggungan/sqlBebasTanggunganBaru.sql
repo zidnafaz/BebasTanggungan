@@ -228,6 +228,62 @@ AS
     INSERT INTO dbo.adminPerpus_konfirmasi(nim, tanggal_adminPerpus_konfirmasi)
     VALUES (@nim, @tanggal);
 
+IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
+DROP TRIGGER dbo.autoAddLoginMahasiswa;
+GO;
+CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
+AFTER INSERT
+AS
+    PRINT 'Trigger autoAddLoginMahasiswa dipanggil!';
+    DECLARE @username VARCHAR = (SELECT nim FROM inserted);
+    DECLARE @password varchar = (SELECT nim FROM inserted);
+    DECLARE @status varchar = 'mahasiswa';
+    INSERT INTO dbo.login(username, [password], [status])
+    VALUES (@username, @password, @status);
+
+IF OBJECT_ID('dbo.autoAddStatus') IS NOT NULL 
+DROP TRIGGER dbo.autoAddStatus;
+
+CREATE TRIGGER autoAddStatus ON dbo.mahasiswa
+AFTER INSERT
+AS
+    PRINT 'Trigger autoAddStatus dipanggil!';
+    DECLARE @nim VARCHAR = (SELECT nim FROM inserted);
+    DECLARE @keterangan VARCHAR = '';
+    INSERT INTO dbo.aplikasi(nim, keterangan_pengumpulan_aplikasi)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.bebas_kompen(nim, keterangan_pengumpulan_bebas_kompen)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.bebas_pinjam_buku_perpustakaan(nim, keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.data_alumni(nim, keterangan_pengumpulan_data_alumni)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.foto_ijazah(nim, keterangan_pengumpulan_foto_ijazah)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.hasil_kuisioner(nim, keterangan_pengumpulan_hasil_kuisioner)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.penyerahan_hardcopy(nim, keterangan_pengumpulan_penyerahan_hardcopy)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.penyerahan_kebenaran_data(nim, keterangan_pengumpulan_penyerahan_kebenaran_data)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.penyerahan_pkl(nim, keterangan_pengumpulan_penyerahan_pkl)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.penyerahan_skripsi(nim, keterangan_pengumpulan_penyerahan_skripsi)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.publikasi_jurnal(nim, keterangan_pengumpulan_publikasi_jurnal)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.skkm(nim, keterangan_pengumpulan_skkm)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.skripsi(nim, keterangan_pengumpulan_skripsi)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.toeic(nim, keterangan_pengumpulan_toeic)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.tugas_akhir_softcopy(nim, keterangan_pengumpulan_tugas_akhir_softcopy)
+    VALUES (@nim, @keterangan);
+    INSERT INTO dbo.ukt(nim, keterangan_pengumpulan_ukt)
+    VALUES (@nim, @keterangan);
+
+
 SELECT * FROM data_alumni;
 SELECT * FROM skkm;
 SELECT * FROM foto_ijazah;

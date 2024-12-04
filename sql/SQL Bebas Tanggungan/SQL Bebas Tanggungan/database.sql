@@ -189,19 +189,6 @@ INSERT into dbo.[login] (username, password, status) VALUES(
 
 SELECT * from dbo.[login]
 
-IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
-DROP TRIGGER dbo.autoAddLoginMahasiswa;
-GO;
-CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
-AFTER INSERT
-AS
-    PRINT 'Trigger autoAddLoginMahasiswa dipanggil!';
-    DECLARE @username VARCHAR = (SELECT nim FROM inserted);
-    DECLARE @password varchar = (SELECT nim FROM inserted);
-    DECLARE @status varchar = 'mahasiswa';
-    INSERT INTO dbo.login(username, [password], [status])
-    VALUES (@username, @password, @status);
-
 -- Insert data ke tabel adminlt6_konfirmasi
 INSERT INTO [dbo].[adminlt6_konfirmasi] (nim, tanggal_adminlt6_konfirmasi)
 VALUES 
@@ -331,3 +318,4 @@ WHERE
 UPDATE [dbo].[adminlt6_konfirmasi] set tanggal_adminlt6_konfirmasi = '2024-11-23' where nim = '20230005';
 
 Select * from dbo.adminlt6_konfirmasi;
+

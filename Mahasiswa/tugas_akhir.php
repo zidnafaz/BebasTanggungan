@@ -262,7 +262,7 @@ sqlsrv_close($conn);
                         color: rgb(0, 0, 0),
                     });
 
-                    firstPage.drawText(`${tanggalLt6}`, {
+                    firstPage.drawText(`${tanggalLt7}`, {
                         x: 296,  // Koordinat X
                         y: 511,  // Koordinat Y
                         size: 9,
@@ -270,7 +270,7 @@ sqlsrv_close($conn);
                         color: rgb(0, 0, 0),
                     });
 
-                    firstPage.drawText(`${tanggalLt7}`, {
+                    firstPage.drawText(`${tanggalLt6}`, {
                         x: 296,  // Koordinat X
                         y: 413,  // Koordinat Y
                         size: 9,

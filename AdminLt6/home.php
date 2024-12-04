@@ -3,49 +3,65 @@
 <?php
 include '../koneksi.php';
 
-// Query untuk total mahasiswa
-$totalQuery = "SELECT COUNT(DISTINCT nim) AS total_mahasiswa FROM mahasiswa";
-$totalResult = sqlsrv_query($conn, $totalQuery);
-$totalRow = sqlsrv_fetch_array($totalResult, SQLSRV_FETCH_ASSOC);
+// Query untuk TOEIC
+$toeicQuery = "
+    SELECT 
+        COUNT(CASE WHEN t.status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN t.status_pengumpulan_toeic = 'pending' THEN 1 END) AS perlu_verifikasi,
+        COUNT(CASE WHEN t.status_pengumpulan_toeic = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN t.status_pengumpulan_toeic = 'tidak terkonfirmasi' THEN 1 END) AS tidak_terverifikasi
+    FROM toeic t
+";
+$toeicResult = sqlsrv_query($conn, $toeicQuery);
+$toeicRow = sqlsrv_fetch_array($toeicResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa terverifikasi
-$verifikasiQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_terverifikasi
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim AND ps.status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi'
-    LEFT JOIN penyerahan_pkl pp ON m.nim = pp.nim AND pp.status_pengumpulan_penyerahan_pkl = 'terkonfirmasi'
-    LEFT JOIN toeic t ON m.nim = t.nim AND t.status_pengumpulan_toeic = 'terkonfirmasi'
-    LEFT JOIN bebas_kompen bk ON m.nim = bk.nim AND bk.status_pengumpulan_bebas_kompen = 'terkonfirmasi'
-    LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim AND pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi'
-    WHERE ps.nim IS NOT NULL AND pp.nim IS NOT NULL AND t.nim IS NOT NULL AND bk.nim IS NOT NULL AND pkd.nim IS NOT NULL";
-$verifikasiResult = sqlsrv_query($conn, $verifikasiQuery);
-$verifikasiRow = sqlsrv_fetch_array($verifikasiResult, SQLSRV_FETCH_ASSOC);
+// Query untuk Penyerahan Skripsi
+$skripsiQuery = "
+    SELECT 
+        COUNT(CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'pending' THEN 1 END) AS perlu_verifikasi,
+        COUNT(CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'tidak terkonfirmasi' THEN 1 END) AS tidak_terverifikasi
+    FROM penyerahan_skripsi ps
+";
+$skripsiResult = sqlsrv_query($conn, $skripsiQuery);
+$skripsiRow = sqlsrv_fetch_array($skripsiResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa perlu verifikasi
-$perluVerifikasiQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_perlu_verifikasi
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim AND ps.status_pengumpulan_penyerahan_skripsi IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN penyerahan_pkl pp ON m.nim = pp.nim AND pp.status_pengumpulan_penyerahan_pkl IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN toeic t ON m.nim = t.nim AND t.status_pengumpulan_toeic IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN bebas_kompen bk ON m.nim = bk.nim AND bk.status_pengumpulan_bebas_kompen IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim AND pkd.status_pengumpulan_penyerahan_kebenaran_data IN ('pending', 'tidak terkonfirmasi')
-    WHERE ps.nim IS NOT NULL OR pp.nim IS NOT NULL OR t.nim IS NOT NULL OR bk.nim IS NOT NULL OR pkd.nim IS NOT NULL";
-$perluVerifikasiResult = sqlsrv_query($conn, $perluVerifikasiQuery);
-$perluVerifikasiRow = sqlsrv_fetch_array($perluVerifikasiResult, SQLSRV_FETCH_ASSOC);
+// Query untuk Penyerahan PKL
+$pklQuery = "
+    SELECT 
+        COUNT(CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'pending' THEN 1 END) AS perlu_verifikasi,
+        COUNT(CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'tidak terkonfirmasi' THEN 1 END) AS tidak_terverifikasi
+    FROM penyerahan_pkl pp
+";
+$pklResult = sqlsrv_query($conn, $pklQuery);
+$pklRow = sqlsrv_fetch_array($pklResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa belum upload
-$belumUploadQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_belum_upload
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim AND ps.status_pengumpulan_penyerahan_skripsi = 'belum upload'
-    LEFT JOIN penyerahan_pkl pp ON m.nim = pp.nim AND pp.status_pengumpulan_penyerahan_pkl = 'belum upload'
-    LEFT JOIN toeic t ON m.nim = t.nim AND t.status_pengumpulan_toeic = 'belum upload'
-    LEFT JOIN bebas_kompen bk ON m.nim = bk.nim AND bk.status_pengumpulan_bebas_kompen = 'belum upload'
-    LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim AND pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload'
-    WHERE ps.nim IS NOT NULL OR pp.nim IS NOT NULL OR t.nim IS NOT NULL OR bk.nim IS NOT NULL OR pkd.nim IS NOT NULL";
-$belumUploadResult = sqlsrv_query($conn, $belumUploadQuery);
-$belumUploadRow = sqlsrv_fetch_array($belumUploadResult, SQLSRV_FETCH_ASSOC);
+// Query untuk Bebas Kompen
+$kompenQuery = "
+    SELECT 
+        COUNT(CASE WHEN bk.status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN bk.status_pengumpulan_bebas_kompen = 'pending' THEN 1 END) AS perlu_verifikasi,
+        COUNT(CASE WHEN bk.status_pengumpulan_bebas_kompen = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN bk.status_pengumpulan_bebas_kompen = 'tidak terkonfirmasi' THEN 1 END) AS tidak_terverifikasi
+    FROM bebas_kompen bk
+";
+$kompenResult = sqlsrv_query($conn, $kompenQuery);
+$kompenRow = sqlsrv_fetch_array($kompenResult, SQLSRV_FETCH_ASSOC);
+
+// Query untuk Penyerahan Kebenaran Data
+$kebenaranQuery = "
+    SELECT 
+        COUNT(CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 1 END) AS perlu_verifikasi,
+        COUNT(CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'tidak terkonfirmasi' THEN 1 END) AS tidak_terverifikasi
+    FROM penyerahan_kebenaran_data pkd
+";
+$kebenaranResult = sqlsrv_query($conn, $kebenaranQuery);
+$kebenaranRow = sqlsrv_fetch_array($kebenaranResult, SQLSRV_FETCH_ASSOC);
 
 sqlsrv_close($conn);
 ?>
@@ -107,7 +123,6 @@ sqlsrv_close($conn);
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
@@ -116,84 +131,509 @@ sqlsrv_close($conn);
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Total Mahasiswa Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
+                        <!-- Card untuk Keseluruhan -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Keseluruhan File</h6>
+                                </div>
+                                <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Mahasiswa
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $totalRow['total_mahasiswa']; ?>
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+
+                                    <!-- Terverifikasi -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['terverifikasi'] + $skripsiRow['terverifikasi'] + $pklRow['terverifikasi'] + $kompenRow['terverifikasi'] + $kebenaranRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+
+                                    <!-- Perlu Verifikasi -->
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['perlu_verifikasi'] + $skripsiRow['perlu_verifikasi'] + $pklRow['perlu_verifikasi'] + $kompenRow['perlu_verifikasi'] + $kebenaranRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Belum Upload -->
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['belum_upload'] + $skripsiRow['belum_upload'] + $pklRow['belum_upload'] + $kompenRow['belum_upload'] + $kebenaranRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tidak Terverifikasi -->
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['tidak_terverifikasi'] + $skripsiRow['tidak_terverifikasi'] + $pklRow['tidak_terverifikasi'] + $kompenRow['tidak_terverifikasi'] + $kebenaranRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Mahasiswa Terverifikasi Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
+                        <!-- Card untuk Laporan Skripsi -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Laporan Skripsi</h6>
+                                </div>
+                                <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Mahasiswa Terverifikasi
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $verifikasiRow['mahasiswa_terverifikasi']; ?>
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $skripsiRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                    </div>
+
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $skripsiRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $skripsiRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $skripsiRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Mahasiswa Perlu Verifikasi Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
+                        <!-- Card untuk Laporan PKL -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Laporan PKL</h6>
+                                </div>
+                                <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Mahasiswa Perlu Verifikasi
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $perluVerifikasiRow['mahasiswa_perlu_verifikasi']; ?>
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $pklRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                    </div>
+
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $pklRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $pklRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $pklRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Mahasiswa Belum Upload Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
+                        <!-- Card untuk TOEIC -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data TOEIC</h6>
+                                </div>
+                                <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Mahasiswa Belum Upload
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $belumUploadRow['mahasiswa_belum_upload']; ?>
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                    </div>
+
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $toeicRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card untuk Bebas Kompen -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Bebas Kompen</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kompenRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kompenRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kompenRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kompenRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card untuk Kebenaran Data -->
+                        <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 mb-4" max-width="20%">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Kebenaran Data</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <!-- Sub-Cards ditampilkan secara vertikal -->
+                                    <div class="card border-left-info mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kebenaranRow['terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-primary mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Perlu Verifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kebenaranRow['perlu_verifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-warning mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Belum Upload</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kebenaranRow['belum_upload']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-upload fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-left-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Tidak Terverifikasi</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        <?php echo $kebenaranRow['tidak_terverifikasi']; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -201,9 +641,9 @@ sqlsrv_close($conn);
                         </div>
 
                     </div>
-
                 </div>
                 <!-- /.container-fluid -->
+
 
             </div>
             <!-- End of Main Content -->

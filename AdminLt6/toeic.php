@@ -334,7 +334,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     </label>
                                     <label>
                                         <input type="radio" id="tidak_terkonfirmasi" name="status_verifikasi"
-                                            value="tidak_terkonfirmasi">
+                                            value="tidak terkonfirmasi">
                                         Tidak Terkonfirmasi
                                     </label>
                                 </div>
@@ -479,42 +479,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             })
             .catch(error => console.error('Error loading topbar:', error));
 
-        // Keterangan pada verifikasi
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const verifikasiTrue = document.getElementById('verifikasiTrue');
-            const verifikasiFalse = document.getElementById('verifikasiFalse');
-            const keterangan = document.getElementById('keterangan');
-            const keteranganError = document.getElementById('keteranganError');
-            const saveButton = document.getElementById('saveVerification');
-
-            // Event listener untuk radio buttons
-            [verifikasiTrue, verifikasiFalse].forEach(radio => {
-                radio.addEventListener('change', () => {
-                    if (verifikasiTrue.checked) {
-                        keterangan.disabled = true;
-                        keterangan.value = ""; // Clear the textarea
-                        keteranganError.style.display = "none";
-                    } else if (verifikasiFalse.checked) {
-                        keterangan.disabled = false;
-                    }
-                });
-            });
-
-            // Validasi sebelum menyimpan
-            saveButton.addEventListener('click', () => {
-                if (verifikasiFalse.checked && keterangan.value.trim() === "") {
-                    keteranganError.style.display = "block";
-                    keterangan.focus();
-                } else {
-                    keteranganError.style.display = "none";
-                    // Lakukan tindakan simpan (AJAX atau proses lainnya)
-                    alert('Data berhasil disimpan!');
-                    $('#verifikasiModal').modal('hide');
-                }
-            });
-        });
-
         document.addEventListener("DOMContentLoaded", function () {
             const buttons = document.querySelectorAll(".edit-data");
             buttons.forEach(button => {
@@ -587,6 +551,42 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             });
         });
 
+        // Keterangan pada verifikasi
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const verifikasiTrue = document.getElementById('verifikasiTrue');
+            const verifikasiFalse = document.getElementById('verifikasiFalse');
+            const keterangan = document.getElementById('keterangan');
+            const keteranganError = document.getElementById('keteranganError');
+            const saveButton = document.getElementById('saveVerification');
+
+            // Event listener untuk radio buttons
+            [verifikasiTrue, verifikasiFalse].forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (verifikasiTrue.checked) {
+                        keterangan.disabled = true;
+                        keterangan.value = ""; // Clear the textarea
+                        keteranganError.style.display = "none";
+                    } else if (verifikasiFalse.checked) {
+                        keterangan.disabled = false;
+                    }
+                });
+            });
+
+            // Validasi sebelum menyimpan
+            saveButton.addEventListener('click', () => {
+                if (verifikasiFalse.checked && keterangan.value.trim() === "") {
+                    keteranganError.style.display = "block";
+                    keterangan.focus();
+                } else {
+                    keteranganError.style.display = "none";
+                    // Lakukan tindakan simpan (AJAX atau proses lainnya)
+                    alert('Data berhasil disimpan!');
+                    $('#verifikasiModal').modal('hide');
+                }
+            });
+        });
+
         $(document).ready(function () {
             // Inisialisasi status awal (Ketika modal dibuka)
             toggleFormFields();
@@ -610,7 +610,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     $("#keterangan").prop("disabled", false);  // Mengaktifkan textarea keterangan
                     $("#keterangan").val('');  // Menghapus isi textarea
                     $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
-                } else if (statusVerifikasi === "tidak_terkonfirmasi") {
+                } else if (statusVerifikasi === "tidak terkonfirmasi") {
                     // Jika tidak terkonfirmasi: keterangan wajib diisi dan tombol simpan dinonaktifkan
                     $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
                     $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
@@ -626,10 +626,11 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 const keterangan = $("#keterangan").val().trim();
                 const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
-                if (statusVerifikasi === "tidak_terkonfirmasi" && keterangan !== '') {
-                    $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan jika keterangan terisi
+                // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terkonfirmasi' dan keterangan diisi
+                if (statusVerifikasi === "tidak terkonfirmasi" && keterangan !== '') {
+                    $("#simpanVerifikasi").prop("disabled", false);
                 } else {
-                    $("#simpanVerifikasi").prop("disabled", false); // Menonaktifkan tombol simpan jika keterangan kosong
+                    $("#simpanVerifikasi").prop("disabled", false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi
                 }
             }
 

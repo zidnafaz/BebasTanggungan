@@ -9,9 +9,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['success' => false, 'error' => 'Status verifikasi tidak dipilih.']);
         exit();
     }
+
     $statusVerifikasi = $_POST['status_verifikasi'];
 
-    // Cek apakah keterangan dikirim atau tidak, jika tidak maka set default "-"
+    // Validasi keterangan jika status verifikasi 'tidak_terkonfirmasi'
+    if ($statusVerifikasi === 'tidak_terkonfirmasi' && ($_POST['keterangan'] === '' || !isset($_POST['keterangan']))) {
+        echo json_encode(['success' => false, 'error' => 'Keterangan wajib diisi jika status verifikasi tidak terkonfirmasi.']);
+        exit();
+    }
+
+    // Jika keterangan tidak dikirim, set default "-"
     $keterangan = isset($_POST['keterangan']) && $_POST['keterangan'] !== '' ? $_POST['keterangan'] : '-';
 
     // Query untuk update status
@@ -23,13 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Mengeksekusi query
     $stmt = sqlsrv_query($conn, $sql, $params);
 
-    if ($stmt) {
-        // Redirect setelah update berhasil
+    $sqlTanggal = "UPDATE dbo.adminlt6_konfirmasi SET tanggal_adminlt6_konfirmasi = GETDATE() WHERE nim = ?";
+    $params2 = [$nim];
+
+    $stmt2 = sqlsrv_query($conn, $sqlTanggal, $params2);
+
+    if ($stmt && $stmt2) {
         header("Location: ../toeic.php?message=Status+berhasil+diperbarui!&type=success");
-        exit(); // Pastikan eksekusi script berhenti setelah redirect
+        exit();
     } else {
-        // Jika query gagal, tampilkan error
-        echo json_encode(['success' => false, 'error' => sqlsrv_errors()]);
+        // Cek apakah ada error dari SQL Server
+        $errors = sqlsrv_errors();
+        echo json_encode(['success' => false, 'error' => $errors ? $errors : 'Unknown error dah masuk sini']);
     }
+    
 }
 ?>

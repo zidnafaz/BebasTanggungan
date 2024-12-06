@@ -213,6 +213,8 @@ CREATE TABLE [dbo].[adminPerpus_konfirmasi] (
 IF OBJECT_ID('dbo.autoAddKonfirmasiMahasiswa') IS NOT NULL 
 DROP TRIGGER dbo.autoAddKonfirmasiMahasiswa;
 
+use Bebas_Tanggungan;
+
 CREATE TRIGGER autoAddKonfirmasi ON dbo.mahasiswa
 AFTER INSERT
 AS
@@ -228,8 +230,8 @@ AS
     INSERT INTO dbo.adminPerpus_konfirmasi(nim, tanggal_adminPerpus_konfirmasi)
     VALUES (@nim, @tanggal);
 
-IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
-DROP TRIGGER dbo.autoAddLoginMahasiswa;
+IF OBJECT_ID('dbo.autoAddLogin') IS NOT NULL 
+DROP TRIGGER dbo.autoAddLogin;
 GO;
 CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
 AFTER INSERT

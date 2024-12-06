@@ -12,9 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $statusVerifikasi = $_POST['status_verifikasi'];
 
-    // Validasi keterangan jika status verifikasi 'tidak_terkonfirmasi'
-    if ($statusVerifikasi === 'tidak_terkonfirmasi' && ($_POST['keterangan'] === '' || !isset($_POST['keterangan']))) {
-        echo json_encode(['success' => false, 'error' => 'Keterangan wajib diisi jika status verifikasi tidak terkonfirmasi.']);
+    // Validasi keterangan jika status verifikasi 'tidak_terverifikasi'
+    if ($statusVerifikasi === 'ditolak' && ($_POST['keterangan'] === '' || !isset($_POST['keterangan']))) {
+        echo json_encode(['success' => false, 'error' => 'Keterangan wajib diisi jika status verifikasi ditolak.']);
         exit();
     }
 

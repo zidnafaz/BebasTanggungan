@@ -25,17 +25,11 @@ CREATE TABLE [dbo].[admin] (
     [jenis_kelamin_karyawan] CHAR(1) CHECK (jenis_kelamin_karyawan IN ('L', 'P')),
     CONSTRAINT [PK_karyawan] PRIMARY KEY CLUSTERED ([id_karyawan] ASC)
 );
-ALTER TABLE dbo.admin ALTER COLUMN tanda_tangan_karyawan VARCHAR(MAX);
---INSERT DATA ADMIN
-INSERT INTO admin (id_karyawan, nama_karyawan, nomor_telfon_karyawan, 
-    alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan, tanda_tangan_karyawan)
-VALUES ('1', 'Kemal', '08123456789', 'Jl. Papa Biru No. 1', '2003-11-01', 'L', 'https://drive.google.com/file/d/1MX3ZGiTu66E4G4tbStnOqwp_zh4cfoSH/view?usp=drive_link');
-SELECT * FROM dbo.admin
 
 --BEBAS TANGGUNGAN AKADEMIK PUSAT
 CREATE TABLE [dbo].[data_alumni] (
     [id_data_alumni] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_data_alumni NVARCHAR(50) CHECK (status_pengumpulan_data_alumni IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_data_alumni NVARCHAR(50) CHECK (status_pengumpulan_data_alumni IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_data_alumni NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -43,7 +37,7 @@ CREATE TABLE [dbo].[data_alumni] (
 );
 CREATE TABLE [dbo].[skkm] (
     [id_skkm] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_skkm NVARCHAR(50) CHECK (status_pengumpulan_skkm IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_skkm NVARCHAR(50) CHECK (status_pengumpulan_skkm IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_skkm NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -51,7 +45,7 @@ CREATE TABLE [dbo].[skkm] (
 );
 CREATE TABLE [dbo].[foto_ijazah] (
     [id_foto_ijazah] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_foto_ijazah NVARCHAR(50) CHECK (status_pengumpulan_foto_ijazah IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_foto_ijazah NVARCHAR(50) CHECK (status_pengumpulan_foto_ijazah IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_foto_ijazah NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -59,7 +53,7 @@ CREATE TABLE [dbo].[foto_ijazah] (
 );
 CREATE TABLE [dbo].[ukt] (
     [id_ukt] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_ukt NVARCHAR(50) CHECK (status_pengumpulan_ukt IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_ukt NVARCHAR(50) CHECK (status_pengumpulan_ukt IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_ukt NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -70,15 +64,16 @@ CREATE TABLE [dbo].[ukt] (
 --PERPUSTAKAAN
 CREATE TABLE [dbo].[penyerahan_hardcopy] (
     [id_penyerahan_hardcopy] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_hardcopy NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_hardcopy IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_hardcopy NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_hardcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_penyerahan_hardcopy NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
+	judul_tugas_akhir NVARCHAR(100),
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
     CONSTRAINT [PK_penyerahan_hardcopy] PRIMARY KEY CLUSTERED ([id_penyerahan_hardcopy] ASC)
 );
 CREATE TABLE [dbo].[tugas_akhir_softcopy] (
     [id_tugas_akhir_softcopy] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) CHECK (status_pengumpulan_tugas_akhir_softcopy IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) CHECK (status_pengumpulan_tugas_akhir_softcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -86,7 +81,7 @@ CREATE TABLE [dbo].[tugas_akhir_softcopy] (
 );
 CREATE TABLE [dbo].[bebas_pinjam_buku_perpustakaan] (
     [id_bebas_pinjam_buku_perpustakaan] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) CHECK (status_pengumpulan_bebas_pinjam_buku_perpustakaan IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) CHECK (status_pengumpulan_bebas_pinjam_buku_perpustakaan IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -94,7 +89,7 @@ CREATE TABLE [dbo].[bebas_pinjam_buku_perpustakaan] (
 );
 CREATE TABLE [dbo].[hasil_kuisioner] (
     [id_hasil_kuisioner] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_hasil_kuisioner NVARCHAR(50) CHECK (status_pengumpulan_hasil_kuisioner IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_hasil_kuisioner NVARCHAR(50) CHECK (status_pengumpulan_hasil_kuisioner IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_hasil_kuisioner NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -104,7 +99,7 @@ CREATE TABLE [dbo].[hasil_kuisioner] (
 --ADMIN LANTAI 6 PRODI
 CREATE TABLE [dbo].[penyerahan_skripsi] (
     [id_penyerahan_skripsi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_skripsi IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_penyerahan_skripsi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -112,7 +107,7 @@ CREATE TABLE [dbo].[penyerahan_skripsi] (
 );
 CREATE TABLE [dbo].[penyerahan_pkl] (
     [id_penyerahan_pkl] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_pkl NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_pkl IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_pkl NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_pkl IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_penyerahan_pkl NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -120,7 +115,7 @@ CREATE TABLE [dbo].[penyerahan_pkl] (
 );
 CREATE TABLE [dbo].[toeic] (
     [id_toeic] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_toeic NVARCHAR(50) CHECK (status_pengumpulan_toeic IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_toeic NVARCHAR(50) CHECK (status_pengumpulan_toeic IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_toeic NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -128,7 +123,7 @@ CREATE TABLE [dbo].[toeic] (
 );
 CREATE TABLE [dbo].[bebas_kompen] (
     [id_bebas_kompen] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_bebas_kompen NVARCHAR(50) CHECK (status_pengumpulan_bebas_kompen IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_bebas_kompen NVARCHAR(50) CHECK (status_pengumpulan_bebas_kompen IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_bebas_kompen NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -136,7 +131,7 @@ CREATE TABLE [dbo].[bebas_kompen] (
 );
 CREATE TABLE [dbo].[penyerahan_kebenaran_data] (
     [id_penyerahan_kebenaran_data] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_kebenaran_data IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_kebenaran_data IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -146,7 +141,7 @@ CREATE TABLE [dbo].[penyerahan_kebenaran_data] (
 --ADMIN LANTAI 7 JURUSAN
 CREATE TABLE [dbo].[publikasi_jurnal] (
     [id_publikasi_jurnal] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_publikasi_jurnal NVARCHAR(50) CHECK (status_pengumpulan_publikasi_jurnal IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_publikasi_jurnal NVARCHAR(50) CHECK (status_pengumpulan_publikasi_jurnal IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_publikasi_jurnal NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -154,7 +149,7 @@ CREATE TABLE [dbo].[publikasi_jurnal] (
 );
 CREATE TABLE [dbo].[aplikasi] (
     [id_aplikasi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_aplikasi NVARCHAR(50) CHECK (status_pengumpulan_aplikasi IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_aplikasi NVARCHAR(50) CHECK (status_pengumpulan_aplikasi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_aplikasi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -162,7 +157,7 @@ CREATE TABLE [dbo].[aplikasi] (
 );
 CREATE TABLE [dbo].[skripsi] (
     [id_skripsi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_skripsi IN ('terkonfirmasi', 'belum upload', 'pending', 'tidak terkonfirmasi')) DEFAULT 'belum upload',
+    status_pengumpulan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
     keterangan_pengumpulan_skripsi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -260,83 +255,82 @@ EXEC InsertSurat @nama_surat = 'bebas tanggungan_perpus',
     @nim = '20230001';
 SELECT * FROM dbo.nomor_surat;
 
-
-
 -- TRIGGER
 
-IF OBJECT_ID('dbo.autoAddKonfirmasiMahasiswa') IS NOT NULL 
-DROP TRIGGER dbo.autoAddKonfirmasiMahasiswa;
+IF OBJECT_ID('dbo.autoAddKonfirmasi') IS NOT NULL 
+DROP TRIGGER dbo.autoAddKonfirmasi;
 
-GO;
-CREATE TRIGGER autoAddKonfirmasi ON dbo.mahasiswa
+CREATE TRIGGER autoAddKonfirmasi 
+ON dbo.mahasiswa
 AFTER INSERT
 AS
+BEGIN
     PRINT 'Trigger autoAddKonfirmasiMahasiswa dipanggil!';
-    DECLARE @nim VARCHAR = (SELECT nim FROM inserted);
-    DECLARE @tanggal DATETIME = GETDATE();
+
+    -- Insert ke adminlt6_konfirmasi
     INSERT INTO dbo.adminlt6_konfirmasi(nim, tanggal_adminlt6_konfirmasi)
-    VALUES (@nim, @tanggal);
+    SELECT nim, GETDATE()
+    FROM inserted;
+
+    -- Insert ke adminlt7_konfirmasi
     INSERT INTO dbo.adminlt7_konfirmasi(nim, tanggal_adminlt7_konfirmasi)
-    VALUES (@nim, @tanggal);
+    SELECT nim, GETDATE()
+    FROM inserted;
+
+    -- Insert ke adminPusat_konfirmasi
     INSERT INTO dbo.adminPusat_konfirmasi(nim, tanggal_adminPusat_konfirmasi)
-    VALUES (@nim, @tanggal);
+    SELECT nim, GETDATE()
+    FROM inserted;
+
+    -- Insert ke adminPerpus_konfirmasi
     INSERT INTO dbo.adminPerpus_konfirmasi(nim, tanggal_adminPerpus_konfirmasi)
-    VALUES (@nim, @tanggal);
+    SELECT nim, GETDATE()
+    FROM inserted;
+END;
 
-IF OBJECT_ID('dbo.autoAddLogin') IS NOT NULL 
-DROP TRIGGER dbo.autoAddLogin;
-GO;
-CREATE TRIGGER autoAddLogin ON dbo.mahasiswa
+IF OBJECT_ID('dbo.autoAddLoginMahasiswa') IS NOT NULL 
+DROP TRIGGER dbo.autoAddLoginMahasiswa;
+
+CREATE TRIGGER autoAddLoginMahasiswa ON dbo.mahasiswa
 AFTER INSERT
 AS
+BEGIN
     PRINT 'Trigger autoAddLoginMahasiswa dipanggil!';
-    DECLARE @username VARCHAR = (SELECT nim FROM inserted);
-    DECLARE @password varchar = (SELECT nim FROM inserted);
-    DECLARE @status varchar = 'mahasiswa';
+
+    -- Insert data ke tabel login berdasarkan data yang ada di inserted
     INSERT INTO dbo.login(username, [password], [status])
-    VALUES (@username, @password, @status);
+    SELECT nim, nim, 'mahasiswa'
+    FROM inserted;
+END;
 
-IF OBJECT_ID('dbo.autoAddStatus') IS NOT NULL 
-DROP TRIGGER dbo.autoAddStatus;
-
-CREATE TRIGGER autoAddStatus ON dbo.mahasiswa
+CREATE TRIGGER trg_InsertMahasiswa
+ON [dbo].[mahasiswa]
 AFTER INSERT
 AS
-    PRINT 'Trigger autoAddStatus dipanggil!';
-    DECLARE @nim VARCHAR = (SELECT nim FROM inserted);
-    DECLARE @keterangan VARCHAR = '';
-    INSERT INTO dbo.aplikasi(nim, keterangan_pengumpulan_aplikasi)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.bebas_kompen(nim, keterangan_pengumpulan_bebas_kompen)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.bebas_pinjam_buku_perpustakaan(nim, keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.data_alumni(nim, keterangan_pengumpulan_data_alumni)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.foto_ijazah(nim, keterangan_pengumpulan_foto_ijazah)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.hasil_kuisioner(nim, keterangan_pengumpulan_hasil_kuisioner)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.penyerahan_hardcopy(nim, keterangan_pengumpulan_penyerahan_hardcopy)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.penyerahan_kebenaran_data(nim, keterangan_pengumpulan_penyerahan_kebenaran_data)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.penyerahan_pkl(nim, keterangan_pengumpulan_penyerahan_pkl)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.penyerahan_skripsi(nim, keterangan_pengumpulan_penyerahan_skripsi)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.publikasi_jurnal(nim, keterangan_pengumpulan_publikasi_jurnal)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.skkm(nim, keterangan_pengumpulan_skkm)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.skripsi(nim, keterangan_pengumpulan_skripsi)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.toeic(nim, keterangan_pengumpulan_toeic)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.tugas_akhir_softcopy(nim, keterangan_pengumpulan_tugas_akhir_softcopy)
-    VALUES (@nim, @keterangan);
-    INSERT INTO dbo.ukt(nim, keterangan_pengumpulan_ukt)
-    VALUES (@nim, @keterangan);
+BEGIN
+    -- Deklarasi variabel untuk menyimpan data dari tabel inserted
+    DECLARE @nim NVARCHAR(10);
+
+    -- Ambil nilai nim dari tabel inserted
+    SELECT @nim = nim FROM inserted;
+
+    INSERT INTO [dbo].[data_alumni] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[skkm] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[foto_ijazah] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[ukt] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[penyerahan_hardcopy] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[tugas_akhir_softcopy] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[bebas_pinjam_buku_perpustakaan] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[hasil_kuisioner] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[penyerahan_skripsi] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[penyerahan_pkl] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[toeic] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[bebas_kompen] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[penyerahan_kebenaran_data] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[publikasi_jurnal] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[aplikasi] (nim) SELECT nim FROM inserted;
+    INSERT INTO [dbo].[skripsi] (nim) SELECT nim FROM inserted;
+END;
 
 
 SELECT * FROM data_alumni;
@@ -355,6 +349,7 @@ SELECT * FROM penyerahan_kebenaran_data;
 SELECT * FROM publikasi_jurnal;
 SELECT * FROM aplikasi;
 SELECT * FROM skripsi;
+SELECT * FROM adminlt6_konfirmasi;
 
 SELECT * FROM dbo.admin
 delete from dbo.admin

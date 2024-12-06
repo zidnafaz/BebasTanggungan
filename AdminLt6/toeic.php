@@ -147,7 +147,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
                                 <option value="">Filter by Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="terkonfirmasi">Terkonfirmasi</option>
+                                <option value="terverifikasi">Terverifikasi</option>
+                                <option value="ditolak">Ditolak</option>
                                 <option value="belum upload">Belum Upload</option>
                             </select>
 
@@ -179,8 +180,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                             $statusClass = match (strtolower($row['status'])) {
                                                 'belum upload' => 'bg-secondary text-white',
                                                 'pending' => 'bg-warning text-dark',
-                                                'tidak terkonfirmasi' => 'bg-danger text-white',
-                                                'terkonfirmasi' => 'bg-success text-white',
+                                                'ditolak' => 'bg-danger text-white',
+                                                'terverifikasi' => 'bg-success text-white',
                                                 default => 'bg-light text-dark'
                                             };
 
@@ -199,7 +200,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                     <?php if (strtolower($row['status']) === 'belum upload'): ?>
                                                         <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
                                                             Disabled</button>
-                                                    <?php elseif (strtolower($row['status']) === 'terkonfirmasi'): ?>
+                                                    <?php elseif (strtolower($row['status']) === 'terverifikasi'): ?>
                                                         <button class="btn btn-info btn-sm edit-data"
                                                             data-nim="<?= htmlspecialchars($row['nim']) ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
@@ -328,19 +329,19 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <form id="verifikasiForm" action="buttonKonfirmasi/buttonToeic.php" method="POST">
                                 <div class="form-group">
                                     <label>
-                                        <input type="radio" id="terkonfirmasi" name="status_verifikasi"
-                                            value="terkonfirmasi">
-                                        Terkonfirmasi
+                                        <input type="radio" id="terverifikasi" name="status_verifikasi"
+                                            value="terverifikasi">
+                                        terverifikasi
                                     </label>
                                     <label>
-                                        <input type="radio" id="tidak_terkonfirmasi" name="status_verifikasi"
-                                            value="tidak terkonfirmasi">
-                                        Tidak Terkonfirmasi
+                                        <input type="radio" id="ditolak" name="status_verifikasi"
+                                            value="ditolak">
+                                        ditolak
                                     </label>
                                 </div>
                                 <div class="form-group">
                                     <label for="keterangan">Keterangan (Berikan Keterangan Jika Tidak
-                                        Terkonfirmasi):</label>
+                                        terverifikasi):</label>
                                     <textarea class="form-control" id="keterangan" name="keterangan" rows="3"
                                         disabled></textarea>
                                 </div>
@@ -446,13 +447,13 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
         document.addEventListener("DOMContentLoaded", function () {
             const statusCells = document.querySelectorAll(".status span");
             statusCells.forEach(cell => {
-                if (cell.textContent.trim() === "terkonfirmasi") {
+                if (cell.textContent.trim() === "terverifikasi") {
                     cell.classList.add("badge-success");
                 } else if (cell.textContent.trim() === "belum upload") {
                     cell.classList.add("badge-secondary");
                 } else if (cell.textContent.trim() === "pending") {
                     cell.classList.add("badge-warning");
-                } else if (cell.textContent.trim() === "tidak terkonfirmasi") {
+                } else if (cell.textContent.trim() === "ditolak") {
                     cell.classList.add("badge-danger");
                 }
             });
@@ -605,13 +606,13 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             function toggleFormFields() {
                 const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
-                if (statusVerifikasi === "terkonfirmasi") {
-                    // Jika terkonfirmasi: keterangan opsional dan tombol simpan diaktifkan
+                if (statusVerifikasi === "terverifikasi") {
+                    // Jika terverifikasi: keterangan opsional dan tombol simpan diaktifkan
                     $("#keterangan").prop("disabled", false);  // Mengaktifkan textarea keterangan
                     $("#keterangan").val('');  // Menghapus isi textarea
                     $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
-                } else if (statusVerifikasi === "tidak terkonfirmasi") {
-                    // Jika tidak terkonfirmasi: keterangan wajib diisi dan tombol simpan dinonaktifkan
+                } else if (statusVerifikasi === "ditolak") {
+                    // Jika ditolak: keterangan wajib diisi dan tombol simpan dinonaktifkan
                     $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
                     $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
                 } else {
@@ -626,8 +627,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 const keterangan = $("#keterangan").val().trim();
                 const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
-                // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terkonfirmasi' dan keterangan diisi
-                if (statusVerifikasi === "tidak terkonfirmasi" && keterangan !== '') {
+                // Aktifkan tombol simpan hanya jika status verifikasi 'ditolak' dan keterangan diisi
+                if (statusVerifikasi === "ditolak" && keterangan !== '') {
                     $("#simpanVerifikasi").prop("disabled", false);
                 } else {
                     $("#simpanVerifikasi").prop("disabled", false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi

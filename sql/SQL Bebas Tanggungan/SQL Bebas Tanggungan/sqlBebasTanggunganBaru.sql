@@ -208,13 +208,66 @@ CREATE TABLE [dbo].[adminPerpus_konfirmasi] (
     CONSTRAINT [PK_adminPerpus_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminPerpus_konfirmasi] ASC)
 );
 
+--MEMBUAT DATABASE UNTUK NOMOR SURAT
+CREATE TABLE dbo.nomor_surat (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    [nim]        NVARCHAR (10) NOT NULL,
+    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+    nomor_surat INT NOT NULL,
+    nama_surat VARCHAR(50) NOT NULL
+);
+-- TABEL melacak nilai terakhir untuk setiap jenis surat.
+CREATE TABLE dbo.nomor_surat_tracker (
+    nama_surat VARCHAR(50) PRIMARY KEY,
+    last_number INT NOT NULL
+);
+-- Insert nilai awal untuk setiap jenis surat
+INSERT INTO nomor_surat_tracker (nama_surat, last_number)
+VALUES 
+('bebas tanggungan perpus', 1000),
+('bebas tanggungan akademik', 2000),
+('rekomendasi', 3000);
+
+GO;
+--Prosedur ini akan secara otomatis meningkatkan nomor_surat berdasarkan jenis nama_surat.
+CREATE PROCEDURE InsertSurat
+    @nama_surat VARCHAR(50),
+    @nim NVARCHAR(10)
+AS
+BEGIN
+    DECLARE @last_number INT;
+    DECLARE @new_number INT;
+
+    -- Ambil nomor terakhir dari tracker
+    SELECT @last_number = last_number
+    FROM nomor_surat_tracker
+    WHERE nama_surat = @nama_surat;
+
+    -- Tingkatkan nomor
+    SET @new_number = @last_number + 1;
+
+    -- Insert ke tabel surat
+    INSERT INTO dbo.nomor_surat (nim, nomor_surat, nama_surat)
+    VALUES (@nim, @new_number, @nama_surat);
+
+    -- Update tracker dengan nomor terakhir yang baru
+    UPDATE nomor_surat_tracker
+    SET last_number = @new_number
+    WHERE nama_surat = @nama_surat;
+END;
+--QUERY UNTUK INSERT TABLE SURAT
+EXEC InsertSurat @nama_surat = 'bebas tanggungan_perpus',
+    @nim = '20230001';
+SELECT * FROM dbo.nomor_surat;
+
+
+
 -- TRIGGER
 
 IF OBJECT_ID('dbo.autoAddKonfirmasiMahasiswa') IS NOT NULL 
 DROP TRIGGER dbo.autoAddKonfirmasiMahasiswa;
 
-use Bebas_Tanggungan;
-
+GO;
 CREATE TRIGGER autoAddKonfirmasi ON dbo.mahasiswa
 AFTER INSERT
 AS

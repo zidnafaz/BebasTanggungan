@@ -2,6 +2,8 @@ CREATE DATABASE Bebas_Tanggungan;
 
 use Bebas_Tanggungan
 
+drop database Bebas_Tanggungan
+
 --MAHASISWA&ADMIN
 CREATE TABLE [dbo].[mahasiswa] (
     [nim]                      NVARCHAR (10) NOT NULL,

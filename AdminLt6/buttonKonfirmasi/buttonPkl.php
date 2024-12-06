@@ -1,45 +1,48 @@
-<?php 
+<?php
 include '../../koneksi.php';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nim'])) {
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nim = $_POST['nim'];
-    $status = $_POST['status'];
 
-    $sql = "UPDATE dbo.penyerahan_pkl SET status_pengumpulan_penyerahan_pkl = ? WHERE NIM = ?";
-    $params = array($status, $nim);
+    // Pastikan status verifikasi terpilih
+    if (!isset($_POST['status_verifikasi'])) {
+        echo json_encode(['success' => false, 'error' => 'Status verifikasi tidak dipilih.']);
+        exit();
+    }
 
+    $statusVerifikasi = $_POST['status_verifikasi'];
+
+    // Validasi keterangan jika status verifikasi 'tidak_terverifikasi'
+    if ($statusVerifikasi === 'ditolak' && ($_POST['keterangan'] === '' || !isset($_POST['keterangan']))) {
+        echo json_encode(['success' => false, 'error' => 'Keterangan wajib diisi jika status verifikasi ditolak.']);
+        exit();
+    }
+
+    // Jika keterangan tidak dikirim, set default "-"
+    $keterangan = isset($_POST['keterangan']) && $_POST['keterangan'] !== '' ? $_POST['keterangan'] : '-';
+
+    // Query untuk update status
+    $sql = "UPDATE dbo.penyerahan_pkl
+            SET status_pengumpulan_penyerahan_pkl = ?, keterangan_pengumpulan_penyerahan_pkl = ?
+            WHERE nim = ?";
+    $params = [$statusVerifikasi, $keterangan, $nim];
+
+    // Mengeksekusi query
     $stmt = sqlsrv_query($conn, $sql, $params);
 
-    if ($stmt === false) {
-        // Redirect ke index.php dengan pesan error
-        header(header: "Location: ../pkl.php?message=Terjadi+kesalahan+saat+memperbarui+data&type=danger");
-    } else {
-        // Redirect ke index.php dengan pesan sukses
+    $sqlTanggal = "UPDATE dbo.adminlt6_konfirmasi SET tanggal_adminlt6_konfirmasi = GETDATE() WHERE nim = ?";
+    $params2 = [$nim];
+
+    $stmt2 = sqlsrv_query($conn, $sqlTanggal, $params2);
+
+    if ($stmt&&$stmt2) {
         header("Location: ../pkl.php?message=Status+berhasil+diperbarui!&type=success");
-    if ($status === 'terkonfirmasi'){
-        $sqlConfirm ="UPDATE dbo.penyerahan_pkl SET keterangan_pengumpulan_penyerahan_pkl = 'laporan lengkap' WHERE NIM = ?";
-        $paramsConfirm = array($nim);
-        $stmtConfirm = sqlsrv_query($conn, $sqlConfirm,$paramsConfirm);
+        exit();
+    } else {
+        // Cek apakah ada error dari SQL Server
+        $errors = sqlsrv_errors();
+        echo json_encode(['success' => false, 'error' => $errors ? $errors : 'Unknown error dah masuk sini']);
     }
-    //else if($status === 'tidak terkonfirmasi'){
-
-    // }
-    }
-    exit();
-} else {
-    // Redirect ke index.php dengan pesan error
-    header("Location: ../pkl.php?message=Data+tidak+valid&type=danger");
-    exit();
-}
-    // if ($stmt === false) {
-    //     die(print_r(sqlsrv_errors(), true));
-    // }else{
-    //     echo "<script>
-    //     alert('Status berhasil diperbarui!');
-    //     window.location.href = '../AdminPerpus/pkl.php';
-    //     </script>";
-    //     exit();
-    // }
-
     
-//}
+}
 ?>

@@ -4,37 +4,21 @@ include '../koneksi.php';
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
     $messageType = htmlspecialchars($_GET['type']); // "success" atau "danger"
-
-    // Tampilkan alert menggunakan Bootstrap
-    echo "<div class='alert alert-$messageType alert-dismissible fade show'
-        role='alert'>
-        $message
-        <button type='button' class='btn-close' data-bs-dismiss='alert'
-            aria-label='Close'></button>
-    </div>";
-}
-
-try{
-// Query untuk mengambil data skripsi
-$sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_penyerahan_pkl
-        FROM dbo.mahasiswa m
-        JOIN dbo.penyerahan_pkl pk ON m.nim = pk.nim";
-$result = sqlsrv_query($conn, $sql);
-
-if($result == false){
-    die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
-}
-
-$hasil=[];
-
-// Ambil data dan cek apakah ada
-while($rows = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)){
-    $hasil[]=$rows;
-}
-
-sqlsrv_free_stmt($result);
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
+    echo "
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                $('#uploadModalStatus').modal('show');
+                document.getElementById('uploadMessage').textContent = '$message';
+                if ('$messageType' === 'success') {
+                    document.getElementById('successIcon').style.display = 'block';
+                    document.getElementById('errorIcon').style.display = 'none';
+                } else {
+                    document.getElementById('successIcon').style.display = 'none';
+                    document.getElementById('errorIcon').style.display = 'block';
+                }
+            });
+        </script>
+    ";
 }
 ?>
 
@@ -62,46 +46,61 @@ sqlsrv_free_stmt($result);
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
     <style>
-    .status span {
-        padding: 5px 10px;
-        border-radius: 15px;
-        color: white;
-        font-weight: bold;
-    }
+        .status span {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+        }
 
-    .status .badge-success {
-        background-color: green;
-    }
+        .status .badge-success {
+            background-color: #1cc88a;
+        }
 
-    .status .badge-pending {
-        background-color: #FFD700;
-    }
+        .status .badge-warning {
+            background-color: #f6c23e;
+            color: #5a5c69;
+        }
 
-    .status .badge-empty {
-        background-color: gray;
-    }
+        .status .badge-secondary {
+            background-color: #858796;
+        }
 
-    .status .badge-danger {
-        background-color: red;
-    }
+        .status .badge-danger {
+            background-color: #e74a3b;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        /* Mengubah warna latar belakang baris tabel */
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: #fff;
+            /* Lebih gelap dari warna default */
+        }
 
-    table,
-    th,
-    td {
-        border: 1px solid black;
-    }
+        table.dataTable tbody tr:nth-child(even) {
+            background-color: #fff;
+            /* Lebih gelap dari warna default */
+        }
 
-    th,
-    td {
-        padding: 8px;
-        text-align: left;
-    }
+        /* Mengubah warna baris yang sedang dipilih */
+        table.dataTable tbody tr.selected {
+            background-color: #d6d6d6 !important;
+            /* Warna ketika baris dipilih */
+        }
+
+        /* Menyesuaikan warna header */
+        table.dataTable thead th {
+            background-color: #4e73df;
+            /* Warna header tabel */
+            color: white;
+        }
     </style>
 
 </head>
@@ -126,7 +125,7 @@ sqlsrv_free_stmt($result);
                 <!-- Topbar -->
 
                 <div id="topbar">
-                    
+
                 </div>
 
                 <!-- End of Topbar -->
@@ -134,7 +133,7 @@ sqlsrv_free_stmt($result);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data PKL</h1>
+                    <h1 class="h3 mb-2 text-gray-800">DATA LAPORAN PKL</h1>
                     <p class="mb-4">Konfirmasi Data Mahasiswa dengan seksama!</p>
 
                     <!-- DataTables Example -->
@@ -143,55 +142,97 @@ sqlsrv_free_stmt($result);
                             <h6 class="m-0 font-weight-bold text-primary">Data Mahasiswa</h6>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>NIM</th>
-                                            <th>Nama Mahasiswa</th>
-                                            <th>Status PKL</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($hasil as $row): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($row['nim']) ?></td>
-                                            <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
-                                            <td class="status">
-                                                <span><?= htmlspecialchars($row['status_pengumpulan_penyerahan_pkl']) ?></span>
-                                            </td>
-                                            <td>
-                                                <form action="buttonKonfirmasi/buttonPkl.php" method="post"
-                                                    style="display:inline;">
-                                                    <input type="hidden" name="nim"
-                                                        value="<?= htmlspecialchars($row['nim']) ?>">
-                                                    <select name="status" class="form-control d-inline"
-                                                        style="width:auto; display:inline;">
-                                                        <option value="terkonfirmasi"
-                                                            <?= $row['status_pengumpulan_penyerahan_pkl'] === 'terkonfirmasi' ? 'selected' : '' ?>>
-                                                            konfirmasi
-                                                        </option>
-                                                        <option value="tidak terkonfirmasi"
-                                                            <?= $row['status_pengumpulan_penyerahan_pkl'] === 'tidak terkonfirmasi' ? 'selected' : '' ?>>
-                                                            tidak konfirmasi</option>
-                                                    </select>
-                                                    <button type="submit"
-                                                        class="btn btn-primary btn-sm">konfirmasi</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
 
-                                    </tbody>
-                                </table>
-                            </div>
+                            <!-- Filter Dropdown -->
+                            <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
+                                <option value="">Filter by Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="terverifikasi">terverifikasi</option>
+                                <option value="belum upload">Belum Upload</option>
+                            </select>
+
+                            <table class="table table-striped table-bordered" id="dataTable" width="100%"
+                                cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>NIM</th>
+                                        <th>Nama Mahasiswa</th>
+                                        <th>Status Laporan PKL</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    try {
+                                        // Query untuk mengambil data
+                                        $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_penyerahan_pkl AS status
+                                                    FROM dbo.mahasiswa m
+                                                    JOIN dbo.penyerahan_pkl pk ON m.nim = pk.nim";
+                                        $result = sqlsrv_query($conn, $sql);
+
+                                        if ($result === false) {
+                                            die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
+                                        }
+
+                                        while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)):
+                                            // Gunakan match expression untuk kelas badge
+                                            $statusClass = match (strtolower($row['status'])) {
+                                                'belum upload' => 'bg-secondary text-white',
+                                                'pending' => 'bg-warning text-dark',
+                                                'ditolak' => 'bg-danger text-white',
+                                                'terverifikasi' => 'bg-success text-white',
+                                                default => 'bg-light text-dark'
+                                            };
+
+                                            ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($row['nim']) ?></td>
+                                                <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
+                                                <td class="status">
+                                                    <span class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                        style="cursor: pointer;"
+                                                        title="<?= htmlspecialchars($row['status']) ?>">
+                                                        <?= htmlspecialchars($row['status']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php if (strtolower($row['status']) === 'belum upload'): ?>
+                                                        <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
+                                                            Disabled</button>
+                                                    <?php elseif (strtolower($row['status']) === 'terverifikasi'): ?>
+                                                        <button class="btn btn-info btn-sm edit-data"
+                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
+                                                            data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
+                                                            data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
+                                                            data-target="#verifikasiModal" data-toggle="modal">
+                                                            <i class="fa fa-solid fa-file-lines"></i> Preview
+                                                        </button>
+                                                    <?php else: ?>
+                                                        <button class="btn btn-primary btn-sm edit-data"
+                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
+                                                            data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
+                                                            data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
+                                                            data-target="#verifikasiModal" data-toggle="modal">
+                                                            <i class="fa fa-edit"></i> Verifikasi
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        endwhile;
+                                        sqlsrv_free_stmt($result);
+                                    } catch (Exception $e) {
+                                        echo "Error: " . $e->getMessage();
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-
                 <!-- /.container-fluid -->
-
 
             </div>
             <!-- End of Main Content -->
@@ -273,32 +314,39 @@ sqlsrv_free_stmt($result);
                         </div>
                     </div>
 
-                    <!-- Tampilan PDF -->
+                    <!-- Tampilan PDF menggunakan iframe -->
                     <div class="embed-responsive embed-responsive-4by3 mb-4">
-                        <object id="pdfViewer" data="" type="application/pdf" class="embed-responsive-item">
+                        <iframe id="pdfPreview" src="" width="100%" height="400px">
                             PDF tidak dapat ditampilkan.
-                        </object>
+                        </iframe>
                     </div>
 
                     <!-- Verifikasi -->
                     <div class="card">
                         <div class="card-body">
                             <h6><strong>Status Verifikasi:</strong></h6>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" id="verifikasiTrue" name="verification"
-                                    value="true">
-                                <label class="form-check-label" for="verifikasiTrue">Terverifikasi</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" id="verifikasiFalse" name="verification"
-                                    value="false">
-                                <label class="form-check-label" for="verifikasiFalse">Belum Terverifikasi</label>
-                            </div>
-                            <div class="mt-3">
-                                <label for="keterangan"><strong>Keterangan:</strong></label>
-                                <textarea id="keterangan" class="form-control" rows="3"
-                                    placeholder="Tambahkan keterangan jika diperlukan"></textarea>
-                            </div>
+                            <form id="verifikasiForm" action="buttonKonfirmasi/buttonPkl.php" method="POST">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="radio" id="terverifikasi" name="status_verifikasi"
+                                            value="terverifikasi">
+                                        terverifikasi
+                                    </label>
+                                    <label>
+                                        <input type="radio" id="tidak_terverifikasi" name="status_verifikasi"
+                                            value="ditolak">
+                                        ditolak
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="keterangan">Keterangan (Berikan Keterangan Jika Tidak
+                                        terverifikasi):</label>
+                                    <textarea class="form-control" id="keterangan" name="keterangan" rows="3"
+                                        disabled></textarea>
+                                </div>
+                                <input type="hidden" name="nim" id="formNim">
+                                <input type="hidden" name="nama" id="formNama">
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -306,7 +354,7 @@ sqlsrv_free_stmt($result);
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times"></i> Tutup
                     </button>
-                    <button type="button" class="btn btn-primary" id="saveVerification">
+                    <button type="submit" class="btn btn-primary" form="verifikasiForm" id="simpanVerifikasi">
                         <i class="fas fa-save"></i> Simpan
                     </button>
                 </div>
@@ -314,110 +362,303 @@ sqlsrv_free_stmt($result);
         </div>
     </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
+    <!-- Modal untuk Status -->
+    <div class="modal fade" id="uploadModalStatus" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="uploadModalLabel">Status Update</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-success" id="successIcon" style="display: none;"></i>
+                    <i class="fas fa-times-circle fa-3x text-danger" id="errorIcon" style="display: none;"></i>
+                    <p id="uploadMessage" class="mt-3"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery (dari CDN atau file lokal, pilih salah satu saja) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap 5 JS Bundle (termasuk Popper.js) -->
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
+    <!-- jQuery Easing Plugin -->
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Custom scripts for all pages-->
+    <!-- sb-admin-2 Script -->
     <script src="../js/sb-admin-2.min.js"></script>
 
-    <!-- Page level plugins -->
+    <!-- Page level plugins (Chart.js) -->
     <script src="../vendor/chart.js/Chart.min.js"></script>
 
-    <!-- Page level custom scripts -->
+    <!-- Page level custom scripts (Chart demos) -->
     <script src="../js/demo/chart-area-demo.js"></script>
     <script src="../js/demo/chart-pie-demo.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Bootstrap 5 JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const statusCells = document.querySelectorAll(".status span");
-        statusCells.forEach(cell => {
-            if (cell.textContent.trim() === "terkonfirmasi") {
-                cell.classList.add("badge-success");
-            } else if (cell.textContent.trim() === "belum upload") {
-                cell.classList.add("badge-empty");
-            } else if (cell.textContent.trim() === "pending") {
-                cell.classList.add("badge-pending");
-            } else if (cell.textContent.trim() === "tidak terkonfirmasi") {
-                cell.classList.add("badge-danger");
-            }
-        });
-    });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('navbar.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        $(document).ready(function () {
+            // Inisialisasi DataTable
+            var table = $('#dataTable').DataTable({
+                "ordering": true,
+                "searching": true,
+                "paging": true,
+                "info": true,
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ entri per halaman",
+                    "zeroRecords": "Tidak ada data yang ditemukan",
+                    "info": "Menampilkan _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total entri)",
+                    "search": "Cari:",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Berikutnya",
+                        "previous": "Sebelumnya"
+                    }
                 }
-                return response.text();
-            })
-            .then(data => {
-                document.getElementById('navbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading navbar:', error));
-    });
+            });
 
-    fetch('topbar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('topbar').innerHTML = data;
-        })
-        .catch(error => console.error('Error loading topbar:', error));
+            $('#statusFilter').on('change', function () {
+                var status = $(this).val();
+                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status pkl
+            });
 
-    $('.edit-data').click(function() {
-        var pdfFile = $(this).data('pdf'); // Get PDF file name correctly
-        var pdfUrl = '../contohPDF/1.pdf'; // Set PDF path dynamically
-        $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
-    });
+        });
 
-    // $(document).ready(function () {
-    //     // Handle Verifikasi button click
-    //     $('.edit-data').click(function () {
-    //         var id = $(this).data('id'); // Get the ID of the row
-    //         var pdfFile = id + '.pdf'; // Generate the PDF file name based on ID
-    //         var pdfUrl = '../contohPDF/' + pdfFile; // Set PDF path dynamically
-    //         $('#pdfViewer').attr('data', pdfUrl); // Update the object element to show PDF
-    //     });
-    // });
-
-    // Keterangan pada verifikasi
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const verifikasiTrue = document.getElementById('verifikasiTrue');
-        const verifikasiFalse = document.getElementById('verifikasiFalse');
-        const keterangan = document.getElementById('keterangan');
-        const keteranganError = document.getElementById('keteranganError');
-        const saveButton = document.getElementById('saveVerification');
-
-        // Event listener untuk radio buttons
-        [verifikasiTrue, verifikasiFalse].forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (verifikasiTrue.checked) {
-                    keterangan.disabled = true;
-                    keterangan.value = ""; // Clear the textarea
-                    keteranganError.style.display = "none";
-                } else if (verifikasiFalse.checked) {
-                    keterangan.disabled = false;
+        document.addEventListener("DOMContentLoaded", function () {
+            const statusCells = document.querySelectorAll(".status span");
+            statusCells.forEach(cell => {
+                if (cell.textContent.trim() === "terverifikasi") {
+                    cell.classList.add("badge-success");
+                } else if (cell.textContent.trim() === "belum upload") {
+                    cell.classList.add("badge-secondary");
+                } else if (cell.textContent.trim() === "pending") {
+                    cell.classList.add("badge-warning");
+                } else if (cell.textContent.trim() === "ditolak") {
+                    cell.classList.add("badge-danger");
                 }
             });
         });
 
-        // Validasi sebelum menyimpan
-        saveButton.addEventListener('click', () => {
-            if (verifikasiFalse.checked && keterangan.value.trim() === "") {
-                keteranganError.style.display = "block";
-                keterangan.focus();
-            } else {
-                keteranganError.style.display = "none";
-                // Lakukan tindakan simpan (AJAX atau proses lainnya)
-                alert('Data berhasil disimpan!');
-                $('#verifikasiModal').modal('hide');
-            }
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('navbar.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading navbar:', error));
         });
-    });
+
+        fetch('topbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('topbar').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading topbar:', error));
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll(".edit-data");
+            buttons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const nim = this.getAttribute("data-nim");
+                    const nama = this.getAttribute("data-nama");
+                    const namaBerkas = this.getAttribute("data-nama-berkas");
+                    const pdfSrc = this.getAttribute("data-pdf");
+
+                    // Set data ke modal
+                    document.getElementById("formNim").value = nim;
+                    document.getElementById("formNama").value = nama;
+                    document.getElementById("nama").value = nama;
+                    document.getElementById("nim").value = nim;
+                    document.getElementById("namaBerkas").value = namaBerkas;
+                    document.getElementById("pdfPreview").src = pdfSrc;
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Event listener untuk setiap tombol Verifikasi
+            const buttons = document.querySelectorAll(".edit-data");
+            buttons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const nim = this.getAttribute("data-nim");
+                    const pdfUrl = `../Documents/uploads/pkl/${nim}_pkl.pdf`;
+
+                    // Update isi modal
+                    document.getElementById('nim').value = nim;
+                    document.getElementById('namaBerkas').value = `${nim}_pkl.pdf`;
+                    document.getElementById('pdfPreview').setAttribute('src', pdfUrl); // Update src iframe
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusModal = document.getElementById('uploadModalStatus');
+            const messageContent = document.getElementById('uploadMessage');
+            const successIcon = document.getElementById('successIcon');
+            const errorIcon = document.getElementById('errorIcon');
+
+            // Show modal with message when it's triggered by URL parameters
+            if (window.location.search.includes('message') && window.location.search.includes('type')) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const message = urlParams.get('message');
+                const messageType = urlParams.get('type');
+
+                messageContent.textContent = message;
+                if (messageType === 'success') {
+                    successIcon.style.display = 'block';
+                    errorIcon.style.display = 'none';
+                } else {
+                    successIcon.style.display = 'none';
+                    errorIcon.style.display = 'block';
+                }
+                $(statusModal).modal('show');
+            }
+
+            // When the modal is closed, clear the URL parameters and message content
+            $(statusModal).on('hidden.bs.modal', function () {
+                // Clear URL parameters from the browser history
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState(null, null, cleanUrl);
+
+                // Clear message content and hide icons
+                messageContent.textContent = '';
+                successIcon.style.display = 'none';
+                errorIcon.style.display = 'none';
+            });
+        });
+
+        // Keterangan pada verifikasi
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const verifikasiTrue = document.getElementById('verifikasiTrue');
+            const verifikasiFalse = document.getElementById('verifikasiFalse');
+            const keterangan = document.getElementById('keterangan');
+            const keteranganError = document.getElementById('keteranganError');
+            const saveButton = document.getElementById('saveVerification');
+
+            // Event listener untuk radio buttons
+            [verifikasiTrue, verifikasiFalse].forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (verifikasiTrue.checked) {
+                        keterangan.disabled = true;
+                        keterangan.value = ""; // Clear the textarea
+                        keteranganError.style.display = "none";
+                    } else if (verifikasiFalse.checked) {
+                        keterangan.disabled = false;
+                    }
+                });
+            });
+
+            // Validasi sebelum menyimpan
+            saveButton.addEventListener('click', () => {
+                if (verifikasiFalse.checked && keterangan.value.trim() === "") {
+                    keteranganError.style.display = "block";
+                    keterangan.focus();
+                } else {
+                    keteranganError.style.display = "none";
+                    // Lakukan tindakan simpan (AJAX atau proses lainnya)
+                    alert('Data berhasil disimpan!');
+                    $('#verifikasiModal').modal('hide');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Inisialisasi status awal (Ketika modal dibuka)
+            toggleFormFields();
+
+            // Ketika radio button status verifikasi diubah
+            $("input[name='status_verifikasi']").change(function () {
+                toggleFormFields();
+            });
+
+            // Ketika keterangan diubah (untuk mengaktifkan tombol simpan)
+            $("#keterangan").on('input', function () {
+                toggleSaveButton();
+            });
+
+            // Fungsi untuk menyesuaikan kondisi form
+            function toggleFormFields() {
+                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
+
+                if (statusVerifikasi === "terverifikasi") {
+                    // Jika terverifikasi: keterangan opsional dan tombol simpan diaktifkan
+                    $("#keterangan").prop("disabled", false);  // Mengaktifkan textarea keterangan
+                    $("#keterangan").val('');  // Menghapus isi textarea
+                    $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
+                } else if (statusVerifikasi === "ditolak") {
+                    // Jika ditolak: keterangan wajib diisi dan tombol simpan dinonaktifkan
+                    $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
+                    $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
+                } else {
+                    // Jika tidak ada pilihan: keterangan di-disable dan tombol simpan dinonaktifkan
+                    $("#keterangan").prop("disabled", true); // Menonaktifkan textarea
+                    $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
+                }
+            }
+
+            // Fungsi untuk mengaktifkan tombol simpan jika keterangan sudah diisi
+            function toggleSaveButton() {
+                const keterangan = $("#keterangan").val().trim();
+                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
+
+                // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terverifikasi' dan keterangan diisi
+                if (statusVerifikasi === "ditolak" && keterangan !== '') {
+                    $("#simpanVerifikasi").prop("disabled", false);
+                } else {
+                    $("#simpanVerifikasi").prop("disabled", false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi
+                }
+            }
+
+            // Pastikan status terpilih sebelum form disubmit
+            $("#verifikasiForm").submit(function (e) {
+                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
+                if (!statusVerifikasi) {
+                    e.preventDefault(); // Mencegah pengiriman form jika status belum dipilih
+                    alert("Status verifikasi belum dipilih. Silakan pilih status.");
+                    return false; // Menghentikan form submit
+                }
+
+                var keterangan = $("#keterangan").val().trim();
+                if (keterangan === '') {
+                    $("#keterangan").val('-'); // Set default keterangan menjadi "-"
+                }
+
+                return true; // Melanjutkan pengiriman form jika semua validasi terpenuhi
+            });
+
+            // Reset radio buttons dan form ketika modal ditutup
+            $('#verifikasiModal').on('hidden.bs.modal', function () {
+                $("input[name='status_verifikasi']").prop('checked', false); // Menghapus pilihan radio
+                $("#keterangan").val(''); // Menghapus keterangan
+                $("#keterangan").prop("disabled", true); // Menonaktifkan textarea
+                $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
+            });
+        });
     </script>
 
 </body>

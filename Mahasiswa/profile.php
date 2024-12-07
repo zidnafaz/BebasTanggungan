@@ -1,12 +1,12 @@
-<?php  
+<?php
 include '../login.php';
 include '../koneksi.php';
 
 try {
     $sql = " 
-    SELECT nim, nama_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa 
-    FROM dbo.mahasiswa m
-    WHERE m.nim = ?";
+            SELECT nim, nama_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, tanggal_lahir_mahasiswa, tahun_angkatan_mahasiswa, jenis_kelamin_mahasiswa, alamat_mahasiswa, nomor_telfon_mahasiswa
+            FROM dbo.mahasiswa m
+            WHERE m.nim = ?";
 
     session_start(); // Tambahkan di atas file mahasiswa.php
     if (isset($_COOKIE['id'])) {
@@ -59,6 +59,14 @@ try {
         .card-fixed-height {
             height: 200px;
         }
+
+        strong {
+            font-size: 22px;
+        }
+
+        p {
+            font-size: 20px;
+        }
     </style>
 
 </head>
@@ -87,45 +95,65 @@ try {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profile</h1>
+                        <h1 class="h2 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?> </h1>
                     </div>
 
                     <!-- Content Row -->
                     <div class="container rounded shadow mt-5">
                         <div class="row" style="size : 200px;">
-                            <div class="col-md-4 border-right">
-                                <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
-                                        class="rounded-circle mt-5" src="https://i.imgur.com/0eg0aG0.jpg"
-                                        width="90"><span class="font-weight-bold">John Doe</span><span
-                                        class="text-black-50">Admin lt ...</span>
-                                        <span>United States</span></div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="p-3 py-5">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="d-flex flex-row align-items-center back" style="margin-left: 200px">
-                                            <h2>Profile</h2>
-                                        </div>
-                                        <!-- <a href="editProfile.html" class="btn btn-warning btn-icon-split">
-                                            <span class="text">Edit Profile</span>
-                                        </a> -->
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header text-center">
+                                        <h1>Informasi Pribadi</h1>
                                     </div>
-                                    <div class="row mt-2">
-                                        <div class="col-md-6" style="margin-left:200px;"><?= htmlspecialchars($result['nim'] ?? '') ?></div>
+                                    <div class="card-body">
+                                        <div class="row mb-5">
+                                            <div class="col-md-6">
+                                                <strong>Nama Lengkap :</strong>
+                                                <p><?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Jurusan :</strong>
+                                                <p><?= htmlspecialchars($result['jurusan_mahasiswa'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>NIM (No Induk) :</strong>
+                                                <p><?= htmlspecialchars($result['nim'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Program Studi :</strong>
+                                                <p><?= htmlspecialchars($result['prodi_mahasiswa'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Jenis Kelamin :</strong>
+                                                <p>
+                                                <?php
+                                                        if ($result['jenis_kelamin_mahasiswa'] == 'L') {
+                                                            echo 'Laki-Laki';
+                                                        } elseif ($result['jenis_kelamin_mahasiswa'] == 'P') {
+                                                            echo 'Perempuan';
+                                                        }
+                                                    ?>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Tahun Angkatan :</strong>
+                                                <p><?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Alamat :</strong>
+                                                <p><?= htmlspecialchars($result['alamat_mahasiswa'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Tanggal Lahir :</strong>
+                                                <p><?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>No Telepon :</strong>
+                                                <p><?= htmlspecialchars($result['nomor_telfon_mahasiswa'] ?? '') ?></p>
+                                            </div>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6" style="margin-left:200px;"><?= htmlspecialchars($result['jurusan_mahasiswa'] ?? '') ?></div>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6" style="margin-left:200px"><?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?></div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6" style="margin-left:200px"><?= htmlspecialchars($result['prodi_mahasiswa'] ?? '') ?></div>
-                                    </div>
-                                    <div class="mt-5 text-right">
-                                        <!-- <button class="btn btn-primary profile-button"
-                                            type="button">Save Profile</button> -->
-                                        </div>
                                 </div>
                             </div>
                         </div>
@@ -136,6 +164,8 @@ try {
 
             </div>
             <!-- End of Main Content -->
+
+
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -196,7 +226,7 @@ try {
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-        
+
         document.addEventListener("DOMContentLoaded", function () {
             fetch('navbar.html')
                 .then(response => {

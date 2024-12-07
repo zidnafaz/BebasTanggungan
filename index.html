@@ -2,14 +2,13 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Login</title>
+    <title>Bebas Tanggungan - Login</title>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -21,101 +20,124 @@
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
-        .bg-login-image .p-5 {
+        body {
+            color: rgb(0, 0, 0);
+        }
+
+        .bg-image-vertical {
+            position: relative;
+            overflow: hidden;
+            background-repeat: no-repeat;
+            background-position: right center;
+            background-size: cover;
+            background-attachment: fixed;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .logo {
+            width: 150px;
+            /* Sesuaikan ukuran logo */
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 15px;
+            /* Jarak antara logo dan teks */
+        }
+
+        .text-center {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            /* Pastikan tinggi div ini mencakup seluruh kolom */
-        }
-
-        .bg-login-image img {
-            max-width: 100%;
-            /* Menyesuaikan ukuran gambar agar sesuai div */
-            height: auto;
         }
     </style>
-
 </head>
 
-<body class="bg-gradient-primary">
-
-    <div class="container">
-
-        <!-- Outer Row -->
-        <div class="row justify-content-center">
-
-            <div class="col-xl-10 col-lg-12 col-md-9">
-
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <!-- Nested Row within Card Body -->
-                        <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                <div class="p-5">
-                                    <img src="img/logo-polinema.png">
-                                </div>
+<body>
+    <section class="vh-100">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Kolom Form -->
+                <div class="col-sm-6 text-black d-flex justify-content-center align-items-center">
+                    <div class="card shadow" style="width: 30rem;">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <img src="img/logo-polinema.png" alt="Logo Polinema" class="logo mb-4">
+                                <h2 class="fw-bold text-gray-900 mb-5">Selamat Datang di laman <br> Bebas Tanggungan!</h2>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="p-5">
-                                    <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Selamat Datang di laman Bebas Tanggungan!</h1>
-                                    </div>
-                                    <form class="user" action="login.php" method="POST">
-                                        <div class="form-group">
-                                            <input type="text" name="username" class="form-control form-control-user"
-                                                id="username" placeholder="Enter Your Username ...">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" name="password"
-                                                class="form-control form-control-user" id="password"
-                                                placeholder="Enter Your Password ...">
-                                        </div>
-                                        <button type="submit" name="login" class="btn btn-primary btn-user btn-block" id="loginButton">
-                                            Login
-                                        </button>
-                                    </form>
-                                    <script>
-                                        document.getElementById('loginButton').addEventListener('click', function () {
-                                            var username = document.getElementById('username').value;
-                                            var password = document.getElementById('password').value;
-                                
-                                            var xhr = new XMLHttpRequest();
-                                            xhr.open("POST", "login.php", true); // Kirim ke file PHP yang sama
-                                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                                
-                                            xhr.onload = function () {
-                                                if (xhr.status === 200) {
-                                                    var response = JSON.parse(xhr.responseText);
-                                                    if (response.success) {
-                                                        alert("Login berhasil!");
-                                                        window.location.href = response.redirect;
-                                                    } else {
-                                                        alert(response.message);
-                                                        window.location.href = 'index.html';
-                                                    }
-                                                }
-                                            };
-                                            xhr.send("ajax=1&username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
-                                        });
-                                    </script>
-                                    </form>
-                                    <hr>
-                                    <div class="text-center">
-                                        <a class="small" ><i class="fa-solid fa-square-phone"></i> Forgot Password?</a>
+                            <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5 mb-3 justify-content-center">
+                                <form style="width: 23rem;" action="login.php" method="POST">
+
+                                    <div class="form-outline mb-3">
+                                        <label class="form-label" for="username">Username</label>
+                                        <input type="text" id="username" name="username"
+                                            class="form-control form-control-lg" placeholder="Username" />
                                     </div>
 
-                                </div>
+                                    <div class="form-outline mb-3">
+                                        <label class="form-label" for="password">Password</label>
+                                        <input type="password" id="password" name="password"
+                                            class="form-control form-control-lg" placeholder="Password" />
+                                    </div>
+
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="showPassword">
+                                        <label class="form-check-label" for="showPassword">Tampilkan Password</label>
+                                    </div>
+
+                                    <div class="pt-1 mb-4">
+                                        <button class="btn btn-primary btn-lg btn-block" type="submit" name="login"
+                                            id="loginButton">Login</button>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small"><i class="fa-solid fa-square-phone"></i> Forgot Password?</a>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                <div class="col-sm-6 px-0 d-none d-sm-block">
+                    <img src="img/gedung.jpg" alt="Login image" class="w-100 vh-100"
+                        style="object-fit: cover; object-position: right;">
+                </div>
             </div>
-
         </div>
+    </section>
 
-    </div>
+    <script>
+        document.getElementById('loginButton').addEventListener('click', function () {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "login.php", true); // Kirim ke file PHP yang sama
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert("Login berhasil!");
+                        window.location.href = response.redirect;
+                    } else {
+                        alert(response.message);
+                        window.location.href = 'index.html';
+                    }
+                }
+            };
+            xhr.send("ajax=1&username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+        });
+        // Menangani perubahan pada checkbox untuk menampilkan atau menyembunyikan password
+        document.getElementById('showPassword').addEventListener('change', function () {
+            var passwordField = document.getElementById('password');
+            if (this.checked) {
+                passwordField.type = 'text'; // Tampilkan password
+            } else {
+                passwordField.type = 'password'; // Sembunyikan password
+            }
+        });
+    </script>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -126,7 +148,6 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-
 </body>
 
 </html>

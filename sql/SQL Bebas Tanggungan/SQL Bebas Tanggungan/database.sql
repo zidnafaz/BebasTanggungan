@@ -4,13 +4,6 @@ SELECT * FROM dbo.[login]
 
 SELECT * FROM dbo.[admin]
 
-INSERT into dbo.mahasiswa (nim, nama_mahasiswa, nomor_telfon_mahasiswa,
-    alamat_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, jenis_kelamin_mahasiswa,
-    tahun_angkatan_mahasiswa, tanggal_lahir_mahasiswa) values (
-        '2341760121', 'Muhammad Rosyid', '084325134651', 'Jl. Jalan Arjosari No. 1', 'Teknologi Informasi',
-        'Sistem Informasi Bisnis', 'L', '2023', '2004-06-12'
-    )
-
 ALTER TABLE dbo.mahasiswa
 ALTER COLUMN jurusan_mahasiswa VARCHAR(50);
 
@@ -19,12 +12,6 @@ set status = 'adminlt7'
 WHERE id_login = 1;
 
 select * from dbo.mahasiswa
-
-insert into dbo.[login](username, [password], [status]) VALUES(
-    '2341760121', '111', 'mahasiswa'
-)
-
-INSERT INTO dbo.[login] (username, password, [status]) VALUES ('2', 'admin', 'adminlt6');
 
 -- Insert Dummy Data Mahasiswa
 
@@ -188,13 +175,6 @@ INSERT into dbo.[login] (username, password, status) VALUES(
 INSERT into dbo.[login] (username, password, status) VALUES(
     '20230009', 'admin', 'adminLt7'
 )
-use Bebas_Tanggungan
-SELECT * from dbo.[login]
-
-select * from data_alumni
-UPDATE data_alumni
-SET status_pengumpulan_data_alumni = 'pending'
-WHERE status_pengumpulan_data_alumni is null;
 
 -- Insert data ke tabel adminlt6_konfirmasi
 INSERT INTO [dbo].[adminlt6_konfirmasi] (nim, tanggal_adminlt6_konfirmasi)

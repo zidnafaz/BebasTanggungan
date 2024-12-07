@@ -203,8 +203,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                         <button class="btn btn-info btn-sm edit-data"
                                                             data-nim="<?= htmlspecialchars($row['nim']) ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_skripsi.pdf" ?>"
-                                                            data-pdf="../Documents/uploads/skripsi/<?= $row['nim'] ?>_skripsi.pdf"
+                                                            data-nama-berkas="<?= $row['nim'] . "_penyerahan_skripsi.pdf" ?>"
+                                                            data-pdf="../Documents/uploads/penyerahan_skripsi/<?= $row['nim'] ?>_penyerahan_skripsi.pdf"
                                                             data-target="#verifikasiModal" data-toggle="modal">
                                                             <i class="fa fa-solid fa-file-lines"></i> Preview
                                                         </button>
@@ -212,8 +212,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                         <button class="btn btn-primary btn-sm edit-data"
                                                             data-nim="<?= htmlspecialchars($row['nim']) ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_skripsi.pdf" ?>"
-                                                            data-pdf="../Documents/uploads/skripsi/<?= $row['nim'] ?>_skripsi.pdf"
+                                                            data-nama-berkas="<?= $row['nim'] . "_penyerahan_skripsi.pdf" ?>"
+                                                            data-pdf="../Documents/uploads/penyerahan_skripsi/<?= $row['nim'] ?>_penyerahan_skripsi.pdf"
                                                             data-target="#verifikasiModal" data-toggle="modal">
                                                             <i class="fa fa-edit"></i> Verifikasi
                                                         </button>
@@ -505,11 +505,11 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             buttons.forEach(button => {
                 button.addEventListener("click", function () {
                     const nim = this.getAttribute("data-nim");
-                    const pdfUrl = `../Documents/uploads/skripsi/${nim}_skripsi.pdf`;
+                    const pdfUrl = `../Documents/uploads/penyerahan_skripsi/${nim}_penyerahan_skripsi.pdf`;
 
                     // Update isi modal
                     document.getElementById('nim').value = nim;
-                    document.getElementById('namaBerkas').value = `${nim}_skripsi.pdf`;
+                    document.getElementById('namaBerkas').value = `${nim}_penyerahan_skripsi.pdf`;
                     document.getElementById('pdfPreview').setAttribute('src', pdfUrl); // Update src iframe
                 });
             });

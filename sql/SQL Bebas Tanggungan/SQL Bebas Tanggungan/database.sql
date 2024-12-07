@@ -191,10 +191,10 @@ INSERT into dbo.[login] (username, password, status) VALUES(
 use Bebas_Tanggungan
 SELECT * from dbo.[login]
 
-select * from penyerahan_kebenaran_data
-UPDATE penyerahan_kebenaran_data
-SET status_pengumpulan_penyerahan_kebenaran_data = 'pending'
-WHERE status_pengumpulan_penyerahan_kebenaran_data = 'belum upload';
+select * from data_alumni
+UPDATE data_alumni
+SET status_pengumpulan_data_alumni = 'pending'
+WHERE status_pengumpulan_data_alumni is null;
 
 -- Insert data ke tabel adminlt6_konfirmasi
 INSERT INTO [dbo].[adminlt6_konfirmasi] (nim, tanggal_adminlt6_konfirmasi)

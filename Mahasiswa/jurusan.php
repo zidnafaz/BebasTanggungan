@@ -383,7 +383,7 @@ sqlsrv_close($conn);
             </li>
 
             <li class="nav-item" id="nav-jurusan">
-                <a class="nav-link" href="jurusan.php">
+                <a class="nav-link" href="prodi.php">
                     <i class="fas fa-solid fa-file-lines"></i>
                     <span>Program Studi</span></a>
             </li>

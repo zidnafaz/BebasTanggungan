@@ -24,12 +24,12 @@ if (isset($_COOKIE['id'])) {
             $statusClass = match ($row['status']) {
                 'belum upload' => 'bg-secondary text-white',
                 'pending' => 'bg-warning text-dark',
-                'tidak terkonfirmasi' => 'bg-danger text-white',
-                'terkonfirmasi' => 'bg-success text-white',
+                'ditolak' => 'bg-danger text-white',
+                'terverifikasi' => 'bg-success text-white',
                 default => 'bg-light text-dark'
             };
 
-            $button = ($row['status'] === 'belum upload' || $row['status'] === 'tidak terkonfirmasi') ?
+            $button = ($row['status'] === 'belum upload' || $row['status'] === 'ditolak') ?
                 "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
                 </button>" :

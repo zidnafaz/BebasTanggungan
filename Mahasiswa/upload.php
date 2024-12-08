@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $allowedExtensions = ['pdf'];
     $maxFileSize = 2 * 1024 * 1024; // Default: 2 MB
 
-    if ($directoryLabel === 'aplikasi') {
+    if ($directoryLabel === 'skripsi') {
         $allowedExtensions = ['pdf'];
         $maxFileSize = 20 * 1024 * 1024; // 20 MB
     } elseif ($directoryLabel === 'aplikasi') {

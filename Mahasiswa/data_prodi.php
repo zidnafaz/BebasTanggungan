@@ -6,9 +6,11 @@ if (isset($_COOKIE['id'])) {
 
     // Query untuk tiap tabel
     $query = [
-        'skripsi' => "SELECT 'Skripsi' AS nama, status_pengumpulan_skripsi AS status, keterangan_pengumpulan_skripsi AS keterangan FROM skripsi WHERE nim = ?",
-        'aplikasi' => "SELECT 'Aplikasi' AS nama, status_pengumpulan_aplikasi AS status, keterangan_pengumpulan_aplikasi AS keterangan FROM aplikasi WHERE nim = ?",
-        'publikasi_jurnal' => "SELECT 'Publikasi Jurnal' AS nama, status_pengumpulan_publikasi_jurnal AS status, keterangan_pengumpulan_publikasi_jurnal AS keterangan FROM publikasi_jurnal WHERE nim = ?"
+        'penyerahan_skripsi' => "SELECT 'Penyerahan Skripsi' AS nama, status_pengumpulan_penyerahan_skripsi AS status, keterangan_pengumpulan_penyerahan_skripsi AS keterangan FROM penyerahan_skripsi WHERE nim = ?",
+        'penyerahan_pkl' => "SELECT 'Penyerahan PKL' AS nama, status_pengumpulan_penyerahan_pkl AS status, keterangan_pengumpulan_penyerahan_pkl AS keterangan FROM penyerahan_pkl WHERE nim = ?",
+        'toeic' => "SELECT 'TOEIC' AS nama, status_pengumpulan_toeic AS status, keterangan_pengumpulan_toeic AS keterangan FROM toeic WHERE nim = ?",
+        'bebas_kompen' => "SELECT 'Bebas Kompen' AS nama, status_pengumpulan_bebas_kompen AS status, keterangan_pengumpulan_bebas_kompen AS keterangan FROM bebas_kompen WHERE nim = ?",
+        'penyerahan_kebenaran_data' => "SELECT 'Penyerahan Kebenaran Data' AS nama, status_pengumpulan_penyerahan_kebenaran_data AS status, keterangan_pengumpulan_penyerahan_kebenaran_data AS keterangan FROM penyerahan_kebenaran_data WHERE nim = ?"
     ];
 
     $no = 1;

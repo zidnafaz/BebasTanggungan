@@ -77,7 +77,60 @@ try {
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <div id="navbar"></div>
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
+
+            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-tugasAkhir">
+                <a class="nav-link" href="jurusan.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Jurusan</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-prodi">
+                <a class="nav-link" href="prodi.php">
+                    <i class="fas fa-solid fa-file-lines"></i>
+                    <span>Program Studi</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-akademik">
+                <a class="nav-link" href="akademik.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Akademik</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-grapol">
+                <a class="nav-link" href="grapol.php">
+                    <i class="fas fa-solid fa-file-invoice"></i>
+                    <span>Graha Polinema</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+        </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -87,7 +140,44 @@ try {
             <div id="content">
 
                 <!-- Topbar -->
-                <div id="topbar"></div>
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($result['nama_mahasiswa'] ?? ''); ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -95,7 +185,8 @@ try {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h2 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?> </h1>
+                        <h1 class="h2 mb-0 text-gray-800">Profil
+                            <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?> </h1>
                     </div>
 
                     <!-- Content Row -->
@@ -127,18 +218,19 @@ try {
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
                                                 <p>
-                                                <?php
-                                                        if ($result['jenis_kelamin_mahasiswa'] == 'L') {
-                                                            echo 'Laki-Laki';
-                                                        } elseif ($result['jenis_kelamin_mahasiswa'] == 'P') {
-                                                            echo 'Perempuan';
-                                                        }
+                                                    <?php
+                                                    if ($result['jenis_kelamin_mahasiswa'] == 'L') {
+                                                        echo 'Laki-Laki';
+                                                    } elseif ($result['jenis_kelamin_mahasiswa'] == 'P') {
+                                                        echo 'Perempuan';
+                                                    }
                                                     ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tahun Angkatan :</strong>
-                                                <p><?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?></p>
+                                                <p><?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
@@ -146,13 +238,14 @@ try {
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
+                                                <p><?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
                                                 <p><?= htmlspecialchars($result['nomor_telfon_mahasiswa'] ?? '') ?></p>
                                             </div>
-                                    </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -225,30 +318,6 @@ try {
     <script src="../js/demo/chart-area-demo.js"></script>
     <script src="../js/demo/chart-pie-demo.js"></script>
 
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
-
-    </script>
 </body>
 
 </html>

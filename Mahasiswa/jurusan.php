@@ -199,7 +199,7 @@ sqlsrv_close($conn);
                         console.error('Failed to load PDF:', pdfResponse.statusText);
                         return;
                     }
-                    
+
                     const pdfArrayBuffer = await pdfResponse.arrayBuffer();
                     const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
 
@@ -216,7 +216,7 @@ sqlsrv_close($conn);
                         console.error('Failed to load font:', fontResponse.statusText);
                         return;
                     }
-                    
+
                     const fontArrayBuffer = await fontResponse.arrayBuffer();
                     const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
 
@@ -320,21 +320,13 @@ sqlsrv_close($conn);
             font-weight: bold;
         }
 
-        .status .badge-success {
-            background-color: green;
-        }
-
-        .status .badge-danger {
-            background-color: red;
-        }
-
         #uploadModalHeader.bg-success {
-            background-color: #28a745 !important;
+            background-color: #1cc88a !important;
             /* Hijau terang */
         }
 
         #uploadModalHeader.bg-danger {
-            background-color: #dc3545 !important;
+            background-color: #e74a3b !important;
             /* Merah terang */
         }
 
@@ -358,9 +350,60 @@ sqlsrv_close($conn);
     <div id="wrapper">
 
         <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-        <div id="navbar"></div>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
+
+            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item active" id="nav-tugasAkhir">
+                <a class="nav-link" href="jurusan.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Jurusan</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-jurusan">
+                <a class="nav-link" href="jurusan.php">
+                    <i class="fas fa-solid fa-file-lines"></i>
+                    <span>Program Studi</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-akademik">
+                <a class="nav-link" href="akademik.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Akademik</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-grapol">
+                <a class="nav-link" href="grapol.php">
+                    <i class="fas fa-solid fa-file-invoice"></i>
+                    <span>Graha Polinema</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+        </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -371,16 +414,53 @@ sqlsrv_close($conn);
 
                 <!-- Topbar -->
 
-                <div id="topbar"></div>
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($nama_mahasiswa); ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
 
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
-                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 7) yang akan diverifikasi oleh ibu Widya (<a target="_blank"
-                    href="https://wa.me/6282232867789">082232867789</a> - <i>Chat Only</i>) </p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas Jurusan</h1>
+                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 7) yang akan diverifikasi oleh ibu Widya (<a
+                            target="_blank" href="https://wa.me/6282232867789">082232867789</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
@@ -397,9 +477,12 @@ sqlsrv_close($conn);
                     <!-- Card Download Dokumen -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Download Template Dokumen</h6>
                         </div>
                         <div class="card-body">
+                            <p>Unduh template dokumen yang disediakan (sesuaikan dengan kebutuhan verifikasi), isi
+                                sesuai petunjuk, lalu unggah untuk
+                                proses verifikasi.</p>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dokumenTable">
                                     <thead>
@@ -413,41 +496,9 @@ sqlsrv_close($conn);
                                     <tbody>
                                         <tr>
                                             <td>1</td>
-                                            <td>Tanda Terima Laporan Skripsi</td>
+                                            <td>Surat Pernyataan Publikasi</td>
                                             <td>-</td>
-                                            <td><a href="../Documents/downloads/template/[Form] Tanda Terima Laporan Skripsi_SIB.docx"
-                                                    class="btn btn-success" download><i class="fas fa-download"></i>
-                                                    Download</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Tanda Terima Laporan PKL / Magang</td>
-                                            <td>-</td>
-                                            <td><a href="../Documents/downloads/template/[Form] Tanda Terima Laporan PKL_Magang_SIB.docx"
-                                                    class="btn btn-success" download><i class="fas fa-download"></i>
-                                                    Download</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>Surat Keterangan Bebas Kompen</td>
-                                            <td>Apabila ada kompen, lampiran bukti kompennya pada halaman berikutnya</td>
-                                            <td><a href="../Documents/downloads/template/[Form] Bebas Kompen_SIB.docx"
-                                                    class="btn btn-success" download><i class="fas fa-download"></i>
-                                                    Download</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>Surat Keterangan TOEIC</td>
-                                            <td>Surat ini dibutuhkan apabila skor kurang dari 450 untuk D4 dan 400 untuk D3</td>
-                                            <td><a href="../Documents/downloads/template/Surat Keterangan mengikuti TOIEC.pdf"
-                                                    class="btn btn-success" download><i class="fas fa-download"></i>
-                                                    Download</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td>Surat Pernyataan Kebenaran Data Diri</td>
-                                            <td>-</td>
-                                            <td><a href="../Documents/downloads/template/[Template] Surat Kebenaran Data Diri_SIB.doc"
+                                            <td><a href="../Documents/downloads/template/[Template] Surat Pernyataan Publikasi_SIB.docx"
                                                     class="btn btn-success" download><i class="fas fa-download"></i>
                                                     Download</a></td>
                                         </tr>
@@ -593,7 +644,6 @@ sqlsrv_close($conn);
         </div>
     </div>
 
-
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -612,27 +662,6 @@ sqlsrv_close($conn);
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
 
         // Ajax untuk mengambil data dan menginisialisasi DataTables
         $(document).ready(function () {

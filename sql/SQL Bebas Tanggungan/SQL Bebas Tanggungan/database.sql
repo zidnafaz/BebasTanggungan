@@ -161,6 +161,20 @@ VALUES
 ('ditolak', 'Format salah', '20230004'),
 ('terverifikasi', 'Skripsi valid', '20230005');
 
+-- Dummy data for the [dbo].[admin] table
+INSERT INTO [dbo].[admin] (
+    [id_karyawan],
+    [nama_karyawan],
+    [nomor_telfon_karyawan],
+    [alamat_karyawan],
+    [tanggal_lahir_karyawan],
+    [jenis_kelamin_karyawan]
+) VALUES
+('20230006', 'Safrilia', '081333213023', 'Jl. Merdeka No. 1, Jakarta', '1990-05-15', 'P'),
+('20230007', 'Merry', '082247723596', 'Jl. Pahlawan No. 22, Bandung', '1988-12-20', 'P'),
+('20230008', 'Ila', '081232245969', 'Jl. Mawar No. 10, Surabaya', '1992-08-11', 'P'),
+('20230009', 'Widya Novy', '082232867789', 'Jl. Kenangan No. 5, Yogyakarta', '1995-03-25', 'P');
+
 -- TAMBAH ADMIN PERPUS DAN ADMIN PUSAT
 use Bebas_Tanggungan;
 INSERT into dbo.[login] (username, password, status) VALUES(
@@ -200,7 +214,6 @@ INSERT INTO [dbo].[adminPerpus_konfirmasi] (nim, tanggal_adminPerpus_konfirmasi)
 VALUES 
 ('20230001', '2024-12-01'), 
 ('20230005', '2024-12-02');
-
 
 -- Query Konfirmasi Admin Tiap User
 

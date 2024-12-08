@@ -27,12 +27,31 @@ if (isset($_COOKIE['id'])) {
                 default => 'bg-light text-dark'
             };
 
-            $button = ($row['status'] === 'belum upload' || $row['status'] === 'ditolak') ?
-                "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
-                    <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload
-                </button>" :
-                "<button class=\"btn btn-secondary btn-sm\" disabled>Disable</button>";
+            // Tentukan file download berdasarkan key
+            $fileExtension = $key === 'aplikasi' ? ['zip', 'rar'] : ['pdf']; // Tentukan ekstensi file sesuai dengan key
+            $filePath = '../Documents/Uploads/' . $key . '/' . $nim . '_' . basename($key) . '.' . (in_array($key, ['aplikasi']) ? 'zip' : 'pdf'); // Sesuaikan ekstensi untuk aplikasi
+            $downloadButton = '';
+            $uploadButton = '';
 
+            // Tombol Upload: aktif jika status 'belum upload' atau 'ditolak', disabled jika status lainnya
+            if ($row['status'] === 'belum upload' || $row['status'] === 'ditolak') {
+                $uploadButton = "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
+                                    <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload 
+                                  </button>";
+            } else {
+                $uploadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Disable</button>";
+            }
+
+            // Tombol Download: aktif jika statusnya 'pending', 'ditolak', atau 'terverifikasi', dan file ada
+            if (in_array($row['status'], ['pending', 'ditolak', 'terverifikasi']) && file_exists($filePath)) {
+                $downloadButton = "<a href='{$filePath}' class='btn btn-success btn-sm' download>
+                                    <i class='fas fa-download'></i> Download
+                                  </a>";
+            } else {
+                $downloadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class='fas fa-download'></i> Disable</button>";
+            }
+
+            // Tampilkan baris tabel dengan tombol Upload dan Download
             echo "<tr>
                 <td>{$no}</td>
                 <td>{$row['nama']}</td>
@@ -40,7 +59,7 @@ if (isset($_COOKIE['id'])) {
                         {$row['status']}
                     </span></td>
                 <td>{$row['keterangan']}</td>
-                <td>{$button}</td>
+                <td>{$uploadButton} {$downloadButton}</td>
             </tr>";
             $no++;
         }

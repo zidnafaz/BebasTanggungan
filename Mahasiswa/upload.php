@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Validasi file
-    $allowedExtensions = ['pdf', 'zip', 'rar'];
+    $allowedExtensions = ['pdf'];
     $maxFileSize = 2 * 1024 * 1024; // Default: 2 MB
 
     if ($directoryLabel !== 'aplikasi') {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $maxFileSize = 20 * 1024 * 1024; // 20 MB
     } elseif ($directoryLabel === 'aplikasi') {
         $allowedExtensions = ['zip', 'rar'];
-        $maxFileSize = 30 * 1024 * 1024; // 30 MB
+        $maxFileSize = 100 * 1024 * 1024; // 100 MB
     }
 
     $originalFileName = basename($_FILES["file"]["name"]);

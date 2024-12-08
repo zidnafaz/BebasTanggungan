@@ -57,20 +57,6 @@ try {
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
-    <style>
-        .card-fixed-height {
-            height: 200px;
-        }
-
-        strong {
-            font-size: 22px;
-        }
-
-        p {
-            font-size: 20px;
-        }
-    </style>
-
 </head>
 
 <body id="page-top">
@@ -188,38 +174,42 @@ try {
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h2 mb-0 text-gray-800">Profil
-                            <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?> </h1>
+                            <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?>
+                        </h1>
                     </div>
 
                     <!-- Content Row -->
-                    <div class="container rounded shadow mt-5">
-                        <div class="row" style="size : 200px;">
+                    <div class="container rounded shadow-lg mt-5 p-4 bg-light">
+                        <div class="row">
                             <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h1>Informasi Pribadi</h1>
+                                <div class="card shadow-sm">
+                                    <div class="card-header text-center bg-primary text-white">
+                                        <h3>Informasi Pribadi</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row mb-5">
+                                        <div class="row mb-4">
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
-                                                <p><?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jurusan :</strong>
-                                                <p><?= htmlspecialchars($result['jurusan_mahasiswa'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['jurusan_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>NIM (No Induk) :</strong>
-                                                <p><?= htmlspecialchars($result['nim'] ?? '') ?></p>
+                                                <p class="text-muted"><?= htmlspecialchars($result['nim'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Program Studi :</strong>
-                                                <p><?= htmlspecialchars($result['prodi_mahasiswa'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['prodi_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
-                                                <p>
+                                                <p class="text-muted">
                                                     <?php
                                                     if ($result['jenis_kelamin_mahasiswa'] == 'L') {
                                                         echo 'Laki-Laki';
@@ -231,21 +221,25 @@ try {
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tahun Angkatan :</strong>
-                                                <p><?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
-                                                <p><?= htmlspecialchars($result['alamat_mahasiswa'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['alamat_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
-                                                <p><?= htmlspecialchars($result['nomor_telfon_mahasiswa'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nomor_telfon_mahasiswa'] ?? '') ?></p>
                                             </div>
                                         </div>
                                     </div>

@@ -6,10 +6,10 @@ if (isset($_COOKIE['id'])) {
 
     // Query untuk tiap tabel
     $query = [
-        'penyerahan_hardcopy' => "SELECT 'Penyerahan Hardcopy' AS nama, status_pengumpulan_penyerahan_hardcopy AS status, keterangan_pengumpulan_penyerahan_hardcopy AS keterangan FROM penyerahan_hardcopy WHERE nim = ?",
-        'tugas_akhir_softcopy' => "SELECT 'Tugas Akhir Softcopy' AS nama, status_pengumpulan_tugas_akhir_softcopy AS status, keterangan_pengumpulan_tugas_akhir_softcopy AS keterangan FROM tugas_akhir_softcopy WHERE nim = ?",
-        'bebas_pinjam_buku_perpustakaan' => "SELECT 'Bebas Pinjam Buku Perpustakaan' AS nama, status_pengumpulan_bebas_pinjam_buku_perpustakaan AS status, keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan AS keterangan FROM bebas_pinjam_buku_perpustakaan WHERE nim = ?",
-        'hasil_kuisioner' => "SELECT 'Hasil Kuisioner' AS nama, status_pengumpulan_hasil_kuisioner AS status, keterangan_pengumpulan_hasil_kuisioner AS keterangan FROM hasil_kuisioner WHERE nim = ?"
+        'penyerahan_hardcopy' => "SELECT 'Bukti Penyerahan Hardcopy Skripsi' AS nama, status_pengumpulan_penyerahan_hardcopy AS status, keterangan_pengumpulan_penyerahan_hardcopy AS keterangan FROM penyerahan_hardcopy WHERE nim = ?",
+        'tugas_akhir_softcopy' => "SELECT 'Bukti Upload Softcopy Skripsi' AS nama, status_pengumpulan_tugas_akhir_softcopy AS status, keterangan_pengumpulan_tugas_akhir_softcopy AS keterangan FROM tugas_akhir_softcopy WHERE nim = ?",
+        'bebas_pinjam_buku_perpustakaan' => "SELECT 'Bukti Bebas Pinjam Buku Perpustakaan' AS nama, status_pengumpulan_bebas_pinjam_buku_perpustakaan AS status, keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan AS keterangan FROM bebas_pinjam_buku_perpustakaan WHERE nim = ?",
+        'hasil_kuisioner' => "SELECT 'Bukti Pengisian Kuisioner' AS nama, status_pengumpulan_hasil_kuisioner AS status, keterangan_pengumpulan_hasil_kuisioner AS keterangan FROM hasil_kuisioner WHERE nim = ?"
     ];
 
     $no = 1;

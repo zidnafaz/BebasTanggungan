@@ -644,7 +644,7 @@ sqlsrv_close($conn);
                                 <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
-                            <small class="form-text text-muted">Accepted file type: .doc only</small>
+                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for aplikasi)</small>
                         </div>
 
                         <!-- Preview Filename -->

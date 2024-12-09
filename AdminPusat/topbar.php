@@ -1,3 +1,38 @@
+<?php  
+include '../login.php';
+include '../koneksi.php';
+
+try {
+    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
+    FROM dbo.admin a
+    WHERE a.id_karyawan = ?";
+
+    session_start(); 
+    
+    if (isset($_COOKIE['id'])) {
+        $inputUsername = $_COOKIE['id'];
+    } else {
+        die("Anda harus login terlebih dahulu.");
+    }
+
+    $param = array($inputUsername);
+    $stmt = sqlsrv_query($conn, $sql, $param);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true)); // Tangani error query
+    }
+
+    // Ambil hasil query
+    if (sqlsrv_has_rows($stmt)) {
+        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
+    } else {
+        echo "Data tidak ditemukan.";
+        $result = null; // Pastikan $result diset null jika data tidak ditemukan
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,7 +72,7 @@
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                    <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></span>
                     <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                 </a>
                 <!-- Dropdown - User Information -->

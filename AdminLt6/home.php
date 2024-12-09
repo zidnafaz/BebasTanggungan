@@ -280,7 +280,7 @@ sqlsrv_close($conn);
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="../index.html">Logout</a>
                 </div>
             </div>
         </div>
@@ -319,7 +319,7 @@ sqlsrv_close($conn);
                 .catch(error => console.error('Error loading navbar:', error));
         });
 
-        fetch('topbar.html')
+        fetch('topbar.php')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('topbar').innerHTML = data;

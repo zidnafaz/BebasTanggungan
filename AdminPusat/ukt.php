@@ -472,7 +472,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 .catch(error => console.error('Error loading navbar:', error));
         });
 
-        fetch('topbar.html')
+        fetch('topbar.php')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('topbar').innerHTML = data;

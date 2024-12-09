@@ -8,6 +8,20 @@ if (!isset($_COOKIE['id'])) {
 
 $nim = $_COOKIE['id'];
 
+$queryUser = "SELECT nama_mahasiswa from dbo.mahasiswa where NIM = '$nim'";
+$stmtUser = sqlsrv_query($conn,$queryUser);
+if (!$stmtUser) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+if (sqlsrv_has_rows($stmtUser)) {
+    $rowUser = sqlsrv_fetch_array($stmtUser, SQLSRV_FETCH_ASSOC);
+
+} else {
+    echo "Data tidak ditemukan.";
+    $rowUser = null; // Pastikan $result diset null jika data tidak ditemukan
+}
+
 $query = "
     SELECT 
         (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
@@ -190,7 +204,7 @@ sqlsrv_close($conn);
             <div id="content">
 
                 <!-- Topbar -->
-
+                
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -206,7 +220,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama_mahasiswa); ?>
+                                    <?php echo htmlspecialchars($rowUser['nama_mahasiswa']?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>

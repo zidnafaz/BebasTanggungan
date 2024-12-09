@@ -1,5 +1,6 @@
 <?php
 include '../koneksi.php';
+include '../data/dataAdmin.php';
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -46,61 +47,64 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
+    <!-- DataTables -->
+    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
     <style>
-        .status span {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            text-align: center;
-            vertical-align: middle;
-        }
+    .status span {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        text-align: center;
+        vertical-align: middle;
+    }
 
-        .status .badge-success {
-            background-color: #1cc88a;
-        }
+    .status .badge-success {
+        background-color: #1cc88a;
+    }
 
-        .status .badge-warning {
-            background-color: #f6c23e;
-            color: #5a5c69;
-        }
+    .status .badge-warning {
+        background-color: #f6c23e;
+        color: #5a5c69;
+    }
 
-        .status .badge-secondary {
-            background-color: #858796;
-        }
+    .status .badge-secondary {
+        background-color: #858796;
+    }
 
-        .status .badge-danger {
-            background-color: #e74a3b;
-        }
+    .status .badge-danger {
+        background-color: #e74a3b;
+    }
 
-        /* Mengubah warna latar belakang baris tabel */
-        table.dataTable tbody tr:nth-child(odd) {
-            background-color: #fff;
-            /* Lebih gelap dari warna default */
-        }
+    /* Mengubah warna latar belakang baris tabel */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #fff;
+        /* Lebih gelap dari warna default */
+    }
 
-        table.dataTable tbody tr:nth-child(even) {
-            background-color: #fff;
-            /* Lebih gelap dari warna default */
-        }
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #fff;
+        /* Lebih gelap dari warna default */
+    }
 
-        /* Mengubah warna baris yang sedang dipilih */
-        table.dataTable tbody tr.selected {
-            background-color: #d6d6d6 !important;
-            /* Warna ketika baris dipilih */
-        }
+    /* Mengubah warna baris yang sedang dipilih */
+    table.dataTable tbody tr.selected {
+        background-color: #d6d6d6 !important;
+        /* Warna ketika baris dipilih */
+    }
 
-        /* Menyesuaikan warna header */
-        table.dataTable thead th {
-            background-color: #4e73df;
-            /* Warna header tabel */
-            color: white;
-        }
+    /* Menyesuaikan warna header */
+    table.dataTable thead th {
+        background-color: #4e73df;
+        /* Warna header tabel */
+        color: white;
+    }
     </style>
 
 </head>
@@ -111,9 +115,67 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <div id="wrapper">
 
         <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-        <div id="navbar"></div>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
+
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item" id="nav-skripsi">
+                <a class="nav-link" href="skripsi.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Laporan Skripsi</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-pkl">
+                <a class="nav-link" href="pkl.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Laporan PKL</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-toeic">
+                <a class="nav-link" href="toeic.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>TOEIC</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-kompen">
+                <a class="nav-link" href="kompen.php">
+                    <i class="fas fa-solid fa-file-invoice"></i>
+                    <span>Kompen</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-kebenaran_data">
+                <a class="nav-link" href="kebenarandata.php">
+                    <i class="fas fa-solid fa-user-graduate"></i>
+                    <span>Kebenaran Data</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+        </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -124,9 +186,44 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
                 <!-- Topbar -->
 
-                <div id="topbar">
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-                </div>
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
 
                 <!-- End of Topbar -->
 
@@ -185,42 +282,42 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                             };
 
                                             ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($row['nim']) ?></td>
-                                                <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
-                                                <td class="status">
-                                                    <span class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
-                                                        style="cursor: pointer;"
-                                                        title="<?= htmlspecialchars($row['status']) ?>">
-                                                        <?= htmlspecialchars($row['status']) ?>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <?php if (strtolower($row['status']) === 'belum upload'): ?>
-                                                        <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
-                                                            Disabled</button>
-                                                    <?php elseif (strtolower($row['status']) === 'terverifikasi'): ?>
-                                                        <button class="btn btn-info btn-sm edit-data"
-                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
-                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
-                                                            data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
-                                                            data-target="#verifikasiModal" data-toggle="modal">
-                                                            <i class="fa fa-solid fa-file-lines"></i> Preview
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-primary btn-sm edit-data"
-                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
-                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
-                                                            data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
-                                                            data-target="#verifikasiModal" data-toggle="modal">
-                                                            <i class="fa fa-edit"></i> Verifikasi
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
-                                            <?php
+                                    <tr>
+                                        <td><?= htmlspecialchars($row['nim']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
+                                        <td class="status">
+                                            <span class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                style="cursor: pointer;"
+                                                title="<?= htmlspecialchars($row['status']) ?>">
+                                                <?= htmlspecialchars($row['status']) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php if (strtolower($row['status']) === 'belum upload'): ?>
+                                            <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
+                                                Disabled</button>
+                                            <?php elseif (strtolower($row['status']) === 'terverifikasi'): ?>
+                                            <button class="btn btn-info btn-sm edit-data"
+                                                data-nim="<?= htmlspecialchars($row['nim']) ?>"
+                                                data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
+                                                data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
+                                                data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
+                                                data-target="#verifikasiModal" data-toggle="modal">
+                                                <i class="fa fa-solid fa-file-lines"></i> Preview
+                                            </button>
+                                            <?php else: ?>
+                                            <button class="btn btn-primary btn-sm edit-data"
+                                                data-nim="<?= htmlspecialchars($row['nim']) ?>"
+                                                data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
+                                                data-nama-berkas="<?= $row['nim'] . "_pkl.pdf" ?>"
+                                                data-pdf="../Documents/uploads/pkl/<?= $row['nim'] ?>_pkl.pdf"
+                                                data-target="#verifikasiModal" data-toggle="modal">
+                                                <i class="fa fa-edit"></i> Verifikasi
+                                            </button>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php
                                         endwhile;
                                         sqlsrv_free_stmt($result);
                                     } catch (Exception $e) {
@@ -412,253 +509,234 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
-
-        $(document).ready(function () {
-            // Inisialisasi DataTable
-            var table = $('#dataTable').DataTable({
-                "ordering": true,
-                "searching": true,
-                "paging": true,
-                "info": true,
-                "language": {
-                    "lengthMenu": "Tampilkan _MENU_ entri per halaman",
-                    "zeroRecords": "Tidak ada data yang ditemukan",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total entri)",
-                    "search": "Cari:",
-                    "paginate": {
-                        "first": "Pertama",
-                        "last": "Terakhir",
-                        "next": "Berikutnya",
-                        "previous": "Sebelumnya"
-                    }
+    $(document).ready(function() {
+        // Inisialisasi DataTable
+        var table = $('#dataTable').DataTable({
+            "ordering": true,
+            "searching": true,
+            "paging": true,
+            "info": true,
+            "language": {
+                "lengthMenu": "Tampilkan _MENU_ entri per halaman",
+                "zeroRecords": "Tidak ada data yang ditemukan",
+                "info": "Menampilkan _PAGE_ dari _PAGES_",
+                "infoEmpty": "Tidak ada data",
+                "infoFiltered": "(difilter dari _MAX_ total entri)",
+                "search": "Cari:",
+                "paginate": {
+                    "first": "Pertama",
+                    "last": "Terakhir",
+                    "next": "Berikutnya",
+                    "previous": "Sebelumnya"
                 }
-            });
-
-            $('#statusFilter').on('change', function () {
-                var status = $(this).val();
-                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status pkl
-            });
-
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const statusCells = document.querySelectorAll(".status span");
-            statusCells.forEach(cell => {
-                if (cell.textContent.trim() === "terverifikasi") {
-                    cell.classList.add("badge-success");
-                } else if (cell.textContent.trim() === "belum upload") {
-                    cell.classList.add("badge-secondary");
-                } else if (cell.textContent.trim() === "pending") {
-                    cell.classList.add("badge-warning");
-                } else if (cell.textContent.trim() === "ditolak") {
-                    cell.classList.add("badge-danger");
-                }
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const buttons = document.querySelectorAll(".edit-data");
-            buttons.forEach(button => {
-                button.addEventListener("click", function () {
-                    const nim = this.getAttribute("data-nim");
-                    const nama = this.getAttribute("data-nama");
-                    const namaBerkas = this.getAttribute("data-nama-berkas");
-                    const pdfSrc = this.getAttribute("data-pdf");
-
-                    // Set data ke modal
-                    document.getElementById("formNim").value = nim;
-                    document.getElementById("formNama").value = nama;
-                    document.getElementById("nama").value = nama;
-                    document.getElementById("nim").value = nim;
-                    document.getElementById("namaBerkas").value = namaBerkas;
-                    document.getElementById("pdfPreview").src = pdfSrc;
-                });
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            // Event listener untuk setiap tombol Verifikasi
-            const buttons = document.querySelectorAll(".edit-data");
-            buttons.forEach(button => {
-                button.addEventListener("click", function () {
-                    const nim = this.getAttribute("data-nim");
-                    const pdfUrl = `../Documents/uploads/pkl/${nim}_pkl.pdf`;
-
-                    // Update isi modal
-                    document.getElementById('nim').value = nim;
-                    document.getElementById('namaBerkas').value = `${nim}_pkl.pdf`;
-                    document.getElementById('pdfPreview').setAttribute('src', pdfUrl); // Update src iframe
-                });
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusModal = document.getElementById('uploadModalStatus');
-            const messageContent = document.getElementById('uploadMessage');
-            const successIcon = document.getElementById('successIcon');
-            const errorIcon = document.getElementById('errorIcon');
-
-            // Show modal with message when it's triggered by URL parameters
-            if (window.location.search.includes('message') && window.location.search.includes('type')) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const message = urlParams.get('message');
-                const messageType = urlParams.get('type');
-
-                messageContent.textContent = message;
-                if (messageType === 'success') {
-                    successIcon.style.display = 'block';
-                    errorIcon.style.display = 'none';
-                } else {
-                    successIcon.style.display = 'none';
-                    errorIcon.style.display = 'block';
-                }
-                $(statusModal).modal('show');
             }
+        });
 
-            // When the modal is closed, clear the URL parameters and message content
-            $(statusModal).on('hidden.bs.modal', function () {
-                // Clear URL parameters from the browser history
-                const cleanUrl = window.location.pathname;
-                window.history.replaceState(null, null, cleanUrl);
+        $('#statusFilter').on('change', function() {
+            var status = $(this).val();
+            table.column(2).search(status).draw(); // Kolom ke-2 adalah Status pkl
+        });
 
-                // Clear message content and hide icons
-                messageContent.textContent = '';
-                successIcon.style.display = 'none';
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const statusCells = document.querySelectorAll(".status span");
+        statusCells.forEach(cell => {
+            if (cell.textContent.trim() === "terverifikasi") {
+                cell.classList.add("badge-success");
+            } else if (cell.textContent.trim() === "belum upload") {
+                cell.classList.add("badge-secondary");
+            } else if (cell.textContent.trim() === "pending") {
+                cell.classList.add("badge-warning");
+            } else if (cell.textContent.trim() === "ditolak") {
+                cell.classList.add("badge-danger");
+            }
+        });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const buttons = document.querySelectorAll(".edit-data");
+        buttons.forEach(button => {
+            button.addEventListener("click", function() {
+                const nim = this.getAttribute("data-nim");
+                const nama = this.getAttribute("data-nama");
+                const namaBerkas = this.getAttribute("data-nama-berkas");
+                const pdfSrc = this.getAttribute("data-pdf");
+
+                // Set data ke modal
+                document.getElementById("formNim").value = nim;
+                document.getElementById("formNama").value = nama;
+                document.getElementById("nama").value = nama;
+                document.getElementById("nim").value = nim;
+                document.getElementById("namaBerkas").value = namaBerkas;
+                document.getElementById("pdfPreview").src = pdfSrc;
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Event listener untuk setiap tombol Verifikasi
+        const buttons = document.querySelectorAll(".edit-data");
+        buttons.forEach(button => {
+            button.addEventListener("click", function() {
+                const nim = this.getAttribute("data-nim");
+                const pdfUrl = `../Documents/uploads/pkl/${nim}_pkl.pdf`;
+
+                // Update isi modal
+                document.getElementById('nim').value = nim;
+                document.getElementById('namaBerkas').value = `${nim}_pkl.pdf`;
+                document.getElementById('pdfPreview').setAttribute('src',
+                pdfUrl); // Update src iframe
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusModal = document.getElementById('uploadModalStatus');
+        const messageContent = document.getElementById('uploadMessage');
+        const successIcon = document.getElementById('successIcon');
+        const errorIcon = document.getElementById('errorIcon');
+
+        // Show modal with message when it's triggered by URL parameters
+        if (window.location.search.includes('message') && window.location.search.includes('type')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const messageType = urlParams.get('type');
+
+            messageContent.textContent = message;
+            if (messageType === 'success') {
+                successIcon.style.display = 'block';
                 errorIcon.style.display = 'none';
-            });
+            } else {
+                successIcon.style.display = 'none';
+                errorIcon.style.display = 'block';
+            }
+            $(statusModal).modal('show');
+        }
+
+        // When the modal is closed, clear the URL parameters and message content
+        $(statusModal).on('hidden.bs.modal', function() {
+            // Clear URL parameters from the browser history
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState(null, null, cleanUrl);
+
+            // Clear message content and hide icons
+            messageContent.textContent = '';
+            successIcon.style.display = 'none';
+            errorIcon.style.display = 'none';
         });
+    });
 
-        // Keterangan pada verifikasi
+    // Keterangan pada verifikasi
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const verifikasiTrue = document.getElementById('verifikasiTrue');
-            const verifikasiFalse = document.getElementById('verifikasiFalse');
-            const keterangan = document.getElementById('keterangan');
-            const keteranganError = document.getElementById('keteranganError');
-            const saveButton = document.getElementById('saveVerification');
+    document.addEventListener('DOMContentLoaded', () => {
+        const verifikasiTrue = document.getElementById('verifikasiTrue');
+        const verifikasiFalse = document.getElementById('verifikasiFalse');
+        const keterangan = document.getElementById('keterangan');
+        const keteranganError = document.getElementById('keteranganError');
+        const saveButton = document.getElementById('saveVerification');
 
-            // Event listener untuk radio buttons
-            [verifikasiTrue, verifikasiFalse].forEach(radio => {
-                radio.addEventListener('change', () => {
-                    if (verifikasiTrue.checked) {
-                        keterangan.disabled = true;
-                        keterangan.value = ""; // Clear the textarea
-                        keteranganError.style.display = "none";
-                    } else if (verifikasiFalse.checked) {
-                        keterangan.disabled = false;
-                    }
-                });
-            });
-
-            // Validasi sebelum menyimpan
-            saveButton.addEventListener('click', () => {
-                if (verifikasiFalse.checked && keterangan.value.trim() === "") {
-                    keteranganError.style.display = "block";
-                    keterangan.focus();
-                } else {
+        // Event listener untuk radio buttons
+        [verifikasiTrue, verifikasiFalse].forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (verifikasiTrue.checked) {
+                    keterangan.disabled = true;
+                    keterangan.value = ""; // Clear the textarea
                     keteranganError.style.display = "none";
-                    // Lakukan tindakan simpan (AJAX atau proses lainnya)
-                    alert('Data berhasil disimpan!');
-                    $('#verifikasiModal').modal('hide');
+                } else if (verifikasiFalse.checked) {
+                    keterangan.disabled = false;
                 }
             });
         });
 
-        $(document).ready(function () {
-            // Inisialisasi status awal (Ketika modal dibuka)
+        // Validasi sebelum menyimpan
+        saveButton.addEventListener('click', () => {
+            if (verifikasiFalse.checked && keterangan.value.trim() === "") {
+                keteranganError.style.display = "block";
+                keterangan.focus();
+            } else {
+                keteranganError.style.display = "none";
+                // Lakukan tindakan simpan (AJAX atau proses lainnya)
+                alert('Data berhasil disimpan!');
+                $('#verifikasiModal').modal('hide');
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Inisialisasi status awal (Ketika modal dibuka)
+        toggleFormFields();
+
+        // Ketika radio button status verifikasi diubah
+        $("input[name='status_verifikasi']").change(function() {
             toggleFormFields();
+        });
 
-            // Ketika radio button status verifikasi diubah
-            $("input[name='status_verifikasi']").change(function () {
-                toggleFormFields();
-            });
+        // Ketika keterangan diubah (untuk mengaktifkan tombol simpan)
+        $("#keterangan").on('input', function() {
+            toggleSaveButton();
+        });
 
-            // Ketika keterangan diubah (untuk mengaktifkan tombol simpan)
-            $("#keterangan").on('input', function () {
-                toggleSaveButton();
-            });
+        // Fungsi untuk menyesuaikan kondisi form
+        function toggleFormFields() {
+            const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
-            // Fungsi untuk menyesuaikan kondisi form
-            function toggleFormFields() {
-                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
-
-                if (statusVerifikasi === "terverifikasi") {
-                    // Jika terverifikasi: keterangan opsional dan tombol simpan diaktifkan
-                    $("#keterangan").prop("disabled", false);  // Mengaktifkan textarea keterangan
-                    $("#keterangan").val('');  // Menghapus isi textarea
-                    $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
-                } else if (statusVerifikasi === "ditolak") {
-                    // Jika ditolak: keterangan wajib diisi dan tombol simpan dinonaktifkan
-                    $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
-                    $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
-                } else {
-                    // Jika tidak ada pilihan: keterangan di-disable dan tombol simpan dinonaktifkan
-                    $("#keterangan").prop("disabled", true); // Menonaktifkan textarea
-                    $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
-                }
-            }
-
-            // Fungsi untuk mengaktifkan tombol simpan jika keterangan sudah diisi
-            function toggleSaveButton() {
-                const keterangan = $("#keterangan").val().trim();
-                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
-
-                // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terverifikasi' dan keterangan diisi
-                if (statusVerifikasi === "ditolak" && keterangan !== '') {
-                    $("#simpanVerifikasi").prop("disabled", false);
-                } else {
-                    $("#simpanVerifikasi").prop("disabled", false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi
-                }
-            }
-
-            // Pastikan status terpilih sebelum form disubmit
-            $("#verifikasiForm").submit(function (e) {
-                const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
-                if (!statusVerifikasi) {
-                    e.preventDefault(); // Mencegah pengiriman form jika status belum dipilih
-                    alert("Status verifikasi belum dipilih. Silakan pilih status.");
-                    return false; // Menghentikan form submit
-                }
-
-                var keterangan = $("#keterangan").val().trim();
-                if (keterangan === '') {
-                    $("#keterangan").val('-'); // Set default keterangan menjadi "-"
-                }
-
-                return true; // Melanjutkan pengiriman form jika semua validasi terpenuhi
-            });
-
-            // Reset radio buttons dan form ketika modal ditutup
-            $('#verifikasiModal').on('hidden.bs.modal', function () {
-                $("input[name='status_verifikasi']").prop('checked', false); // Menghapus pilihan radio
-                $("#keterangan").val(''); // Menghapus keterangan
+            if (statusVerifikasi === "terverifikasi") {
+                // Jika terverifikasi: keterangan opsional dan tombol simpan diaktifkan
+                $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
+                $("#keterangan").val(''); // Menghapus isi textarea
+                $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
+            } else if (statusVerifikasi === "ditolak") {
+                // Jika ditolak: keterangan wajib diisi dan tombol simpan dinonaktifkan
+                $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
+                $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
+            } else {
+                // Jika tidak ada pilihan: keterangan di-disable dan tombol simpan dinonaktifkan
                 $("#keterangan").prop("disabled", true); // Menonaktifkan textarea
                 $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
-            });
+            }
+        }
+
+        // Fungsi untuk mengaktifkan tombol simpan jika keterangan sudah diisi
+        function toggleSaveButton() {
+            const keterangan = $("#keterangan").val().trim();
+            const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
+
+            // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terverifikasi' dan keterangan diisi
+            if (statusVerifikasi === "ditolak" && keterangan !== '') {
+                $("#simpanVerifikasi").prop("disabled", false);
+            } else {
+                $("#simpanVerifikasi").prop("disabled",
+                false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi
+            }
+        }
+
+        // Pastikan status terpilih sebelum form disubmit
+        $("#verifikasiForm").submit(function(e) {
+            const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
+            if (!statusVerifikasi) {
+                e.preventDefault(); // Mencegah pengiriman form jika status belum dipilih
+                alert("Status verifikasi belum dipilih. Silakan pilih status.");
+                return false; // Menghentikan form submit
+            }
+
+            var keterangan = $("#keterangan").val().trim();
+            if (keterangan === '') {
+                $("#keterangan").val('-'); // Set default keterangan menjadi "-"
+            }
+
+            return true; // Melanjutkan pengiriman form jika semua validasi terpenuhi
         });
+
+        // Reset radio buttons dan form ketika modal ditutup
+        $('#verifikasiModal').on('hidden.bs.modal', function() {
+            $("input[name='status_verifikasi']").prop('checked', false); // Menghapus pilihan radio
+            $("#keterangan").val(''); // Menghapus keterangan
+            $("#keterangan").prop("disabled", true); // Menonaktifkan textarea
+            $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
+        });
+    });
     </script>
 
 </body>

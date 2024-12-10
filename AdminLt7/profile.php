@@ -1,37 +1,7 @@
 <?php  
 include '../login.php';
 include '../koneksi.php';
-
-try {
-    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
-    FROM dbo.admin a
-    WHERE a.id_karyawan = ?";
-
-    session_start(); 
-    
-    if (isset($_COOKIE['id'])) {
-        $inputUsername = $_COOKIE['id'];
-    } else {
-        die("Anda harus login terlebih dahulu.");
-    }
-
-    $param = array($inputUsername);
-    $stmt = sqlsrv_query($conn, $sql, $param);
-
-    if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true)); // Tangani error query
-    }
-
-    // Ambil hasil query
-    if (sqlsrv_has_rows($stmt)) {
-        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
-    } else {
-        echo "Data tidak ditemukan.";
-        $result = null; // Pastikan $result diset null jika data tidak ditemukan
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+include '../data/dataAdmin.php';
 ?>
 
 <!DOCTYPE html>
@@ -77,9 +47,58 @@ try {
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        <!-- Sidebar -->
-        <div id="navbar"></div>
-        <!-- End of Sidebar -->
+        
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+<!-- Sidebar - Brand -->
+<a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+    <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+</a>
+
+<!-- Divider -->
+<hr class="sidebar-divider my-0">
+
+<!-- Nav Item - Dashboard -->
+<li class="nav-item active" id="nav-dashboard">
+    <a class="nav-link" href="home.php">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Dashboard</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading">
+    Verifikasi
+</div>
+
+
+<!-- Nav Item - Verifikasi -->
+<li class="nav-item" id="nav-upload_skripsi">
+            <a class="nav-link" href="upload_skripsi.php">
+                <i class="fas fa-solid fa-book"></i>
+                <span>Upload Skripsi</span></a>
+        </li>
+
+        <li class="nav-item" id="nav-program_mahasiswa">
+            <a class="nav-link" href="program_mahasiswa.php">
+                <i class="fas fa-solid fa-file-lines"></i>
+                <span>Program Mahasiswa</span></a>
+        </li>
+
+        <li class="nav-item" id="nav-publikasi_jurnal">
+            <a class="nav-link" href="publikasi_jurnal.php">
+                <i class="fas fa-solid fa-file"></i>
+                <span>Publikasi Jurnal</span></a>
+        </li>
+
+<!-- Divider -->
+<hr class="sidebar-divider d-none d-md-block">
+
+</ul>
+<!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -88,7 +107,46 @@ try {
             <div id="content">
 
                 <!-- Topbar -->
-                <div id="topbar"></div>
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -96,7 +154,7 @@ try {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></h1>
+                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></h1>
                     </div>
 
                     <!-- Content Row -->
@@ -111,15 +169,15 @@ try {
                                         <div class="row mb-5">
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
-                                                <p><?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></p>
+                                                <p><?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
                                                 <p>
                                                 <?php
-                                                        if ($result['jenis_kelamin_karyawan'] == 'L') {
+                                                        if ($resultUser['jenis_kelamin_karyawan'] == 'L') {
                                                             echo 'Laki-Laki';
-                                                        } elseif ($result['jenis_kelamin_karyawan'] == 'P') {
+                                                        } elseif ($resultUser['jenis_kelamin_karyawan'] == 'P') {
                                                             echo 'Perempuan';
                                                         }
                                                     ?>
@@ -127,15 +185,15 @@ try {
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
-                                                <p><?= htmlspecialchars($result['alamat_karyawan'] ?? '') ?></p>
+                                                <p><?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($result['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
+                                                <p><?= htmlspecialchars($resultUser['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
-                                                <p><?= htmlspecialchars($result['nomor_telfon_karyawan'] ?? '') ?></p>
+                                                <p><?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?></p>
                                             </div>
                                     </div>
                                     </div>

@@ -2,47 +2,54 @@
 
 <?php
 include '../koneksi.php';
+include '../data/dataAdmin.php';
 
 // Query untuk total mahasiswa
-$totalQuery = "SELECT COUNT(DISTINCT nim) AS total_mahasiswa FROM mahasiswa";
-$totalResult = sqlsrv_query($conn, $totalQuery);
-$totalRow = sqlsrv_fetch_array($totalResult, SQLSRV_FETCH_ASSOC);
+$penyerahan_hardcopyQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'pending' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+    FROM penyerahan_hardcopy;
+";
+$penyerahan_hardcopyResult = sqlsrv_query($conn, $penyerahan_hardcopyQuery);
+$penyerahan_hardcopyRow = sqlsrv_fetch_array($penyerahan_hardcopyResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa terverifikasi
-$verifikasiQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_terverifikasi
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_hardcopy ph ON m.nim = ph.nim AND ph.status_pengumpulan_penyerahan_hardcopy = 'terkonfirmasi'
-    LEFT JOIN tugas_akhir_softcopy tas ON m.nim = tas.nim AND tas.status_pengumpulan_tugas_akhir_softcopy = 'terkonfirmasi'
-    LEFT JOIN bebas_pinjam_buku_perpustakaan bp ON m.nim = bp.nim AND bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terkonfirmasi'
-    LEFT JOIN hasil_kuisioner hk ON m.nim = hk.nim AND hk.status_pengumpulan_hasil_kuisioner = 'terkonfirmasi'
-    WHERE ph.nim IS NOT NULL AND tas.nim IS NOT NULL AND bp.nim IS NOT NULL AND hk.nim IS NOT NULL";
-$verifikasiResult = sqlsrv_query($conn, $verifikasiQuery);
-$verifikasiRow = sqlsrv_fetch_array($verifikasiResult, SQLSRV_FETCH_ASSOC);
+// Query untuk Penyerahan tugas_akhir_softcopy
+$tugas_akhir_softcopyQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'pending' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+    FROM tugas_akhir_softcopy;
+";
+$tugas_akhir_softcopyResult = sqlsrv_query($conn, $tugas_akhir_softcopyQuery);
+$tugas_akhir_softcopyRow = sqlsrv_fetch_array($tugas_akhir_softcopyResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa perlu verifikasi
-$perluVerifikasiQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_perlu_verifikasi
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_hardcopy ph ON m.nim = ph.nim AND ph.status_pengumpulan_penyerahan_hardcopy IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN tugas_akhir_softcopy tas ON m.nim = tas.nim AND tas.status_pengumpulan_tugas_akhir_softcopy IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN bebas_pinjam_buku_perpustakaan bp ON m.nim = bp.nim AND bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan IN ('pending', 'tidak terkonfirmasi')
-    LEFT JOIN hasil_kuisioner hk ON m.nim = hk.nim AND hk.status_pengumpulan_hasil_kuisioner IN ('pending', 'tidak terkonfirmasi')
-    WHERE ph.nim IS NOT NULL OR tas.nim IS NOT NULL OR bp.nim IS NOT NULL OR hk.nim IS NOT NULL";
-$perluVerifikasiResult = sqlsrv_query($conn, $perluVerifikasiQuery);
-$perluVerifikasiRow = sqlsrv_fetch_array($perluVerifikasiResult, SQLSRV_FETCH_ASSOC);
+// Query untuk Penyerahan hasil_kuisioner
+$hasil_kuisionerQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'pending' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+    FROM hasil_kuisioner;
+";
+$hasil_kuisionerResult = sqlsrv_query($conn, $hasil_kuisionerQuery);
+$hasil_kuisionerRow = sqlsrv_fetch_array($hasil_kuisionerResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk mahasiswa belum upload
-$belumUploadQuery = "
-    SELECT COUNT(DISTINCT m.nim) AS mahasiswa_belum_upload
-    FROM mahasiswa m
-    LEFT JOIN penyerahan_hardcopy ph ON m.nim = ph.nim AND ph.status_pengumpulan_penyerahan_hardcopy = 'belum upload'
-    LEFT JOIN tugas_akhir_softcopy tas ON m.nim = tas.nim AND tas.status_pengumpulan_tugas_akhir_softcopy = 'belum upload'
-    LEFT JOIN bebas_pinjam_buku_perpustakaan bp ON m.nim = bp.nim AND bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload'
-    LEFT JOIN hasil_kuisioner hk ON m.nim = hk.nim AND hk.status_pengumpulan_hasil_kuisioner = 'belum upload'
-    WHERE ph.nim IS NOT NULL OR tas.nim IS NOT NULL OR bp.nim IS NOT NULL OR hk.nim IS NOT NULL";
-$belumUploadResult = sqlsrv_query($conn, $belumUploadQuery);
-$belumUploadRow = sqlsrv_fetch_array($belumUploadResult, SQLSRV_FETCH_ASSOC);
+$bebas_pinjam_buku_perpustakaanQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' THEN 1 END) AS belum_upload,
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+    FROM bebas_pinjam_buku_perpustakaan;
+";
+$bebas_pinjam_buku_perpustakaanResult = sqlsrv_query($conn, $bebas_pinjam_buku_perpustakaanQuery);
+$bebas_pinjam_buku_perpustakaanRow = sqlsrv_fetch_array($bebas_pinjam_buku_perpustakaanResult, SQLSRV_FETCH_ASSOC);
 
 sqlsrv_close($conn);
 ?>
@@ -85,9 +92,61 @@ sqlsrv_close($conn);
     <div id="wrapper">
 
         <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-        <div id="navbar"></div>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
+
+
+            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-tugas_akhir">
+                <a class="nav-link" href="softcopy.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Tugas Akhir</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-kuisioner">
+                <a class="nav-link" href="kuisioner.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Kuisioner</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-hardcopy">
+                <a class="nav-link" href="hardcopy.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Hard Copy</span></a>
+            </li>
+
+            <li class="nav-item" id="nav-bebas_pinjaman">
+                <a class="nav-link" href="bebas_pinjaman.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Bebas Pinjaman</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+        </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -98,7 +157,44 @@ sqlsrv_close($conn);
 
                 <!-- Topbar -->
 
-                <div id="topbar"></div>
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
 
                 <!-- End of Topbar -->
 
@@ -113,87 +209,81 @@ sqlsrv_close($conn);
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Total Mahasiswa Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Mahasiswa
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $totalRow['total_mahasiswa']; ?>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
+                        <!-- Kolom untuk tabel -->
+                        <div class="col-lg-12">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Rekapitulasi Dokumen</h6>
                                 </div>
-                            </div>
-                        </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered text-center">
+                                            <thead>
+                                                <tr class="table-header bg-primary text-white">
+                                                    <th rowspan="2">Status</th>
+                                                    <th colspan="4">Dokumen</th>
+                                                    <th rowspan="2">Total</th>
+                                                </tr>
+                                                <tr class="table-header bg-primary text-white">
+                                                    <th>Hard Copy</th>
+                                                    <th>Tugas Akhir</th>
+                                                    <th>Kuisioner</th>
+                                                    <th>Bebas Pinjaman</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $statuses = ['terverifikasi', 'pending', 'belum_upload', 'ditolak'];
+                                                foreach ($statuses as $status) {
+                                                    // Menentukan kelas badge berdasarkan status
+                                                    $statusClass = '';
+                                                    switch ($status) {
+                                                        case 'terverifikasi':
+                                                            $statusClass = 'badge-success';
+                                                            break;
+                                                        case 'pending':
+                                                            $statusClass = 'badge-warning';
+                                                            break;
+                                                        case 'belum_upload':
+                                                            $statusClass = 'badge-secondary';
+                                                            break;
+                                                        case 'ditolak':
+                                                            $statusClass = 'badge-danger';
+                                                            break;
+                                                    }
 
-                        <!-- Mahasiswa Terverifikasi Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Mahasiswa Terverifikasi
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $verifikasiRow['mahasiswa_terverifikasi']; ?>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                                    // Data tiap dokumen
+                                                    $penyerahan_hardcopy = $penyerahan_hardcopyRow[$status] ?? 0;
+                                                    $tugas_akhir_softcopy = $tugas_akhir_softcopyRow[$status] ?? 0;
+                                                    $hasil_kuisioner = $hasil_kuisionerRow[$status] ?? 0;
+                                                    $bebas_pinjam_buku_perpustakaan = $bebas_pinjam_buku_perpustakaanRow[$status] ?? 0;
+                                                    
+                                                    $total = $penyerahan_hardcopy + $tugas_akhir_softcopy + $hasil_kuisioner + $bebas_pinjam_buku_perpustakaan;
 
-                        <!-- Mahasiswa Perlu Verifikasi Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Mahasiswa Perlu Verifikasi
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $perluVerifikasiRow['mahasiswa_perlu_verifikasi']; ?>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
-                                        </div>
+                                                    echo "<tr>
+                                                            <td class='status'>
+                                                                <span class='badge $statusClass p-2 rounded text-uppercase'
+                                                                    style='cursor: pointer;'
+                                                                    title='" . htmlspecialchars($status) . "'>
+                                                                    " . htmlspecialchars($status) . "
+                                                                </span>
+                                                            </td>
+                                                            <td>$penyerahan_hardcopy</td>
+                                                            <td>$tugas_akhir_softcopy</td>
+                                                            <td>$hasil_kuisioner</td>
+                                                            <td>$bebas_pinjam_buku_perpustakaan</td>
+                                                            <td><strong>$total</strong></td>
+                                                            
+                                                        </tr>";
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Mahasiswa Belum Upload Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Mahasiswa Belum Upload
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo $belumUploadRow['mahasiswa_belum_upload']; ?>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-upload fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -261,31 +351,6 @@ sqlsrv_close($conn);
     <!-- Page level custom scripts -->
     <script src="../js/demo/chart-area-demo.js"></script>
     <script src="../js/demo/chart-pie-demo.js"></script>
-
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
-
-    </script>
 
 </body>
 

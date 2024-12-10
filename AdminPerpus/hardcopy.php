@@ -1,5 +1,6 @@
 <?php
 include '../koneksi.php';
+include '../data/dataAdmin.php';
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -110,11 +111,63 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        <!-- Sidebar -->
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-        <div id="navbar"></div>
+<!-- Sidebar - Brand -->
+<a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+    <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+</a>
 
-        <!-- End of Sidebar -->
+<!-- Divider -->
+<hr class="sidebar-divider my-0">
+
+<!-- Nav Item - Dashboard -->
+<li class="nav-item active" id="nav-dashboard">
+    <a class="nav-link" href="home.php">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Dashboard</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading">
+    Verifikasi
+</div>
+
+
+<!-- Nav Item - Verifikasi -->
+<li class="nav-item" id="nav-tugas_akhir">
+    <a class="nav-link" href="softcopy.php">
+        <i class="fas fa-solid fa-book"></i>
+        <span>Tugas Akhir</span></a>
+</li>
+
+<li class="nav-item" id="nav-kuisioner">
+    <a class="nav-link" href="kuisioner.php">
+        <i class="fas fa-solid fa-file"></i>
+        <span>Kuisioner</span></a>
+</li>
+
+<li class="nav-item" id="nav-hardcopy">
+    <a class="nav-link" href="hardcopy.php">
+        <i class="fas fa-solid fa-file"></i>
+        <span>Hard Copy</span></a>
+</li>
+
+<li class="nav-item" id="nav-bebas_pinjaman">
+    <a class="nav-link" href="bebas_pinjaman.php">
+        <i class="fas fa-solid fa-file"></i>
+        <span>Bebas Pinjaman</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider d-none d-md-block">
+
+</ul>
+<!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -124,9 +177,44 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
                 <!-- Topbar -->
 
-                <div id="topbar">
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-                </div>
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                </span>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile.php">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="index.html" data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
 
                 <!-- End of Topbar -->
 

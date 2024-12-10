@@ -71,7 +71,7 @@ try {
                     const username = getCookie('id');
                     console.log("Nilai cookie 'id':", username);
                     // Path ke file PDF dan font
-                    const pdfPath = './kemm.pdf';
+                    const pdfPath = './Rekomendasi_Pengambilan_Ijazah.pdf';
                     const fontPath = './TimesNewRoman/TimesNewRoman.ttf';
 
                     // Muat PDF
@@ -95,21 +95,53 @@ try {
                     const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
                     const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
 
-                    firstPage.drawText(`${nama}`, {
-                        x: 0,
-                        y: 0,
-                        size: 40,
-                        font: timesFont,
-                        color: rgb(0, 0, 0),
-                    });
+                    firstPage.drawText(`kemal`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 612.7,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
 
-                    firstPage.drawText(`${nim}`, {
-                        x: 0,
-                        y: 50,
-                        size: 40,
-                        font: timesFont,
-                        color: rgb(0, 0, 0),
-                    });
+                firstPage.drawText(`10`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 596.6,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`Teknologi`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 580.5,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`Sistem`, {
+                    x: 190,  // Ganti dengan koordinat X yang sesuai
+                    y: 564.4,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`wowowow`, {
+                    x: 215,  // Ganti dengan koordinat X yang sesuai
+                    y: 660.5,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`hais`, {
+                    x: 333,  // Ganti dengan koordinat X yang sesuai
+                    y: 235,  // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
 
 
                     // Simpan PDF baru

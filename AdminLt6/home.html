@@ -1,38 +1,4 @@
-<?php  
-include '../login.php';
-include '../koneksi.php';
-
-try {
-    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
-    FROM dbo.admin a
-    WHERE a.id_karyawan = ?";
-
-    session_start(); 
-    
-    if (isset($_COOKIE['id'])) {
-        $inputUsername = $_COOKIE['id'];
-    } else {
-        die("Anda harus login terlebih dahulu.");
-    }
-
-    $param = array($inputUsername);
-    $stmt = sqlsrv_query($conn, $sql, $param);
-
-    if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true)); // Tangani error query
-    }
-
-    // Ambil hasil query
-    if (sqlsrv_has_rows($stmt)) {
-        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
-    } else {
-        echo "Data tidak ditemukan.";
-        $result = null; // Pastikan $result diset null jika data tidak ditemukan
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
-?>
+<!-- Admin Lantai 6 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +15,8 @@ try {
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
@@ -60,14 +28,6 @@ try {
         .card-fixed-height {
             height: 200px;
         }
-
-        strong {
-            font-size: 22px;
-        }
-
-        p {
-            font-size: 20px;
-        }
     </style>
 
 </head>
@@ -78,7 +38,9 @@ try {
     <div id="wrapper">
 
         <!-- Sidebar -->
+
         <div id="navbar"></div>
+
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -88,7 +50,9 @@ try {
             <div id="content">
 
                 <!-- Topbar -->
+                
                 <div id="topbar"></div>
+
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -96,52 +60,50 @@ try {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></h1>
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard Admin Prodi</h1>
                     </div>
 
                     <!-- Content Row -->
-                    <div class="container rounded shadow mt-5">
-                        <div class="row" style="size : 200px;">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h1>Informasi Pribadi</h1>
+                    <div class="row">
+
+                        <!-- Content Column -->
+                        <div class="col-lg-12 mb-4">
+
+                            <!-- Project Card Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data Verifikasi</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="small font-weight-bold">Mahasiswa Belum Terverifikasi Awal <span
+                                            class="float-right">123</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 40%"
+                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row mb-5">
-                                            <div class="col-md-6">
-                                                <strong>Nama Lengkap :</strong>
-                                                <p><?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Jenis Kelamin :</strong>
-                                                <p>
-                                                <?php
-                                                        if ($result['jenis_kelamin_karyawan'] == 'L') {
-                                                            echo 'Laki-Laki';
-                                                        } elseif ($result['jenis_kelamin_karyawan'] == 'P') {
-                                                            echo 'Perempuan';
-                                                        }
-                                                    ?>
-                                                </p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Alamat :</strong>
-                                                <p><?= htmlspecialchars($result['alamat_karyawan'] ?? '') ?></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($result['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>No Telepon :</strong>
-                                                <p><?= htmlspecialchars($result['nomor_telfon_karyawan'] ?? '') ?></p>
-                                            </div>
+                                    <h4 class="small font-weight-bold">Mahasiswa Belum Terverifikasi Akhir <span
+                                            class="float-right">123</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"
+                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
+                                    <h4 class="small font-weight-bold">Mahasiswa Sudah Terverifikasi Awal<span
+                                            class="float-right">1234</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 40%"
+                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Mahasiswa Sudah Terverifikasi Akhir <span
+                                            class="float-right">1234</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%"
+                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
+
                     </div>
 
                 </div>
@@ -185,7 +147,7 @@ try {
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.html">Logout</a>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
                 </div>
             </div>
         </div>
@@ -209,7 +171,7 @@ try {
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-        
+
         document.addEventListener("DOMContentLoaded", function () {
             fetch('navbar.html')
                 .then(response => {
@@ -224,7 +186,7 @@ try {
                 .catch(error => console.error('Error loading navbar:', error));
         });
 
-        fetch('topbar.php')
+        fetch('topbar.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('topbar').innerHTML = data;
@@ -232,6 +194,7 @@ try {
             .catch(error => console.error('Error loading topbar:', error));
 
     </script>
+
 </body>
 
 </html>

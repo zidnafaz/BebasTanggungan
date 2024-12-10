@@ -1,5 +1,5 @@
 <?php
-    $host = "LAPTOP-KCCPM824";
+    $host = "MYNARON";
     $connInfo = array("Database" => "Bebas_Tanggungan", "UID" => "", "PWD" => "");
     $conn = sqlsrv_connect($host, $connInfo);
 ?>

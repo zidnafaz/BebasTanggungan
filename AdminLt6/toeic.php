@@ -1,6 +1,5 @@
 <?php
 include '../koneksi.php';
-include '../data/dataAdmin.php';
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -112,68 +111,11 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
-                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
-            </a>
+        <div id="navbar"></div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item active" id="nav-dashboard">
-                <a class="nav-link" href="home.php">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Verifikasi
-            </div>
-
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item" id="nav-skripsi">
-                <a class="nav-link" href="skripsi.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Laporan Skripsi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-pkl">
-                <a class="nav-link" href="pkl.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Laporan PKL</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-toeic">
-                <a class="nav-link" href="toeic.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>TOEIC</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-kompen">
-                <a class="nav-link" href="kompen.php">
-                    <i class="fas fa-solid fa-file-invoice"></i>
-                    <span>Kompen</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-kebenaran_data">
-                <a class="nav-link" href="kebenarandata.php">
-                    <i class="fas fa-solid fa-user-graduate"></i>
-                    <span>Kebenaran Data</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-        </ul>
         <!-- End of Sidebar -->
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -182,44 +124,10 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
                 <!-- Topbar -->
 
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <div id="topbar">
 
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
+                </div>
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
-                                </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="profile.php">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="index.html" data-toggle="modal"
-                                    data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -550,7 +458,28 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 }
             });
         });
-        
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('navbar.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading navbar:', error));
+        });
+
+        fetch('topbar.php')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('topbar').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading topbar:', error));
+
         document.addEventListener("DOMContentLoaded", function () {
             const buttons = document.querySelectorAll(".edit-data");
             buttons.forEach(button => {

@@ -190,31 +190,45 @@ INSERT into dbo.[login] (username, password, status) VALUES(
     '20230009', 'admin', 'adminLt7'
 )
 
+SELECT * FROM dbo.mahasiswa
+
 -- Insert data ke tabel adminlt6_konfirmasi
 INSERT INTO [dbo].[adminlt6_konfirmasi] (nim, tanggal_adminlt6_konfirmasi)
 VALUES 
-('20230003', '2024-12-01'),
-('20230001', '2024-12-01'), 
+('20230001', '2024-12-01'),
+('20230002', '2024-12-01'), 
+('20230003', '2024-12-01'), 
+('20230004', '2024-12-01'), 
 ('20230005', '2024-12-02');
-SELECT*FROM adminlt6_konfirmasi
+
 -- Insert data ke tabel adminlt7_konfirmasi
 INSERT INTO [dbo].[adminlt7_konfirmasi] (nim, tanggal_adminlt7_konfirmasi)
 VALUES 
-('20230001', '2024-12-01'), 
+('20230001', '2024-12-01'),
+('20230002', '2024-12-01'), 
+('20230003', '2024-12-01'), 
+('20230004', '2024-12-01'), 
 ('20230005', '2024-12-02');
 
 -- Insert data ke tabel adminPusat_konfirmasi
 INSERT INTO [dbo].[adminPusat_konfirmasi] (nim, tanggal_adminPusat_konfirmasi)
 VALUES 
-('20230001', '2024-12-01'), 
+('20230001', '2024-12-01'),
+('20230002', '2024-12-01'), 
+('20230003', '2024-12-01'), 
+('20230004', '2024-12-01'), 
 ('20230005', '2024-12-02');
 
 -- Insert data ke tabel adminPerpus_konfirmasi
 INSERT INTO [dbo].[adminPerpus_konfirmasi] (nim, tanggal_adminPerpus_konfirmasi)
 VALUES 
-('20230001', '2024-12-01'), 
+('20230001', '2024-12-01'),
+('20230002', '2024-12-01'), 
+('20230003', '2024-12-01'), 
+('20230004', '2024-12-01'), 
 ('20230005', '2024-12-02');
 
+SELECT * FROM adminPerpus_konfirmasi
 -- Query Konfirmasi Admin Tiap User
 
 SELECT 

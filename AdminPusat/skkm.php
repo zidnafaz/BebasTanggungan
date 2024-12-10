@@ -111,61 +111,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <div id="wrapper">
 
         <!-- Sidebar -->
-
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
-                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
-            </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item" id="nav-dashboard">
-                <a class="nav-link" href="home.php">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Verifikasi
-            </div>
-
-            <!-- Nav Item - Verifikasi -->
-            <li class="nav-item" id="nav-tugasAkhir">
-                <a class="nav-link" href="jurusan.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Jurusan</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-jurusan">
-                <a class="nav-link" href="prodi.php">
-                    <i class="fas fa-solid fa-file-lines"></i>
-                    <span>Program Studi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-akademik">
-                <a class="nav-link" href="akademik.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Akademik</span></a>
-            </li>
-
-            <li class="nav-item active" id="nav-grapol">
-                <a class="nav-link" href="grapol.php">
-                    <i class="fas fa-solid fa-file-invoice"></i>
-                    <span>Graha Polinema</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-        </ul>
+         <div id="navbar"></div>
         <!-- End of Sidebar -->
 
         <!-- End of Sidebar -->
@@ -193,7 +139,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama_karyawan); ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>

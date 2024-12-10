@@ -8,9 +8,32 @@ if (!isset($_COOKIE['id'])) {
     $username = $_COOKIE['id'];
 }
 
-$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
+
+//CEK APAKAH NOMOR SURAT SUDAH ADA
+$cekSurat = "select * from dbo.nomor_surat where nim = ? and nama_surat = 'rekomendasi'";
+$paramsCek = array($username);
+$resultCek = sqlsrv_query($conn, $cekSurat, $paramsCek);
+
+if ($resultCek === false) {
+    die("Gagal menjalankan query");
+}
+
+if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
+    // ...
+} else {
+    $sqlNomorSurat = "EXEC InsertSurat @nama_surat = 'rekomendasi',
+    @nim = ?";
+    $paramsNomor = array($username);
+    $stmtNomor = sqlsrv_query($conn, $sqlNomorSurat, $paramsNomor);
+
+    sqlsrv_free_stmt($stmtNomor);
+}
+
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ak.tanggal_adminlt6_konfirmasi
             FROM dbo.mahasiswa m
-            WHERE m.nim = ?";
+            join dbo.nomor_surat ns on m.nim = ns.nim
+            join dbo.adminlt6_konfirmasi ak on m.nim = ak.nim
+            WHERE m.nim = ? AND ns.nama_surat = 'rekomendasi'";
 
 $params = array($username);
 $result = sqlsrv_query($conn, $sql, $params);
@@ -18,7 +41,6 @@ $result = sqlsrv_query($conn, $sql, $params);
 if ($result === false) {
     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
 }
-
 $nama_mahasiswa = "";
 
 // Ambil data dan cek apakah ada
@@ -27,8 +49,11 @@ if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nim = $row['nim'];
     $jurusan = $row['jurusan_mahasiswa'];
     $prodi = $row['prodi_mahasiswa'];
-}
-
+    $nomor_surat = $row['nomor_surat'];
+    $tanggal = $row['tanggal_adminlt6_konfirmasi'];
+    $tanggalString = $tanggal->format('d-m-Y');
+    $tahun = $tanggal->format('Y');
+};
 sqlsrv_free_stmt($result);
 ?>
 
@@ -108,35 +133,62 @@ sqlsrv_free_stmt($result);
                 const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
                 const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
                 const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
+                const nomor_surat = "<?php echo htmlspecialchars($nomor_surat, ENT_QUOTES, 'UTF-8'); ?>";
+                const tanggal = "<?php echo htmlspecialchars($tanggalString, ENT_QUOTES, 'UTF-8'); ?>";
+                const tahun = "<?php echo htmlspecialchars($tahun, ENT_QUOTES, 'UTF-8'); ?>";
 
                 // Tentukan posisi teks untuk setiap field
                 firstPage.drawText(`${nama}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 468,  // Ganti dengan koordinat Y yang sesuai
+                    x: 190, // Ganti dengan koordinat X yang sesuai
+                    y: 468, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
                     font: timesFont,
                     color: rgb(0, 0, 0),
                 });
 
                 firstPage.drawText(`${nim}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 446,  // Ganti dengan koordinat Y yang sesuai
+                    x: 190, // Ganti dengan koordinat X yang sesuai
+                    y: 446, // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${tahun}`, {
+                    x: 190, // Ganti dengan koordinat X yang sesuai
+                    y: 425.3, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
                     font: timesFont,
                     color: rgb(0, 0, 0),
                 });
 
                 firstPage.drawText(`${prodi}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 404,  // Ganti dengan koordinat Y yang sesuai
+                    x: 190, // Ganti dengan koordinat X yang sesuai
+                    y: 404, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
                     font: timesFont,
                     color: rgb(0, 0, 0),
                 });
 
                 firstPage.drawText(`${jurusan}`, {
-                    x: 190,  // Ganti dengan koordinat X yang sesuai
-                    y: 382,  // Ganti dengan koordinat Y yang sesuai
+                    x: 190, // Ganti dengan koordinat X yang sesuai
+                    y: 382, // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${nomor_surat}/PLT2.TI/${tahun}`, {
+                    x: 260, // Ganti dengan koordinat X yang sesuai
+                    y: 622.5, // Ganti dengan koordinat Y yang sesuai
+                    size: 12,
+                    font: timesFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                firstPage.drawText(`${tanggal}`, {
+                    x: 333, // Ganti dengan koordinat X yang sesuai
+                    y: 235, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
                     font: timesFont,
                     color: rgb(0, 0, 0),
@@ -155,8 +207,6 @@ sqlsrv_free_stmt($result);
                 link.click();
             });
         });
-
-
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
@@ -448,7 +498,6 @@ sqlsrv_free_stmt($result);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-
         fetch('get_persentase.php')
             .then(response => response.json())
             .then(data => {
@@ -471,7 +520,7 @@ sqlsrv_free_stmt($result);
                             '#1cc88a', // Terkonfirmasi
                             '#858796', // Belum Upload
                             '#f6c23e', // Pending
-                            '#e74a3b'  // Tidak Terkonfirmasi
+                            '#e74a3b' // Tidak Terkonfirmasi
                         ],
                         borderWidth: 1
                     }]
@@ -498,7 +547,7 @@ sqlsrv_free_stmt($result);
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function (tooltipItem) {
+                                    label: function(tooltipItem) {
                                         return tooltipItem.raw + ' items'; // Format tooltip
                                     }
                                 }
@@ -540,7 +589,6 @@ sqlsrv_free_stmt($result);
 
             })
             .catch(error => console.error('Error loading data:', error));
-
     </script>
 
 </body>

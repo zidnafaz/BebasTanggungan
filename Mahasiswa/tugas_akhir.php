@@ -4,94 +4,128 @@ include '../koneksi.php';
 if (!isset($_COOKIE['id'])) {
     header("Location: ../index.html");
     exit();
+} else {
+    $username = $_COOKIE['id'];
 }
 
 $nim = $_COOKIE['id'];
 
 $query = "
     SELECT 
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS tugas_akhir_softcopy,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_pinjam_buku_perpustakaan,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS hasil_kuisioner
-    FROM dbo.penyerahan_hardcopy
-    LEFT JOIN dbo.tugas_akhir_softcopy ON penyerahan_hardcopy.nim = tugas_akhir_softcopy.nim
-    LEFT JOIN dbo.bebas_pinjam_buku_perpustakaan ON penyerahan_hardcopy.nim = bebas_pinjam_buku_perpustakaan.nim
-    LEFT JOIN dbo.hasil_kuisioner ON penyerahan_hardcopy.nim = hasil_kuisioner.nim
-    WHERE penyerahan_hardcopy.nim = ?
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
+    FROM dbo.penyerahan_skripsi
+    LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
+    LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
+    LEFT JOIN dbo.bebas_kompen ON penyerahan_skripsi.nim = bebas_kompen.nim
+    LEFT JOIN dbo.publikasi_jurnal ON penyerahan_skripsi.nim = publikasi_jurnal.nim
+    LEFT JOIN dbo.aplikasi ON penyerahan_skripsi.nim = aplikasi.nim
+    LEFT JOIN dbo.skripsi ON penyerahan_skripsi.nim = skripsi.nim
+    LEFT JOIN dbo.penyerahan_kebenaran_data ON penyerahan_skripsi.nim = penyerahan_kebenaran_data.nim
+    WHERE penyerahan_skripsi.nim = '$nim'
 ";
 
+// Eksekusi query dengan parameterized query untuk menghindari SQL Injection
 $params = array($nim);
-$stmt = sqlsrv_prepare($conn, $query, $params);
-if (!$stmt) {
-    die(print_r(sqlsrv_errors(), true));
+$stmt = sqlsrv_query($conn, $query, $params);
+
+if ($stmt === false) {
+    die("Kesalahan pada eksekusi query: " . print_r(sqlsrv_errors(), true));
 }
 
-$result = sqlsrv_execute($stmt);
-if (!$result) {
-    die(print_r(sqlsrv_errors(), true));
-}
-
+// Ambil hasil query
 $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-if ($row === false) {
-    die("Gagal mengambil data");
+sqlsrv_free_stmt($stmt);
+
+if (!$row) {
+    die("Gagal mengambil data: " . print_r(sqlsrv_errors(), true));
 }
 
 // Mengecek apakah semua status sudah terkonfirmasi
-$allConfirmed = $row['penyerahan_hardcopy'] && $row['tugas_akhir_softcopy'] && $row['bebas_pinjam_buku_perpustakaan'] && $row['hasil_kuisioner'];
-sqlsrv_free_stmt($stmt);
+$allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'] && $row['penyerahan_kebenaran_data'];
 
-//CEK APAKAH NOMOR SURAT SUDAH ADA
-$cekSurat = "select * from dbo.nomor_surat where nim = ? and nama_surat = 'bebas tanggungan perpus'";
-$paramsCek = array($nim);
-$resultCek = sqlsrv_query($conn, $cekSurat, $paramsCek);
-
-if ($resultCek === false) {
-    die("Gagal menjalankan query");
-}
-
-if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
-    // ...
-} else {
-    $sqlNomorSurat = "EXEC InsertSurat @nama_surat = 'bebas tanggungan perpus',
-            @nim = ?";
-    $paramsNomor = array($nim);
-    $stmtNomor = sqlsrv_query($conn, $sqlNomorSurat, $paramsNomor);
-
-    sqlsrv_free_stmt($stmtNomor);
-}
-
-$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ak.tanggal_adminPerpus_konfirmasi
-            FROM dbo.mahasiswa m
-            join dbo.nomor_surat ns on m.nim = ns.nim
-            join dbo.adminPerpus_konfirmasi ak on m.nim = ak.nim
-            WHERE m.nim = ? AND ns.nama_surat = 'bebas tanggungan perpus'";
-
-$params = array($nim);
+// Query untuk mengambil data mahasiswa
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa
+        FROM dbo.mahasiswa m
+        WHERE m.nim = ?";
 $result = sqlsrv_query($conn, $sql, $params);
 
 if ($result === false) {
-    die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
+    die("Kesalahan saat menjalankan query mahasiswa: " . print_r(sqlsrv_errors(), true));
 }
 
+// Ambil data mahasiswa
 $nama_mahasiswa = "";
-
-// Ambil data dan cek apakah ada
 if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nama_mahasiswa = $row['nama_mahasiswa'];
     $nim = $row['nim'];
     $jurusan = $row['jurusan_mahasiswa'];
     $prodi = $row['prodi_mahasiswa'];
-    $nomor_surat = $row['nomor_surat'];
-    $tanggal = $row['tanggal_adminPerpus_konfirmasi'];
-    $tanggalString = $tanggal->format('d-m-Y');
-    $tahun = $tanggal->format('Y');
 }
-
-// Fungsi untuk membebaskan sumber daya yang digunakan oleh statement query
 sqlsrv_free_stmt($result);
 
-// Tutup koneksi
+// Query untuk mengambil tanggal konfirmasi dari tabel adminlt7_konfirmasi
+$sqlTanggal = "SELECT tanggal_adminlt7_konfirmasi FROM dbo.adminlt7_konfirmasi WHERE nim = ?";
+$resultTanggal = sqlsrv_query($conn, $sqlTanggal, $params);
+
+if ($resultTanggal === false) {
+    die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+}
+
+// Mengecek apakah tanggal hanya diambil jika semua status sudah terkonfirmasi
+$tanggalLt7 = null;
+$tanggalLt6 = null;
+if ($allConfirmed) {
+    // Query untuk mengambil tanggal konfirmasi dari tabel adminlt7_konfirmasi
+    $sqlTanggalLt7 = "SELECT tanggal_adminlt7_konfirmasi FROM dbo.adminlt7_konfirmasi WHERE nim = ?";
+    $resultTanggalLt7 = sqlsrv_query($conn, $sqlTanggalLt7, $params);
+
+    if ($resultTanggalLt7 === false) {
+        die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+    }
+
+    if ($row = sqlsrv_fetch_array($resultTanggal, SQLSRV_FETCH_ASSOC)) {
+        $tanggalLt7 = $row['tanggal_adminlt7_konfirmasi'];
+    }
+
+    // Jika $tanggal adalah objek DateTime, ubah menjadi string
+    if ($tanggalLt7 instanceof DateTime) {
+        $tanggalLt7 = $tanggalLt7->format('Y-m-d');  // Atur format sesuai kebutuhan
+    }
+
+    // Gunakan htmlspecialchars untuk mencegah XSS
+    $tanggalLt7 = htmlspecialchars($tanggalLt7, ENT_QUOTES, 'UTF-8');
+
+    sqlsrv_free_stmt($resultTanggalLt7);
+
+    $sqlTanggalLt6 = "SELECT tanggal_adminlt6_konfirmasi FROM dbo.adminlt6_konfirmasi WHERE nim = ?";
+    $resultTanggalLt6 = sqlsrv_query($conn, $sqlTanggalLt6, $params);
+
+    if ($resultTanggalLt6 === false) {
+        die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
+    }
+
+    if ($row = sqlsrv_fetch_array($resultTanggalLt6, SQLSRV_FETCH_ASSOC)) {
+        $tanggalLt6 = $row['tanggal_adminlt6_konfirmasi'];
+    }
+
+    // Jika $tanggal adalah objek DateTime, ubah menjadi string
+    if ($tanggalLt6 instanceof DateTime) {
+        $tanggalLt6 = $tanggalLt6->format('Y-m-d');  // Atur format sesuai kebutuhan
+    }
+
+    // Gunakan htmlspecialchars untuk mencegah XSS
+    $tanggalLt6 = htmlspecialchars($tanggalLt6, ENT_QUOTES, 'UTF-8');
+
+    sqlsrv_free_stmt($resultTanggalLt6);
+}
+
 sqlsrv_close($conn);
 ?>
 
@@ -135,6 +169,148 @@ sqlsrv_close($conn);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
+    <script type="module">
+        import { PDFDocument, rgb } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('downloadButton');
+
+            button.addEventListener('click', async () => {
+                // Fungsi untuk mengambil nilai cookie
+                function getCookie(name) {
+                    let cookieArr = document.cookie.split(";");
+                    for (let i = 0; i < cookieArr.length; i++) {
+                        let cookie = cookieArr[i].trim();
+                        if (cookie.indexOf(name + "=") == 0) {
+                            return cookie.substring(name.length + 1);
+                        }
+                    }
+                    return "";
+                }
+
+                const username = getCookie('id');  // Ambil cookie 'id' (jika ada)
+                const pdfPath = '../Documents/downloads/generate/Bebas_Tanggungan_Jurusan.pdf';  // Path ke file PDF
+                const fontPath = './TimesNewRoman/TimesNewRoman.ttf';  // Path ke font kustom
+
+                try {
+                    // Muat PDF
+                    const pdfResponse = await fetch(pdfPath);
+                    if (!pdfResponse.ok) {
+                        console.error('Failed to load PDF:', pdfResponse.statusText);
+                        return;
+                    }
+                    
+                    const pdfArrayBuffer = await pdfResponse.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
+
+                    // Registrasikan fontkit (periksa apakah window.fontkit ada)
+                    if (typeof window.fontkit === 'undefined') {
+                        console.error('fontkit is not available!');
+                        return;
+                    }
+                    pdfDoc.registerFontkit(window.fontkit);
+
+                    // Muat font kustom
+                    const fontResponse = await fetch(fontPath);
+                    if (!fontResponse.ok) {
+                        console.error('Failed to load font:', fontResponse.statusText);
+                        return;
+                    }
+                    
+                    const fontArrayBuffer = await fontResponse.arrayBuffer();
+                    const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
+
+                    // Ambil data dari PHP untuk dimasukkan ke PDF
+                    const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
+                    const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
+                    const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
+                    const tanggalLt7 = "<?php echo htmlspecialchars($tanggalLt7, ENT_QUOTES, 'UTF-8'); ?>";
+                    const tanggalLt6 = "<?php echo htmlspecialchars($tanggalLt6, ENT_QUOTES, 'UTF-8'); ?>";
+
+                    // Pastikan data PHP sudah terisi
+                    if (!nama || !nim || !prodi || !tanggalLt7 || !tanggalLt6) {
+                        console.error('Some PHP variables are not properly set');
+                        return;
+                    }
+
+                    // Tambahkan teks ke halaman pertama
+                    const pages = pdfDoc.getPages();
+                    const firstPage = pages[0];
+
+                    // Tentukan posisi teks untuk setiap field
+                    firstPage.drawText(`${nama}`, {
+                        x: 190,  // Koordinat X
+                        y: 626,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    firstPage.drawText(`${nim}`, {
+                        x: 190,  // Koordinat X
+                        y: 605,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    firstPage.drawText(`${prodi}`, {
+                        x: 190,  // Koordinat X
+                        y: 584,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    firstPage.drawText(`${tanggalLt7}`, {
+                        x: 296,  // Koordinat X
+                        y: 511,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 296,  // Koordinat X
+                        y: 413,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // TTD penanggung Jawab (Ketua Prodi)
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 462,  // Koordinat X
+                        y: 474,  // Koordinat Y
+                        size: 9,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // TTD Ketua Jurusan
+                    firstPage.drawText(`${tanggalLt6}`, {
+                        x: 332,  // Koordinat X
+                        y: 298,  // Koordinat Y
+                        size: 12,
+                        font: timesFont,
+                        color: rgb(0, 0, 0),
+                    });
+
+                    // Unduh PDF yang telah dimodifikasi
+                    const pdfBytes = await pdfDoc.save();
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${nim}_Bebas_Tanggungan_Jurusan.pdf`;
+                    link.click();
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
 
     <style>
         .status span {
@@ -144,21 +320,13 @@ sqlsrv_close($conn);
             font-weight: bold;
         }
 
-        .status .badge-success {
-            background-color: green;
-        }
-
-        .status .badge-danger {
-            background-color: red;
-        }
-
         #uploadModalHeader.bg-success {
-            background-color: #28a745 !important;
+            background-color: #1cc88a !important;
             /* Hijau terang */
         }
 
         #uploadModalHeader.bg-danger {
-            background-color: #dc3545 !important;
+            background-color: #e74a3b !important;
             /* Merah terang */
         }
 
@@ -174,125 +342,6 @@ sqlsrv_close($conn);
         }
     </style>
 
-    <script type="module">
-        import {
-            PDFDocument,
-            rgb
-        } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const button = document.getElementById('downloadButton');
-
-            // Hanya jalankan jika tombol tidak memiliki atribut 'disabled'
-            if (!button.hasAttribute('disabled')) {
-                button.addEventListener('click', async () => {
-                    try {
-                        // Fungsi untuk mendapatkan cookie
-                        function getCookie(name) {
-                            const nameEQ = name + "=";
-                            const cookies = document.cookie.split("; ");
-                            for (let i = 0; i < cookies.length; i++) {
-                                const c = cookies[i];
-                                if (c.indexOf(nameEQ) === 0) {
-                                    return c.substring(nameEQ.length, c.length);
-                                }
-                            }
-                            return null;
-                        }
-
-                        const username = getCookie('id');
-                        const pdfPath = '../Documents/downloads/generate/Bebas_Tanggungan_Perpustakaan_Grapol.pdf';
-                        const fontPath = './TimesNewRoman/TimesNewRoman.ttf';
-
-                        // Muat PDF
-                        const pdfResponse = await fetch(pdfPath);
-                        if (!pdfResponse.ok) throw new Error(`Could not load PDF: ${pdfResponse.statusText}`);
-                        const pdfArrayBuffer = await pdfResponse.arrayBuffer();
-                        const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
-
-                        // Registrasikan fontkit
-                        pdfDoc.registerFontkit(window.fontkit);
-
-                        // Muat font kustom
-                        const fontResponse = await fetch(fontPath);
-                        if (!fontResponse.ok) throw new Error(`Could not load font: ${fontResponse.statusText}`);
-                        const fontArrayBuffer = await fontResponse.arrayBuffer();
-                        const timesFont = await pdfDoc.embedFont(fontArrayBuffer);
-
-                        // Tambahkan teks ke halaman pertama
-                        const pages = pdfDoc.getPages();
-                        const firstPage = pages[0];
-                        const nama = "<?php echo htmlspecialchars($nama_mahasiswa, ENT_QUOTES, 'UTF-8'); ?>";
-                        const nim = "<?php echo htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'); ?>";
-                        const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
-                        const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
-                        const nomor_surat = "<?php echo htmlspecialchars($nomor_surat, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tanggal = "<?php echo htmlspecialchars($tanggalString, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tahun = "<?php echo htmlspecialchars($tahun, ENT_QUOTES, 'UTF-8'); ?>";
-
-                        firstPage.drawText(`${nama}`, {
-                            x: 190, // Ganti dengan koordinat X yang sesuai
-                            y: 612.7, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-                        firstPage.drawText(`${nim}`, {
-                            x: 190, // Ganti dengan koordinat X yang sesuai
-                            y: 596.6, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-                        firstPage.drawText(`${jurusan}`, {
-                            x: 190, // Ganti dengan koordinat X yang sesuai
-                            y: 580.5, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-                        firstPage.drawText(`${prodi}`, {
-                            x: 190, // Ganti dengan koordinat X yang sesuai
-                            y: 564.4, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-                        firstPage.drawText(`${nomor_surat}/PL.2.UPA.PERPUS/${tahun}`, {
-                            x: 215, // Ganti dengan koordinat X yang sesuai
-                            y: 660.5, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-                        firstPage.drawText(`${tanggal}`, {
-                            x: 437, // Ganti dengan koordinat X yang sesuai
-                            y: 324.5, // Ganti dengan koordinat Y yang sesuai
-                            size: 12,
-                            font: timesFont,
-                            color: rgb(0, 0, 0),
-                        });
-
-                        // Simpan PDF baru
-                        const modifiedPdf = await pdfDoc.save();
-                        const blob = new Blob([modifiedPdf], {
-                            type: 'application/pdf'
-                        });
-
-                        // Unduh PDF yang sudah diedit
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = `${nim}_Bebas_Tanggungan_Akademik.pdf`;
-                        link.click();
-                    } catch (error) {
-                        console.error('Terjadi error:', error);
-                    }
-                });
-            }
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
-
 </head>
 
 <body id="page-top">
@@ -301,60 +350,9 @@ sqlsrv_close($conn);
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
-                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
-            </a>
+        <div id="navbar"></div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item" id="nav-dashboard">
-                <a class="nav-link" href="home.php">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Verifikasi
-            </div>
-
-            <!-- Nav Item - Verifikasi -->
-            <li class="nav-item" id="nav-tugasAkhir">
-                <a class="nav-link" href="jurusan.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Jurusan</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-jurusan">
-                <a class="nav-link" href="prodi.php">
-                    <i class="fas fa-solid fa-file-lines"></i>
-                    <span>Program Studi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-akademik">
-                <a class="nav-link" href="akademik.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Akademik</span></a>
-            </li>
-
-            <li class="nav-item active" id="nav-grapol">
-                <a class="nav-link" href="grapol.php">
-                    <i class="fas fa-solid fa-file-invoice"></i>
-                    <span>Graha Polinema</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-        </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -365,54 +363,16 @@ sqlsrv_close($conn);
 
                 <!-- Topbar -->
 
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($rowUser['nama_mahasiswa'] ?? '') ?>
-                                </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="profile.php">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="index.html" data-toggle="modal"
-                                    data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
+                <div id="topbar"></div>
 
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas Perpustakaan Polinema (Grapol)</h1>
-                    <p class="mb-4">Verifikasi berkas pada perpustakaan Polinema (Grapol lantai 3) yang akan
-                        diverifikasi oleh ibu Safrilia (<a target="_blank"
-                            href="https://wa.me/6281333213023">081333213023</a> - <i>Chat Only</i>) </p>
+                    <h1 class="h3 mb-2 text-gray-800">Verifikasi Berkas</h1>
+                    <p class="mb-4">Verifikasi berkas pada jurusan (lantai 6) yang akan diverifikasi oleh ibu Ila (<a
+                            target="_blank" href="https://wa.me/6281232245969">081232245969</a> - <i>Chat Only</i>) </p>
 
                     <!-- DataTables Example -->
                     <div class="card shadow mb-4">
@@ -429,12 +389,9 @@ sqlsrv_close($conn);
                     <!-- Card Download Dokumen -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Download Template Dokumen</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Download Dokumen</h6>
                         </div>
                         <div class="card-body">
-                            <p>Unduh template dokumen yang disediakan (sesuaikan dengan kebutuhan verifikasi), isi
-                                sesuai petunjuk, lalu unggah untuk
-                                proses verifikasi.</p>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dokumenTable">
                                     <thead>
@@ -448,9 +405,9 @@ sqlsrv_close($conn);
                                     <tbody>
                                         <tr>
                                             <td>1</td>
-                                            <td>Panduan Alur Bebas Tanggungan Perpustakaan Grapol</td>
+                                            <td>Surat Pernyataan Publikasi</td>
                                             <td>-</td>
-                                            <td><a href="../Documents/downloads/template/[Panduan] Alur Bebas Tanggungan Perpustakaan Pusat.pdf"
+                                            <td><a href="../Documents/downloads/template/[Template] Surat Pernyataan Publikasi_SIB.docx"
                                                     class="btn btn-success" download><i class="fas fa-download"></i>
                                                     Download</a></td>
                                         </tr>
@@ -463,13 +420,13 @@ sqlsrv_close($conn);
                     <!-- Card Bebas Tanggungan -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Perpustakaan Polinema</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Bebas Tanggungan Jurusan</h6>
                         </div>
                         <div class="card-body">
-                            <p>Surat ini meliputi Bebas Tanggungan Perpustakaan Polinema.</p>
+                            <p>Surat ini meliputi Bebas Tanggungan Jurusan lantai 6 dan 7.</p>
                             <?php if ($allConfirmed): ?>
-                                <button class="btn btn-success"id="downloadButton">
-                                    <i class="fas fa-download"></i> Download</button>
+                                <button class="btn btn-success" id="downloadButton" download><i class="fas fa-download"></i>
+                                    Download</button>
                             <?php else: ?>
                                 <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
                             <?php endif; ?>
@@ -554,7 +511,7 @@ sqlsrv_close($conn);
                                 <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
-                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for aplikasi)</small>
+                            <small class="form-text text-muted">Accepted file type: .doc only</small>
                         </div>
 
                         <!-- Preview Filename -->
@@ -596,7 +553,6 @@ sqlsrv_close($conn);
         </div>
     </div>
 
-
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -615,13 +571,35 @@ sqlsrv_close($conn);
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('navbar.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading navbar:', error));
+        });
+
+        fetch('topbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('topbar').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading topbar:', error));
+
         // Ajax untuk mengambil data dan menginisialisasi DataTables
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Memuat data dari data.php
             $.ajax({
-                url: 'data_grapol.php', // File PHP untuk memuat data
+                url: 'data_tugas_akhir.php', // File PHP untuk memuat data
                 type: 'GET', // Gunakan metode GET
-                success: function(response) {
+                success: function (response) {
                     // Masukkan data ke dalam tabel
                     $('#table').html(`<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -644,14 +622,14 @@ sqlsrv_close($conn);
                         "info": true // Menampilkan informasi jumlah data
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error:', error);
                 }
             });
         });
 
-        $(document).ready(function() {
-            $('#uploadForm').submit(function(e) {
+        $(document).ready(function () {
+            $('#uploadForm').submit(function (e) {
                 e.preventDefault();
                 var formData = new FormData(this);
 
@@ -661,7 +639,7 @@ sqlsrv_close($conn);
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(response) {
+                    success: function (response) {
                         // Tutup modal upload
                         $('#uploadModal').modal('hide');
 
@@ -690,7 +668,7 @@ sqlsrv_close($conn);
 
                         loadTableData();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('Error:', error);
                     }
                 });
@@ -699,13 +677,13 @@ sqlsrv_close($conn);
 
         function loadTableData() {
             $.ajax({
-                url: 'data_grapol.php', // Endpoint untuk mengambil data tabel
+                url: 'data_tugas_akhir.php', // Endpoint untuk mengambil data tabel
                 type: 'GET',
-                success: function(data) {
+                success: function (data) {
                     // Perbarui isi tabel dengan data yang diterima
                     $('#table tbody').html(data);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error loading table data:', error);
                 }
             });
@@ -721,12 +699,12 @@ sqlsrv_close($conn);
         }
 
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Menangani perubahan input file
             const fileInput = document.getElementById("file");
             const fileNameInput = document.getElementById("fileName");
 
-            fileInput.addEventListener("change", function() {
+            fileInput.addEventListener("change", function () {
                 const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
                 fileNameInput.value = fileName;
             });
@@ -768,6 +746,7 @@ sqlsrv_close($conn);
                 }
             });
         });
+
     </script>
 
 </body>

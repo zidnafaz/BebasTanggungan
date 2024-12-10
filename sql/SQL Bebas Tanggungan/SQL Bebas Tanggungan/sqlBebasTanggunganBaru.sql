@@ -31,7 +31,7 @@ CREATE TABLE [dbo].[admin] (
 --BEBAS TANGGUNGAN AKADEMIK PUSAT
 CREATE TABLE [dbo].[data_alumni] (
     [id_data_alumni] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_data_alumni NVARCHAR(50) CHECK (status_pengumpulan_data_alumni IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_data_alumni NVARCHAR(50) CHECK (status_pengumpulan_data_alumni IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_data_alumni NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -39,7 +39,7 @@ CREATE TABLE [dbo].[data_alumni] (
 );
 CREATE TABLE [dbo].[skkm] (
     [id_skkm] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_skkm NVARCHAR(50) CHECK (status_pengumpulan_skkm IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_skkm NVARCHAR(50) CHECK (status_pengumpulan_skkm IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_skkm NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -47,7 +47,7 @@ CREATE TABLE [dbo].[skkm] (
 );
 CREATE TABLE [dbo].[foto_ijazah] (
     [id_foto_ijazah] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_foto_ijazah NVARCHAR(50) CHECK (status_pengumpulan_foto_ijazah IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_foto_ijazah NVARCHAR(50) CHECK (status_pengumpulan_foto_ijazah IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_foto_ijazah NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -55,7 +55,7 @@ CREATE TABLE [dbo].[foto_ijazah] (
 );
 CREATE TABLE [dbo].[ukt] (
     [id_ukt] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_ukt NVARCHAR(50) CHECK (status_pengumpulan_ukt IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_ukt NVARCHAR(50) CHECK (status_pengumpulan_ukt IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_ukt NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -66,7 +66,7 @@ CREATE TABLE [dbo].[ukt] (
 --PERPUSTAKAAN
 CREATE TABLE [dbo].[penyerahan_hardcopy] (
     [id_penyerahan_hardcopy] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_hardcopy NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_hardcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_hardcopy NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_hardcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_penyerahan_hardcopy NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
 	judul_tugas_akhir NVARCHAR(100),
@@ -75,7 +75,7 @@ CREATE TABLE [dbo].[penyerahan_hardcopy] (
 );
 CREATE TABLE [dbo].[tugas_akhir_softcopy] (
     [id_tugas_akhir_softcopy] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) CHECK (status_pengumpulan_tugas_akhir_softcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) CHECK (status_pengumpulan_tugas_akhir_softcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_tugas_akhir_softcopy NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -83,7 +83,7 @@ CREATE TABLE [dbo].[tugas_akhir_softcopy] (
 );
 CREATE TABLE [dbo].[bebas_pinjam_buku_perpustakaan] (
     [id_bebas_pinjam_buku_perpustakaan] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) CHECK (status_pengumpulan_bebas_pinjam_buku_perpustakaan IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) CHECK (status_pengumpulan_bebas_pinjam_buku_perpustakaan IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -91,7 +91,7 @@ CREATE TABLE [dbo].[bebas_pinjam_buku_perpustakaan] (
 );
 CREATE TABLE [dbo].[hasil_kuisioner] (
     [id_hasil_kuisioner] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_hasil_kuisioner NVARCHAR(50) CHECK (status_pengumpulan_hasil_kuisioner IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_hasil_kuisioner NVARCHAR(50) CHECK (status_pengumpulan_hasil_kuisioner IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_hasil_kuisioner NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -101,7 +101,7 @@ CREATE TABLE [dbo].[hasil_kuisioner] (
 --ADMIN LANTAI 6 PRODI
 CREATE TABLE [dbo].[penyerahan_skripsi] (
     [id_penyerahan_skripsi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_penyerahan_skripsi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -109,7 +109,7 @@ CREATE TABLE [dbo].[penyerahan_skripsi] (
 );
 CREATE TABLE [dbo].[penyerahan_pkl] (
     [id_penyerahan_pkl] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_pkl NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_pkl IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_pkl NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_pkl IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_penyerahan_pkl NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -117,7 +117,7 @@ CREATE TABLE [dbo].[penyerahan_pkl] (
 );
 CREATE TABLE [dbo].[toeic] (
     [id_toeic] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_toeic NVARCHAR(50) CHECK (status_pengumpulan_toeic IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_toeic NVARCHAR(50) CHECK (status_pengumpulan_toeic IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_toeic NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -125,7 +125,7 @@ CREATE TABLE [dbo].[toeic] (
 );
 CREATE TABLE [dbo].[bebas_kompen] (
     [id_bebas_kompen] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_bebas_kompen NVARCHAR(50) CHECK (status_pengumpulan_bebas_kompen IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_bebas_kompen NVARCHAR(50) CHECK (status_pengumpulan_bebas_kompen IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_bebas_kompen NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -133,7 +133,7 @@ CREATE TABLE [dbo].[bebas_kompen] (
 );
 CREATE TABLE [dbo].[penyerahan_kebenaran_data] (
     [id_penyerahan_kebenaran_data] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_kebenaran_data IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_kebenaran_data IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_penyerahan_kebenaran_data NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -143,7 +143,7 @@ CREATE TABLE [dbo].[penyerahan_kebenaran_data] (
 --ADMIN LANTAI 7 JURUSAN
 CREATE TABLE [dbo].[publikasi_jurnal] (
     [id_publikasi_jurnal] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_publikasi_jurnal NVARCHAR(50) CHECK (status_pengumpulan_publikasi_jurnal IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_publikasi_jurnal NVARCHAR(50) CHECK (status_pengumpulan_publikasi_jurnal IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_publikasi_jurnal NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -151,7 +151,7 @@ CREATE TABLE [dbo].[publikasi_jurnal] (
 );
 CREATE TABLE [dbo].[aplikasi] (
     [id_aplikasi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_aplikasi NVARCHAR(50) CHECK (status_pengumpulan_aplikasi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_aplikasi NVARCHAR(50) CHECK (status_pengumpulan_aplikasi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_aplikasi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -159,7 +159,7 @@ CREATE TABLE [dbo].[aplikasi] (
 );
 CREATE TABLE [dbo].[skripsi] (
     [id_skripsi] INT IDENTITY (1, 1) NOT NULL,
-    status_pengumpulan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'belum upload',
+    status_pengumpulan_skripsi NVARCHAR(50) CHECK (status_pengumpulan_skripsi IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_skripsi NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
@@ -253,10 +253,10 @@ BEGIN
     WHERE nama_surat = @nama_surat;
 END;
 --QUERY UNTUK INSERT TABLE SURAT
-EXEC InsertSurat @nama_surat = 'bebas tanggungan_perpus',
+EXEC InsertSurat @nama_surat = 'rekomendasi',
     @nim = '20230001';
 SELECT * FROM dbo.nomor_surat;
-
+DELETE FROM dbo.nomor_surat
 -- TRIGGER
 
 IF OBJECT_ID('dbo.autoAddKonfirmasi') IS NOT NULL 

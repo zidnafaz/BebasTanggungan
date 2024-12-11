@@ -1,5 +1,6 @@
 <?php
 include '../koneksi.php';
+include '../data/dataMahasiswa.php';
 
 if (!isset($_COOKIE['id'])) {
     header("Location: ../index.html");
@@ -429,7 +430,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama_mahasiswa); ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -602,7 +603,8 @@ sqlsrv_close($conn);
                                 <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
-                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for aplikasi)</small>
+                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for
+                                aplikasi)</small>
                         </div>
 
                         <!-- Preview Filename -->

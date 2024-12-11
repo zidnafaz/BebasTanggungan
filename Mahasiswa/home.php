@@ -1,5 +1,6 @@
 <?php
 include '../koneksi.php';
+include '../data/dataMahasiswa.php';
 
 if (!isset($_COOKIE['id'])) {
     header("Location: ../index.html");
@@ -105,25 +106,25 @@ if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
 
         $queryUrut = "SELECT MAX(CAST(LEFT(nomor_surat, CHARINDEX('/', nomor_surat) - 1) AS INT)) AS last_number FROM dbo.nomor_surat_rekomendasi";
         $resultUrut = sqlsrv_query($conn, $queryUrut);
-    
+
         if ($resultUrut === false) {
             die("Gagal mengambil nomor urut terakhir: " . print_r(sqlsrv_errors(), true));
         }
-    
+
         $rowUrut = sqlsrv_fetch_array($resultUrut, SQLSRV_FETCH_ASSOC);
         $lastNumber = $rowUrut['last_number'] ?? 1000;
-    
+
         // Buat nomor surat baru
         $newNumber = $lastNumber + 1;
         $tahun = date("Y");
         $nomor_surat = sprintf("%04d/PL.T2.TI/%s", $newNumber, $tahun);
-    
+
         // Masukkan ke tabel nomor_surat
         $insertSurat = "INSERT INTO dbo.nomor_surat_rekomendasi (nim, nomor_surat) 
                         VALUES (?, ?)";
         $paramsInsert = array($nim, $nomor_surat);
         $stmtInsert = sqlsrv_query($conn, $insertSurat, $paramsInsert);
-    
+
         if ($stmtInsert === false) {
             die("Gagal menyimpan nomor surat: " . print_r(sqlsrv_errors(), true));
         }
@@ -155,18 +156,6 @@ if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nomor_surat = $row['nomor_surat'];
     $tahunLulus = $row['tahun_lulus_mahasiswa']->format('Y');
     $tanggalTerbit = $row['tanggal_adminlt6_konfirmasi']->format('d-m-Y');
-}
-
-$sqlNama = "SELECT nama_mahasiswa FROM dbo.mahasiswa WHERE nim = ?";
-$paramsNama = array($nim);
-$resultNama = sqlsrv_query($conn, $sqlNama, $paramsNama);
-
-if ($resultNama === false) {
-    die("Kesalahan saat menjalankan query nama: " . print_r(sqlsrv_errors(), true));
-}
-
-if ($rowNama = sqlsrv_fetch_array($resultNama, SQLSRV_FETCH_ASSOC)) {
-    $nama = $rowNama['nama_mahasiswa'];
 }
 
 // Tutup koneksi
@@ -448,7 +437,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama); ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>

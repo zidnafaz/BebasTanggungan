@@ -1,37 +1,7 @@
 <?php
 include '../login.php';
 include '../koneksi.php';
-
-try {
-    $sql = " 
-            SELECT nim, nama_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, tanggal_lahir_mahasiswa, tahun_angkatan_mahasiswa, jenis_kelamin_mahasiswa, alamat_mahasiswa, nomor_telfon_mahasiswa, tahun_lulus_mahasiswa
-            FROM dbo.mahasiswa m
-            WHERE m.nim = ?";
-
-    session_start(); // Tambahkan di atas file mahasiswa.php
-    if (isset($_COOKIE['id'])) {
-        $inputUsername = $_COOKIE['id'];
-    } else {
-        die("Anda harus login terlebih dahulu.");
-    }
-
-    $param = array($inputUsername);
-    $stmt = sqlsrv_query($conn, $sql, $param);
-
-    if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true)); // Tangani error query
-    }
-
-    // Ambil hasil query
-    if (sqlsrv_has_rows($stmt)) {
-        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
-    } else {
-        echo "Data tidak ditemukan.";
-        $result = null; // Pastikan $result diset null jika data tidak ditemukan
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+include '../data/dataMahasiswa.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -143,7 +113,7 @@ try {
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($result['nama_mahasiswa'] ?? ''); ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_mahasiswa'] ?? ''); ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -174,7 +144,7 @@ try {
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h2 mb-0 text-gray-800">Profil
-                            <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?>
+                            <?= htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?>
                         </h1>
                     </div>
 
@@ -191,29 +161,29 @@ try {
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['nama_mahasiswa'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jurusan :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['jurusan_mahasiswa'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['jurusan_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>NIM (No Induk) :</strong>
-                                                <p class="text-muted"><?= htmlspecialchars($result['nim'] ?? '') ?></p>
+                                                <p class="text-muted"><?= htmlspecialchars($resultUser['nim'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Program Studi :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['prodi_mahasiswa'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['prodi_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
                                                 <p class="text-muted">
                                                     <?php
-                                                    if ($result['jenis_kelamin_mahasiswa'] == 'L') {
+                                                    if ($resultUser['jenis_kelamin_mahasiswa'] == 'L') {
                                                         echo 'Laki-Laki';
-                                                    } elseif ($result['jenis_kelamin_mahasiswa'] == 'P') {
+                                                    } elseif ($resultUser['jenis_kelamin_mahasiswa'] == 'P') {
                                                         echo 'Perempuan';
                                                     }
                                                     ?>
@@ -222,30 +192,30 @@ try {
                                             <div class="col-md-6">
                                                 <strong>Tahun Angkatan :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?>
+                                                    <?= htmlspecialchars($resultUser['tahun_angkatan_mahasiswa']->format('Y') ?? '') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['alamat_mahasiswa'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['alamat_mahasiswa'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tahun Lulus :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['tahun_lulus_mahasiswa']->format('Y') ?? '') ?>
+                                                    <?= htmlspecialchars($resultUser['tahun_lulus_mahasiswa']->format('Y') ?? '') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                    <?= htmlspecialchars($resultUser['tanggal_lahir_mahasiswa']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['nomor_telfon_mahasiswa'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nomor_telfon_mahasiswa'] ?? '') ?></p>
                                             </div>
                                         </div>
                                     </div>

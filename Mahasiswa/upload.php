@@ -90,16 +90,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Pindahkan file ke direktori tujuan
     if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-        $sql = "UPDATE {$tableName} 
-                SET status_pengumpulan_{$directoryLabel} = 'pending', 
-                    keterangan_pengumpulan_{$directoryLabel} = 'Menunggu Proses Verifikasi' 
-                WHERE nim = ?";
-        $params = [$id];
+        // Jika upload ke penyerahan_hardcopy, insert judul_tugas_akhir dan update status
+        if ($directoryLabel === 'penyerahan_hardcopy') {
+            $judulTugasAkhir = htmlspecialchars($_POST['judul_tugas_akhir']);
+            
+            if (strlen($judulTugasAkhir) > 200) {
+                echo "Judul tugas akhir tidak boleh lebih dari 200 karakter.";
+                exit;
+            }
 
-        $stmt = sqlsrv_query($conn, $sql, $params);
-        if ($stmt === false) {
-            echo 'Gagal memperbarui status di database.';
-            exit;
+            // Update status pengumpulan tugas akhir menjadi 'pending'
+            $updateSql = "UPDATE penyerahan_hardcopy
+                          SET status_pengumpulan_penyerahan_hardcopy = 'pending', 
+                              keterangan_pengumpulan_penyerahan_hardcopy = 'Menunggu Proses Verifikasi',
+                              judul_tugas_akhir = ?
+                          WHERE nim = ?";
+            $params = [$judulTugasAkhir, $id];
+            $updateStmt = sqlsrv_query($conn, $updateSql, $params);
+            if ($updateStmt === false) {
+                echo 'Gagal memperbarui status pengumpulan.';
+                exit;
+            }
+        } else {
+            // Update status untuk tabel lainnya
+            $sql = "UPDATE {$tableName} 
+                    SET status_pengumpulan_{$directoryLabel} = 'pending', 
+                        keterangan_pengumpulan_{$directoryLabel} = 'Menunggu Proses Verifikasi' 
+                    WHERE nim = ?";
+            $params = [$id];
+
+            $stmt = sqlsrv_query($conn, $sql, $params);
+            if ($stmt === false) {
+                echo 'Gagal memperbarui status di database.';
+                exit;
+            }
         }
 
         echo 'File berhasil diupload.';

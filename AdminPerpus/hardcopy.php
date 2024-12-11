@@ -111,63 +111,60 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-<!-- Sidebar -->
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-<!-- Sidebar - Brand -->
-<a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
-    <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
-</a>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
 
-<!-- Divider -->
-<hr class="sidebar-divider my-0">
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
 
-<!-- Nav Item - Dashboard -->
-<li class="nav-item active" id="nav-dashboard">
-    <a class="nav-link" href="home.php">
-        <i class="fas fa-fw fa-tachometer-alt"></i>
-        <span>Dashboard</span></a>
-</li>
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
 
-<!-- Divider -->
-<hr class="sidebar-divider">
+            <!-- Divider -->
+            <hr class="sidebar-divider">
 
-<!-- Heading -->
-<div class="sidebar-heading">
-    Verifikasi
-</div>
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
 
 
-<!-- Nav Item - Verifikasi -->
-<li class="nav-item" id="nav-tugas_akhir">
-    <a class="nav-link" href="softcopy.php">
-        <i class="fas fa-solid fa-book"></i>
-        <span>Tugas Akhir</span></a>
-</li>
+            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item active" id="nav-hardcopy">
+                <a class="nav-link" href="hardcopy.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Hardcopy</span></a>
+            </li>
+            <li class="nav-item" id="nav-tugas_akhir">
+                <a class="nav-link" href="softcopy.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Softcopy</span></a>
+            </li>
+            <li class="nav-item" id="nav-bebas_pinjaman">
+                <a class="nav-link" href="bebas_pinjaman.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Bebas Pinjaman Buku</span></a>
+            </li>
+            <li class="nav-item" id="nav-kuisioner">
+                <a class="nav-link" href="kuisioner.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Kuisioner</span></a>
+            </li>
 
-<li class="nav-item" id="nav-kuisioner">
-    <a class="nav-link" href="kuisioner.php">
-        <i class="fas fa-solid fa-file"></i>
-        <span>Kuisioner</span></a>
-</li>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
 
-<li class="nav-item" id="nav-hardcopy">
-    <a class="nav-link" href="hardcopy.php">
-        <i class="fas fa-solid fa-file"></i>
-        <span>Hard Copy</span></a>
-</li>
-
-<li class="nav-item" id="nav-bebas_pinjaman">
-    <a class="nav-link" href="bebas_pinjaman.php">
-        <i class="fas fa-solid fa-file"></i>
-        <span>Bebas Pinjaman</span></a>
-</li>
-
-<!-- Divider -->
-<hr class="sidebar-divider d-none d-md-block">
-
-</ul>
-<!-- End of Sidebar -->
+        </ul>
+        <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -176,7 +173,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -192,7 +188,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -215,13 +211,12 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">DATA LAPORAN UPLOAD HARDCOPY</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Data Verifikasi Bukti Penyerahan Hardcopy</h1>
                     <p class="mb-4">Konfirmasi Data Mahasiswa dengan seksama!</p>
 
                     <!-- DataTables Example -->
@@ -235,8 +230,9 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
                                 <option value="">Filter by Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="terverifikasi">terverifikasi</option>
+                                <option value="terverifikasi">Terverifikasi</option>
                                 <option value="belum upload">Belum Upload</option>
+                                <option value="ditolak">Ditolak</option>
                             </select>
 
                             <table class="table table-striped table-bordered" id="dataTable" width="100%"
@@ -245,7 +241,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     <tr>
                                         <th>NIM</th>
                                         <th>Nama Mahasiswa</th>
-                                        <th>Status Upload Hardcopy</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -254,8 +250,17 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     try {
                                         // Query untuk mengambil data
                                         $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_penyerahan_hardcopy AS status
-                                                    FROM dbo.mahasiswa m
-                                                    JOIN dbo.penyerahan_hardcopy pk ON m.nim = pk.nim";
+                                                FROM dbo.mahasiswa m
+                                                JOIN dbo.penyerahan_hardcopy pk ON m.nim = pk.nim
+                                                ORDER BY 
+                                                    CASE 
+                                                        WHEN pk.status_pengumpulan_penyerahan_hardcopy = 'pending' THEN 1
+                                                        WHEN pk.status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 2
+                                                        WHEN pk.status_pengumpulan_penyerahan_hardcopy = 'belum upload' THEN 3
+                                                        WHEN pk.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 4
+                                                        ELSE 5
+                                                    END";
+
                                         $result = sqlsrv_query($conn, $sql);
 
                                         if ($result === false) {
@@ -521,15 +526,23 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                }
+                },
+                "order": [[2, 'asc']],  // Menyortir berdasarkan kolom status (kolom 2) dengan urutan ascending
+                "columnDefs": [
+                    {
+                        "targets": 2,
+                        "orderData": [2]  // Menetapkan status sebagai kolom untuk pengurutan
+                    }
+                ]
             });
 
+            // Menambahkan filter berdasarkan status
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
-                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status penyerahan_hardcopy
+                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
             });
-
         });
+
 
         document.addEventListener("DOMContentLoaded", function () {
             const statusCells = document.querySelectorAll(".status span");
@@ -545,27 +558,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 }
             });
         });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
 
         document.addEventListener("DOMContentLoaded", function () {
             const buttons = document.querySelectorAll(".edit-data");

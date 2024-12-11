@@ -12,22 +12,22 @@ $nim = $_COOKIE['id'];
 
 $query = "
     SELECT 
-        SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN skkm.status_pengumpulan_skkm = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN fi.status_pengumpulan_foto_ijazah = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ukt.status_pengumpulan_ukt = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN bpbp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN hk.status_pengumpulan_hasil_kuisioner = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ppkl.status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN toeic.status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN bk.status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN pj.status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN apl.status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN skripsi.status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) AS terkonfirmasi,
+        SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN skkm.status_pengumpulan_skkm = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN fi.status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN ukt.status_pengumpulan_ukt = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN bpbp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN hk.status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN ppkl.status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN toeic.status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN bk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN pj.status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN apl.status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END +
+            CASE WHEN skripsi.status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) AS terverifikasi,
 
         SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'belum upload' THEN 1 ELSE 0 END +
             CASE WHEN skkm.status_pengumpulan_skkm = 'belum upload' THEN 1 ELSE 0 END +
@@ -63,22 +63,22 @@ $query = "
             CASE WHEN apl.status_pengumpulan_aplikasi = 'pending' THEN 1 ELSE 0 END +
             CASE WHEN skripsi.status_pengumpulan_skripsi = 'pending' THEN 1 ELSE 0 END) AS pending,
 
-        SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN skkm.status_pengumpulan_skkm = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN fi.status_pengumpulan_foto_ijazah = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ukt.status_pengumpulan_ukt = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN bpbp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN hk.status_pengumpulan_hasil_kuisioner = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN ppkl.status_pengumpulan_penyerahan_pkl = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN toeic.status_pengumpulan_toeic = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN bk.status_pengumpulan_bebas_kompen = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN pj.status_pengumpulan_publikasi_jurnal = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN apl.status_pengumpulan_aplikasi = 'tidak terkonfirmasi' THEN 1 ELSE 0 END +
-            CASE WHEN skripsi.status_pengumpulan_skripsi = 'tidak terkonfirmasi' THEN 1 ELSE 0 END) AS tidak_terkonfirmasi
+        SUM(CASE WHEN da.status_pengumpulan_data_alumni = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN skkm.status_pengumpulan_skkm = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN fi.status_pengumpulan_foto_ijazah = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN ukt.status_pengumpulan_ukt = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN bpbp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN hk.status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN ppkl.status_pengumpulan_penyerahan_pkl = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN toeic.status_pengumpulan_toeic = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN bk.status_pengumpulan_bebas_kompen = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN pj.status_pengumpulan_publikasi_jurnal = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN apl.status_pengumpulan_aplikasi = 'ditolak' THEN 1 ELSE 0 END +
+            CASE WHEN skripsi.status_pengumpulan_skripsi = 'ditolak' THEN 1 ELSE 0 END) AS ditolak
     FROM mahasiswa m
     LEFT JOIN data_alumni da ON m.nim = da.nim
     LEFT JOIN skkm ON m.nim = skkm.nim
@@ -114,10 +114,10 @@ $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
 // Return the result as JSON
 echo json_encode([
-    "terkonfirmasi" => $row['terkonfirmasi'],
+    "terverifikasi" => $row['terverifikasi'],
     "belum_upload" => $row['belum_upload'],
     "pending" => $row['pending'],
-    "tidak_terkonfirmasi" => $row['tidak_terkonfirmasi']
+    "ditolak" => $row['ditolak']
 ]);
 
 // Close the connection

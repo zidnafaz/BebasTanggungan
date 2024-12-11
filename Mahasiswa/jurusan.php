@@ -12,14 +12,14 @@ $nim = $_COOKIE['id'];
 
 $query = "
     SELECT 
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terkonfirmasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
     FROM dbo.penyerahan_skripsi
     LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
     LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
@@ -47,7 +47,7 @@ if (!$row) {
     die("Gagal mengambil data: " . print_r(sqlsrv_errors(), true));
 }
 
-// Mengecek apakah semua status sudah terkonfirmasi
+// Mengecek apakah semua status sudah terverifikasi
 $allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'] && $row['penyerahan_kebenaran_data'];
 
 // Query untuk mengambil data mahasiswa
@@ -78,7 +78,7 @@ if ($resultTanggal === false) {
     die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
 }
 
-// Mengecek apakah tanggal hanya diambil jika semua status sudah terkonfirmasi
+// Mengecek apakah tanggal hanya diambil jika semua status sudah terverifikasi
 $tanggalLt7 = null;
 $tanggalLt6 = null;
 if ($allConfirmed) {
@@ -96,7 +96,7 @@ if ($allConfirmed) {
 
     // Jika $tanggal adalah objek DateTime, ubah menjadi string
     if ($tanggalLt7 instanceof DateTime) {
-        $tanggalLt7 = $tanggalLt7->format('Y-m-d');  // Atur format sesuai kebutuhan
+        $tanggalLt7 = $tanggalLt7->format('d-m-Y');  // Atur format sesuai kebutuhan
     }
 
     // Gunakan htmlspecialchars untuk mencegah XSS
@@ -117,7 +117,7 @@ if ($allConfirmed) {
 
     // Jika $tanggal adalah objek DateTime, ubah menjadi string
     if ($tanggalLt6 instanceof DateTime) {
-        $tanggalLt6 = $tanggalLt6->format('Y-m-d');  // Atur format sesuai kebutuhan
+        $tanggalLt6 = $tanggalLt6->format('d-m-Y');  // Atur format sesuai kebutuhan
     }
 
     // Gunakan htmlspecialchars untuk mencegah XSS

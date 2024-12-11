@@ -10,7 +10,7 @@ $uktQuery = "
         COUNT(CASE WHEN status_pengumpulan_ukt = 'terverifikasi' THEN 1 END) AS terverifikasi,
         COUNT(CASE WHEN status_pengumpulan_ukt = 'pending' THEN 1 END) AS pending,
         COUNT(CASE WHEN status_pengumpulan_ukt = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_ukt = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_ukt = 'ditolak' THEN 1 END) AS ditolak
     FROM ukt;
 ";
 $uktResult = sqlsrv_query($conn, $uktQuery);
@@ -22,7 +22,7 @@ $skkmQuery = "
         COUNT(CASE WHEN status_pengumpulan_skkm = 'terverifikasi' THEN 1 END) AS terverifikasi,
         COUNT(CASE WHEN status_pengumpulan_skkm = 'pending' THEN 1 END) AS pending,
         COUNT(CASE WHEN status_pengumpulan_skkm = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_skkm = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_skkm = 'ditolak' THEN 1 END) AS ditolak
     FROM skkm;
 ";
 $skkmResult = sqlsrv_query($conn, $skkmQuery);
@@ -34,7 +34,7 @@ $data_alumniQuery = "
         COUNT(CASE WHEN status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 END) AS terverifikasi,
         COUNT(CASE WHEN status_pengumpulan_data_alumni = 'pending' THEN 1 END) AS pending,
         COUNT(CASE WHEN status_pengumpulan_data_alumni = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'ditolak' THEN 1 END) AS ditolak
     FROM data_alumni;
 ";
 $data_alumniResult = sqlsrv_query($conn, $data_alumniQuery);
@@ -45,7 +45,7 @@ $foto_ijazahQuery = "
         COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 END) AS terverifikasi,
         COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'pending' THEN 1 END) AS pending,
         COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'ditolak' THEN 1 END) AS ditolak
     FROM foto_ijazah;
 ";
 $foto_ijazahResult = sqlsrv_query($conn, $foto_ijazahQuery);
@@ -78,9 +78,9 @@ sqlsrv_close($conn);
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
-    .card-fixed-height {
-        height: 200px;
-    }
+        .card-fixed-height {
+            height: 200px;
+        }
     </style>
 
 </head>
@@ -116,30 +116,26 @@ sqlsrv_close($conn);
                 Verifikasi
             </div>
 
-
             <!-- Nav Item - Verifikasi -->
-            <li class="nav-item" id="nav-ukt">
-                <a class="nav-link" href="ukt.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Laporan UKT</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-foto">
-                <a class="nav-link" href="foto.php">
-                    <i class="fas fa-solid fa-file-lines"></i>
-                    <span>Foto 3x4</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-skkm">
-                <a class="nav-link" href="skkm.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Laporan SKKM/span></a>
-            </li>
-
             <li class="nav-item" id="nav-data_alumni">
                 <a class="nav-link" href="data_alumni.php">
                     <i class="fas fa-solid fa-file-invoice"></i>
-                    <span>Data Alumni</span></a>
+                    <span>Pengisian Data Alumni</span></a>
+            </li>
+            <li class="nav-item" id="nav-skkm">
+                <a class="nav-link" href="skkm.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>SKKM</a>
+            </li>
+            <li class="nav-item" id="nav-foto">
+                <a class="nav-link" href="foto.php">
+                    <i class="fas fa-solid fa-file-lines"></i>
+                    <span>Foto Ijazah</span></a>
+            </li>
+            <li class="nav-item" id="nav-ukt">
+                <a class="nav-link" href="ukt.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>UKT</span></a>
             </li>
 
             <!-- Divider -->
@@ -155,7 +151,6 @@ sqlsrv_close($conn);
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -171,7 +166,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -194,7 +189,6 @@ sqlsrv_close($conn);
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -226,10 +220,10 @@ sqlsrv_close($conn);
                                                     <th rowspan="2">Total</th>
                                                 </tr>
                                                 <tr class="table-header bg-primary text-white">
-                                                    <th>Hard Copy</th>
-                                                    <th>Tugas Akhir</th>
-                                                    <th>Kuisioner</th>
-                                                    <th>Bebas Pinjaman</th>
+                                                    <th>Pengisian Data Alumni</th>
+                                                    <th>SKKM</th>
+                                                    <th>Foto Ijazah</th>
+                                                    <th>UKT</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -258,7 +252,7 @@ sqlsrv_close($conn);
                                                     $skkm = $skkmRow[$status] ?? 0;
                                                     $data_alumni = $data_alumniRow[$status] ?? 0;
                                                     $foto_ijazah = $foto_ijazahRow[$status] ?? 0;
-                                                    
+
                                                     $total = $ukt + $skkm + $data_alumni + $foto_ijazah;
 
                                                     echo "<tr>
@@ -269,10 +263,10 @@ sqlsrv_close($conn);
                                                                     " . htmlspecialchars($status) . "
                                                                 </span>
                                                             </td>
-                                                            <td>$ukt</td>
-                                                            <td>$skkm</td>
                                                             <td>$data_alumni</td>
+                                                            <td>$skkm</td>
                                                             <td>$foto_ijazah</td>
+                                                            <td>$ukt</td>
                                                             <td><strong>$total</strong></td>
                                                             
                                                         </tr>";
@@ -351,27 +345,6 @@ sqlsrv_close($conn);
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
 
     </script>
 

@@ -332,5 +332,6 @@ WHERE
 
 UPDATE [dbo].[adminlt6_konfirmasi] set tanggal_adminlt6_konfirmasi = '2024-11-23' where nim = '20230005';
 
-Select * from dbo.adminlt6_konfirmasi;
+Select * from dbo.nomor_surat_tracker;
+Select * from dbo.nomor_surat;
 

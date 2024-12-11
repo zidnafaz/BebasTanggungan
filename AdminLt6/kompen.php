@@ -1,6 +1,7 @@
 <?php
 include '../koneksi.php';
 include '../data/dataAdmin.php';
+
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
     $messageType = htmlspecialchars($_GET['type']); // "success" atau "danger"
@@ -27,7 +28,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
 <head>
 
-<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -46,13 +47,9 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
-    <!-- DataTables -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
-    
     <style>
         .status span {
             display: inline-block;
@@ -126,7 +123,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active" id="nav-dashboard">
+            <li class="nav-item" id="nav-dashboard">
                 <a class="nav-link" href="home.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -150,7 +147,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
             <li class="nav-item" id="nav-pkl">
                 <a class="nav-link" href="pkl.php">
-                    <i class="fas fa-solid fa-file"></i>
+                    <i class="fas fa-solid fa-file-lines"></i>
                     <span>Laporan PKL</span></a>
             </li>
 
@@ -160,7 +157,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     <span>TOEIC</span></a>
             </li>
 
-            <li class="nav-item" id="nav-kompen">
+            <li class="nav-item active" id="nav-kompen">
                 <a class="nav-link" href="kompen.php">
                     <i class="fas fa-solid fa-file-invoice"></i>
                     <span>Kompen</span></a>
@@ -185,7 +182,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -201,7 +197,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -229,7 +225,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">DATA LAPORAN BEBAS KOMPEN</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Data Verifikasi Bebas Kompen</h1>
                     <p class="mb-4">Konfirmasi Data Mahasiswa dengan seksama!</p>
 
                     <!-- DataTables Example -->
@@ -243,8 +239,9 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
                                 <option value="">Filter by Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="terverifikasi">terverifikasi</option>
+                                <option value="terverifikasi">Terverifikasi</option>
                                 <option value="belum upload">Belum Upload</option>
+                                <option value="ditolak">Ditolak</option>
                             </select>
 
                             <table class="table table-striped table-bordered" id="dataTable" width="100%"
@@ -253,7 +250,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     <tr>
                                         <th>NIM</th>
                                         <th>Nama Mahasiswa</th>
-                                        <th>Status Laporan BEBAS KOMPEN</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -262,8 +259,17 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     try {
                                         // Query untuk mengambil data
                                         $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_bebas_kompen AS status
-                                                    FROM dbo.mahasiswa m
-                                                    JOIN dbo.bebas_kompen pk ON m.nim = pk.nim";
+                                                FROM dbo.mahasiswa m
+                                                JOIN dbo.bebas_kompen pk ON m.nim = pk.nim
+                                                ORDER BY 
+                                                    CASE 
+                                                        WHEN pk.status_pengumpulan_bebas_kompen = 'pending' THEN 1
+                                                        WHEN pk.status_pengumpulan_bebas_kompen = 'ditolak' THEN 2
+                                                        WHEN pk.status_pengumpulan_bebas_kompen = 'belum upload' THEN 3
+                                                        WHEN pk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 4
+                                                        ELSE 5
+                                                    END";
+
                                         $result = sqlsrv_query($conn, $sql);
 
                                         if ($result === false) {
@@ -529,14 +535,21 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                }
+                },
+                "order": [[2, 'asc']],  // Menyortir berdasarkan kolom status (kolom 2) dengan urutan ascending
+                "columnDefs": [
+                    {
+                        "targets": 2,
+                        "orderData": [2]  // Menetapkan status sebagai kolom untuk pengurutan
+                    }
+                ]
             });
 
+            // Menambahkan filter berdasarkan status
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
-                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status kompen
+                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
             });
-
         });
 
         document.addEventListener("DOMContentLoaded", function () {

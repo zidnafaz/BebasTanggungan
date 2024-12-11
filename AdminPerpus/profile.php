@@ -1,7 +1,37 @@
-<?php  
+<?php
 include '../login.php';
 include '../koneksi.php';
-include '../data/dataAdmin.php';
+
+try {
+    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
+    FROM dbo.admin a
+    WHERE a.id_karyawan = ?";
+
+    session_start();
+
+    if (isset($_COOKIE['id'])) {
+        $inputUsername = $_COOKIE['id'];
+    } else {
+        die("Anda harus login terlebih dahulu.");
+    }
+
+    $param = array($inputUsername);
+    $stmt = sqlsrv_query($conn, $sql, $param);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true)); // Tangani error query
+    }
+
+    // Ambil hasil query
+    if (sqlsrv_has_rows($stmt)) {
+        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
+    } else {
+        echo "Data tidak ditemukan.";
+        $result = null; // Pastikan $result diset null jika data tidak ditemukan
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,27 +56,12 @@ include '../data/dataAdmin.php';
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
-    <style>
-    .card-fixed-height {
-        height: 200px;
-    }
-
-    strong {
-        font-size: 22px;
-    }
-
-    p {
-        font-size: 20px;
-    }
-    </style>
-
 </head>
 
 <body id="page-top">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
-
 
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -60,7 +75,7 @@ include '../data/dataAdmin.php';
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active" id="nav-dashboard">
+            <li class="nav-item" id="nav-dashboard">
                 <a class="nav-link" href="home.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -76,31 +91,26 @@ include '../data/dataAdmin.php';
 
 
             <!-- Nav Item - Verifikasi -->
-            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-hardcopy">
+                <a class="nav-link" href="hardcopy.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Hardcopy</span></a>
+            </li>
             <li class="nav-item" id="nav-tugas_akhir">
                 <a class="nav-link" href="softcopy.php">
                     <i class="fas fa-solid fa-book"></i>
-                    <span>Tugas Akhir</span></a>
+                    <span>Softcopy</span></a>
             </li>
-
+            <li class="nav-item" id="nav-bebas_pinjaman">
+                <a class="nav-link" href="bebas_pinjaman.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Bebas Pinjaman Buku</span></a>
+            </li>
             <li class="nav-item" id="nav-kuisioner">
                 <a class="nav-link" href="kuisioner.php">
                     <i class="fas fa-solid fa-file"></i>
                     <span>Kuisioner</span></a>
             </li>
-
-            <li class="nav-item" id="nav-hardcopy">
-                <a class="nav-link" href="hardcopy.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Hard Copy</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-bebas_pinjaman">
-                <a class="nav-link" href="bebas_pinjaman.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Bebas Pinjaman</span></a>
-            </li>
-
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -115,7 +125,6 @@ include '../data/dataAdmin.php';
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -131,7 +140,7 @@ include '../data/dataAdmin.php';
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -154,7 +163,6 @@ include '../data/dataAdmin.php';
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -162,49 +170,52 @@ include '../data/dataAdmin.php';
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil
-                            <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></h1>
+                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?>
+                        </h1>
                     </div>
 
                     <!-- Content Row -->
-                    <div class="container rounded shadow mt-5">
-                        <div class="row" style="size : 200px;">
+                    <div class="container rounded shadow-lg mt-5 p-4 bg-light">
+                        <div class="row">
                             <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h1>Informasi Pribadi</h1>
+                                <div class="card shadow-sm">
+                                    <div class="card-header text-center bg-primary text-white">
+                                        <h3>Informasi Pribadi</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row mb-5">
+                                        <div class="row mb-4">
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
-                                                <p><?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
-                                                <p>
+                                                <p class="text-muted">
                                                     <?php
-                                                        if ($resultUser['jenis_kelamin_karyawan'] == 'L') {
-                                                            echo 'Laki-Laki';
-                                                        } elseif ($resultUser['jenis_kelamin_karyawan'] == 'P') {
-                                                            echo 'Perempuan';
-                                                        }
+                                                    if ($result['jenis_kelamin_karyawan'] == 'L') {
+                                                        echo 'Laki-Laki';
+                                                    } elseif ($result['jenis_kelamin_karyawan'] == 'P') {
+                                                        echo 'Perempuan';
+                                                    }
                                                     ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
-                                                <p><?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['alamat_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($resultUser['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
-                                                <p><?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?>
-                                                </p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nomor_telfon_karyawan'] ?? '') ?></p>
                                             </div>
                                         </div>
                                     </div>

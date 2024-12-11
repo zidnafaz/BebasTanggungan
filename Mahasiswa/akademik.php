@@ -40,8 +40,8 @@ $allConfirmed = $row['data_alumni'] && $row['skkm'] && $row['foto_ijazah'] && $r
 // Pastikan untuk memanggil fungsi sqlsrv_free_stmt langsung
 sqlsrv_free_stmt($stmt);
 
-//CEK APAKAH NOMOR SURAT SUDAH ADA
-$cekSurat = "select * from dbo.nomor_surat where nim = ? and nama_surat = 'bebas tanggungan akademik'";
+// Cek apakah nomor surat sudah ada
+$cekSurat = "SELECT * FROM dbo.nomor_surat_akademik_pusat WHERE nim = ?";
 $paramsCek = array($nim);
 $resultCek = sqlsrv_query($conn, $cekSurat, $paramsCek);
 
@@ -50,25 +50,47 @@ if ($resultCek === false) {
 }
 
 if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
-    // ...
+    // Nomor surat sudah ada, tidak perlu membuat lagi
+    $nomor_surat = $rowCek['nomor_surat'];
 } else {
-    $sqlNomorSurat = "EXEC InsertSurat @nama_surat = 'bebas tanggungan akademik',
-            @nim = ?";
-    $paramsNomor = array($nim);
-    $stmtNomor = sqlsrv_query($conn, $sqlNomorSurat, $paramsNomor);
+    // Nomor surat belum ada, buat nomor surat baru jika semua terverifikasi
+    if ($allConfirmed) {
+        // Ambil nomor urut terakhir
+        $queryUrut = "SELECT MAX(CAST(LEFT(nomor_surat, CHARINDEX('/', nomor_surat) - 1) AS INT)) AS last_number FROM dbo.nomor_surat_akademik_pusat";
+        $resultUrut = sqlsrv_query($conn, $queryUrut);
 
-    sqlsrv_free_stmt($stmtNomor);
+        if ($resultUrut === false) {
+            die("Gagal mengambil nomor urut terakhir: " . print_r(sqlsrv_errors(), true));
+        }
+
+        $rowUrut = sqlsrv_fetch_array($resultUrut, SQLSRV_FETCH_ASSOC);
+        $lastNumber = $rowUrut['last_number'] ?? 1000;
+
+        // Buat nomor surat baru
+        $newNumber = $lastNumber + 1;
+        $tahun = date("Y");
+        $nomor_surat = sprintf("%04d/KSB.AK/BT/%s", $newNumber, $tahun);
+
+        // Masukkan ke tabel nomor_surat
+        $insertSurat = "INSERT INTO dbo.nomor_surat_akademik_pusat (nim, nomor_surat) 
+                        VALUES (?, ?)";
+        $paramsInsert = array($nim, $nomor_surat);
+        $stmtInsert = sqlsrv_query($conn, $insertSurat, $paramsInsert);
+
+        if ($stmtInsert === false) {
+            die("Gagal menyimpan nomor surat: " . print_r(sqlsrv_errors(), true));
+        }
+    } else {
+        $nomor_surat = "Belum memenuhi syarat";
+    }
 }
 
-sqlsrv_free_stmt($resultCek);
-
-
-// Query untuk mengambil data mahasiswa
-$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ak.tanggal_adminPusat_konfirmasi
-            FROM dbo.mahasiswa m
-            join dbo.nomor_surat ns on m.nim = ns.nim
-            join dbo.adminPusat_konfirmasi ak on m.nim = ak.nim
-            WHERE m.nim = ? AND ns.nama_surat = 'bebas tanggungan akademik'";
+// Menampilkan data mahasiswa dan nomor surat
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ap.tanggal_adminPusat_konfirmasi
+        FROM dbo.mahasiswa m
+        JOIN dbo.nomor_surat_akademik_pusat ns ON m.nim = ns.nim
+        JOIN dbo.adminPusat_konfirmasi ap ON m.nim = ns.nim
+        WHERE m.nim = ?";
 
 $params = array($nim);
 $result = sqlsrv_query($conn, $sql, $params);
@@ -77,22 +99,27 @@ if ($result === false) {
     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
 }
 
-$nama_mahasiswa = "";
-
-// Ambil data dan cek apakah ada
+// Ambil data
 if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nama_mahasiswa = $row['nama_mahasiswa'];
     $nim = $row['nim'];
     $jurusan = $row['jurusan_mahasiswa'];
     $prodi = $row['prodi_mahasiswa'];
     $nomor_surat = $row['nomor_surat'];
-    $tanggal = $row['tanggal_adminPusat_konfirmasi'];
-    $tanggalString = $tanggal->format('d-m-Y');
-    $tahun = $tanggal->format('Y');
+    $tanggalTerbit = $row['tanggal_adminPusat_konfirmasi']->format('d-m-Y');
 }
 
-// Fungsi untuk membebaskan sumber daya yang digunakan oleh statement query
-sqlsrv_free_stmt($result);
+$sqlNama = "SELECT nama_mahasiswa FROM dbo.mahasiswa WHERE nim = ?";
+$paramsNama = array($nim);
+$resultNama = sqlsrv_query($conn, $sqlNama, $paramsNama);
+
+if ($resultNama === false) {
+    die("Kesalahan saat menjalankan query nama: " . print_r(sqlsrv_errors(), true));
+}
+
+if ($rowNama = sqlsrv_fetch_array($resultNama, SQLSRV_FETCH_ASSOC)) {
+    $nama = $rowNama['nama_mahasiswa'];
+}
 
 // Tutup koneksi
 sqlsrv_close($conn);
@@ -230,8 +257,7 @@ sqlsrv_close($conn);
                         const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
                         const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
                         const nomor_surat = "<?php echo htmlspecialchars($nomor_surat, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tanggal = "<?php echo htmlspecialchars($tanggalString, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tahun = "<?php echo htmlspecialchars($tahun, ENT_QUOTES, 'UTF-8'); ?>";
+                        const tanggal = "<?php echo htmlspecialchars($tanggalTerbit, ENT_QUOTES, 'UTF-8'); ?>";
 
                         firstPage.drawText(`${nama}`, {
                             x: 225,
@@ -261,7 +287,7 @@ sqlsrv_close($conn);
                             font: timesFont,
                             color: rgb(0, 0, 0)
                         });
-                        firstPage.drawText(`${nomor_surat}/KSB.AK/BT/${tahun}`, {
+                        firstPage.drawText(`${nomor_surat}`, {
                             x: 265,
                             y: 666,
                             size: 12,
@@ -285,7 +311,7 @@ sqlsrv_close($conn);
                         // Unduh PDF yang sudah diedit
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(blob);
-                        link.download = `${nim}_Bebas_Tanggungan_Akademik.pdf`;
+                        link.download = `${nim}_Bebas_Tanggungan_Akademik_Pusat.pdf`;
                         link.click();
                     } catch (error) {
                         console.error('Terjadi error:', error);
@@ -383,7 +409,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama_mahasiswa); ?>
+                                    <?php echo htmlspecialchars($nama); ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -479,7 +505,7 @@ sqlsrv_close($conn);
                         <div class="card-body">
                             <p>Surat ini meliputi Bebas Tanggungan Akademik Pusat.</p>
                             <?php if ($allConfirmed): ?>
-                                <button class="btn btn-success btn-block" id="downloadButton">
+                                <button class="btn btn-success" id="downloadButton">
                                     <i class="fas fa-download"></i> Download
                                 </button>
                             <?php else: ?>
@@ -566,7 +592,8 @@ sqlsrv_close($conn);
                                 <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
-                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for aplikasi)</small>
+                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for
+                                aplikasi)</small>
                         </div>
 
                         <!-- Preview Filename -->
@@ -627,34 +654,14 @@ sqlsrv_close($conn);
     <script src="../js/demo/chart-pie-demo.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
 
         // Ajax untuk mengambil data dan menginisialisasi DataTables
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Memuat data dari data.php
             $.ajax({
                 url: 'data_akademik.php', // File PHP untuk memuat data
                 type: 'GET', // Gunakan metode GET
-                success: function(response) {
+                success: function (response) {
                     // Masukkan data ke dalam tabel
                     $('#table').html(`<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -677,14 +684,14 @@ sqlsrv_close($conn);
                         "info": true // Menampilkan informasi jumlah data
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error:', error);
                 }
             });
         });
 
-        $(document).ready(function() {
-            $('#uploadForm').submit(function(e) {
+        $(document).ready(function () {
+            $('#uploadForm').submit(function (e) {
                 e.preventDefault();
                 var formData = new FormData(this);
 
@@ -694,7 +701,7 @@ sqlsrv_close($conn);
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(response) {
+                    success: function (response) {
                         // Tutup modal upload
                         $('#uploadModal').modal('hide');
 
@@ -723,7 +730,7 @@ sqlsrv_close($conn);
 
                         loadTableData();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('Error:', error);
                     }
                 });
@@ -734,11 +741,11 @@ sqlsrv_close($conn);
             $.ajax({
                 url: 'data_akademik.php', // Endpoint untuk mengambil data tabel
                 type: 'GET',
-                success: function(data) {
+                success: function (data) {
                     // Perbarui isi tabel dengan data yang diterima
                     $('#table tbody').html(data);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error loading table data:', error);
                 }
             });
@@ -754,12 +761,12 @@ sqlsrv_close($conn);
         }
 
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Menangani perubahan input file
             const fileInput = document.getElementById("file");
             const fileNameInput = document.getElementById("fileName");
 
-            fileInput.addEventListener("change", function() {
+            fileInput.addEventListener("change", function () {
                 const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
                 fileNameInput.value = fileName;
             });

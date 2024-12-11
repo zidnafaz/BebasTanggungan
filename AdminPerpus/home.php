@@ -119,28 +119,25 @@ sqlsrv_close($conn);
 
 
             <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-hardcopy">
+                <a class="nav-link" href="hardcopy.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Hardcopy</span></a>
+            </li>
             <li class="nav-item" id="nav-tugas_akhir">
                 <a class="nav-link" href="softcopy.php">
                     <i class="fas fa-solid fa-book"></i>
-                    <span>Tugas Akhir</span></a>
+                    <span>Softcopy</span></a>
             </li>
-
+            <li class="nav-item" id="nav-bebas_pinjaman">
+                <a class="nav-link" href="bebas_pinjaman.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Bebas Pinjaman Buku</span></a>
+            </li>
             <li class="nav-item" id="nav-kuisioner">
                 <a class="nav-link" href="kuisioner.php">
                     <i class="fas fa-solid fa-file"></i>
                     <span>Kuisioner</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-hardcopy">
-                <a class="nav-link" href="hardcopy.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Hard Copy</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-bebas_pinjaman">
-                <a class="nav-link" href="bebas_pinjaman.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Bebas Pinjaman</span></a>
             </li>
 
             <!-- Divider -->
@@ -172,7 +169,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -227,10 +224,10 @@ sqlsrv_close($conn);
                                                     <th rowspan="2">Total</th>
                                                 </tr>
                                                 <tr class="table-header bg-primary text-white">
-                                                    <th>Hard Copy</th>
-                                                    <th>Tugas Akhir</th>
+                                                    <th>Hardcopy</th>
+                                                    <th>Softcopy</th>
+                                                    <th>Bebas Pinjaman Buku</th>
                                                     <th>Kuisioner</th>
-                                                    <th>Bebas Pinjaman</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -259,7 +256,7 @@ sqlsrv_close($conn);
                                                     $tugas_akhir_softcopy = $tugas_akhir_softcopyRow[$status] ?? 0;
                                                     $hasil_kuisioner = $hasil_kuisionerRow[$status] ?? 0;
                                                     $bebas_pinjam_buku_perpustakaan = $bebas_pinjam_buku_perpustakaanRow[$status] ?? 0;
-                                                    
+
                                                     $total = $penyerahan_hardcopy + $tugas_akhir_softcopy + $hasil_kuisioner + $bebas_pinjam_buku_perpustakaan;
 
                                                     echo "<tr>
@@ -272,8 +269,8 @@ sqlsrv_close($conn);
                                                             </td>
                                                             <td>$penyerahan_hardcopy</td>
                                                             <td>$tugas_akhir_softcopy</td>
-                                                            <td>$hasil_kuisioner</td>
                                                             <td>$bebas_pinjam_buku_perpustakaan</td>
+                                                            <td>$hasil_kuisioner</td>
                                                             <td><strong>$total</strong></td>
                                                             
                                                         </tr>";

@@ -146,7 +146,7 @@ sqlsrv_close($conn);
             <li class="nav-item" id="nav-program_mahasiswa">
                 <a class="nav-link" href="program_mahasiswa.php">
                     <i class="fas fa-solid fa-file"></i>
-                    <span>Program Mahasiswa</span></a>
+                    <span>Aplikasi</span></a>
             </li>
 
             <li class="nav-item" id="nav-publikasi_jurnal">
@@ -239,9 +239,9 @@ sqlsrv_close($conn);
                                                     <th rowspan="2">Total</th>
                                                 </tr>
                                                 <tr class="table-header bg-primary text-white">
-                                                    <th>aplikasi</th>
-                                                    <th>skripsi</th>
-                                                    <th>publikasi_jurnal</th>
+                                                    <th>Aplikasi</th>
+                                                    <th>Skripsi</th>
+                                                    <th>Publikasi Jurnal</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

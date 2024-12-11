@@ -4,14 +4,94 @@ include '../koneksi.php';
 if (!isset($_COOKIE['id'])) {
     header("Location: ../index.html");
     exit();
-} else {
-    $username = $_COOKIE['id'];
 }
 
+$nim = $_COOKIE['id'];
 
-//CEK APAKAH NOMOR SURAT SUDAH ADA
-$cekSurat = "select * from dbo.nomor_surat where nim = ? and nama_surat = 'rekomendasi'";
-$paramsCek = array($username);
+$query = "
+        SELECT 
+            -- PERPUSTAKAAN
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS tugas_akhir_softcopy,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_pinjam_buku_perpustakaan,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS hasil_kuisioner,
+
+            -- BEBAS TANGGUNGAN AKADEMIK PUSAT
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS data_alumni,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_skkm = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skkm,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS foto_ijazah,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_ukt = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS ukt,
+
+            -- ADMIN LANTAI 6 PRODI
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_skripsi,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_pkl,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data,
+
+            -- ADMIN LANTAI 7 JURUSAN
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+            (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi
+        FROM dbo.penyerahan_hardcopy
+        LEFT JOIN dbo.tugas_akhir_softcopy ON penyerahan_hardcopy.nim = tugas_akhir_softcopy.nim
+        LEFT JOIN dbo.bebas_pinjam_buku_perpustakaan ON penyerahan_hardcopy.nim = bebas_pinjam_buku_perpustakaan.nim
+        LEFT JOIN dbo.hasil_kuisioner ON penyerahan_hardcopy.nim = hasil_kuisioner.nim
+        LEFT JOIN dbo.data_alumni ON penyerahan_hardcopy.nim = data_alumni.nim
+        LEFT JOIN dbo.skkm ON penyerahan_hardcopy.nim = skkm.nim
+        LEFT JOIN dbo.foto_ijazah ON penyerahan_hardcopy.nim = foto_ijazah.nim
+        LEFT JOIN dbo.ukt ON penyerahan_hardcopy.nim = ukt.nim
+        LEFT JOIN dbo.penyerahan_skripsi ON penyerahan_hardcopy.nim = penyerahan_skripsi.nim
+        LEFT JOIN dbo.penyerahan_pkl ON penyerahan_hardcopy.nim = penyerahan_pkl.nim
+        LEFT JOIN dbo.toeic ON penyerahan_hardcopy.nim = toeic.nim
+        LEFT JOIN dbo.bebas_kompen ON penyerahan_hardcopy.nim = bebas_kompen.nim
+        LEFT JOIN dbo.penyerahan_kebenaran_data ON penyerahan_hardcopy.nim = penyerahan_kebenaran_data.nim
+        LEFT JOIN dbo.publikasi_jurnal ON penyerahan_hardcopy.nim = publikasi_jurnal.nim
+        LEFT JOIN dbo.aplikasi ON penyerahan_hardcopy.nim = aplikasi.nim
+        LEFT JOIN dbo.skripsi ON penyerahan_hardcopy.nim = skripsi.nim
+        WHERE penyerahan_hardcopy.nim = ?
+        ";
+
+$params = array($nim);
+$stmt = sqlsrv_prepare($conn, $query, $params);
+if (!$stmt) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$result = sqlsrv_execute($stmt);
+if (!$result) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+if ($row === false) {
+    die("Gagal mengambil data");
+}
+
+// Mengecek apakah semua status sudah "terverifikasi"
+$allConfirmed =
+    $row['penyerahan_hardcopy'] &&
+    $row['tugas_akhir_softcopy'] &&
+    $row['bebas_pinjam_buku_perpustakaan'] &&
+    $row['hasil_kuisioner'] &&
+    $row['data_alumni'] &&
+    $row['skkm'] &&
+    $row['foto_ijazah'] &&
+    $row['ukt'] &&
+    $row['penyerahan_skripsi'] &&
+    $row['penyerahan_pkl'] &&
+    $row['toeic'] &&
+    $row['bebas_kompen'] &&
+    $row['penyerahan_kebenaran_data'] &&
+    $row['publikasi_jurnal'] &&
+    $row['aplikasi'] &&
+    $row['skripsi'];
+
+sqlsrv_free_stmt($stmt);
+
+// Cek apakah nomor surat sudah ada
+$cekSurat = "SELECT * FROM dbo.nomor_surat_rekomendasi WHERE nim = ?";
+$paramsCek = array($nim);
 $resultCek = sqlsrv_query($conn, $cekSurat, $paramsCek);
 
 if ($resultCek === false) {
@@ -19,42 +99,78 @@ if ($resultCek === false) {
 }
 
 if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
-    // ...
+    $nomor_surat = $rowCek['nomor_surat'];
 } else {
-    $sqlNomorSurat = "EXEC InsertSurat @nama_surat = 'rekomendasi',
-    @nim = ?";
-    $paramsNomor = array($username);
-    $stmtNomor = sqlsrv_query($conn, $sqlNomorSurat, $paramsNomor);
+    if ($allConfirmed) {
 
-    sqlsrv_free_stmt($stmtNomor);
+        $queryUrut = "SELECT MAX(CAST(LEFT(nomor_surat, CHARINDEX('/', nomor_surat) - 1) AS INT)) AS last_number FROM dbo.nomor_surat_rekomendasi";
+        $resultUrut = sqlsrv_query($conn, $queryUrut);
+    
+        if ($resultUrut === false) {
+            die("Gagal mengambil nomor urut terakhir: " . print_r(sqlsrv_errors(), true));
+        }
+    
+        $rowUrut = sqlsrv_fetch_array($resultUrut, SQLSRV_FETCH_ASSOC);
+        $lastNumber = $rowUrut['last_number'] ?? 1000;
+    
+        // Buat nomor surat baru
+        $newNumber = $lastNumber + 1;
+        $tahun = date("Y");
+        $nomor_surat = sprintf("%04d/PL.T2.TI/%s", $newNumber, $tahun);
+    
+        // Masukkan ke tabel nomor_surat
+        $insertSurat = "INSERT INTO dbo.nomor_surat_rekomendasi (nim, nomor_surat) 
+                        VALUES (?, ?)";
+        $paramsInsert = array($nim, $nomor_surat);
+        $stmtInsert = sqlsrv_query($conn, $insertSurat, $paramsInsert);
+    
+        if ($stmtInsert === false) {
+            die("Gagal menyimpan nomor surat: " . print_r(sqlsrv_errors(), true));
+        }
+    } else {
+        $nomor_surat = "Belum memenuhi syarat";
+    }
 }
 
-$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ak.tanggal_adminlt6_konfirmasi
-            FROM dbo.mahasiswa m
-            join dbo.nomor_surat ns on m.nim = ns.nim
-            join dbo.adminlt6_konfirmasi ak on m.nim = ak.nim
-            WHERE m.nim = ? AND ns.nama_surat = 'rekomendasi'";
+// Menampilkan data mahasiswa dan nomor surat
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, m.tahun_lulus_mahasiswa, ns.nomor_surat, ap.tanggal_adminlt6_konfirmasi
+        FROM dbo.mahasiswa m
+        JOIN dbo.nomor_surat_rekomendasi ns ON m.nim = ns.nim
+        JOIN dbo.adminlt6_konfirmasi ap ON m.nim = ns.nim
+        WHERE m.nim = ?";
 
-$params = array($username);
+$params = array($nim);
 $result = sqlsrv_query($conn, $sql, $params);
 
 if ($result === false) {
     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
 }
-$nama_mahasiswa = "";
 
-// Ambil data dan cek apakah ada
+// Ambil data
 if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nama_mahasiswa = $row['nama_mahasiswa'];
     $nim = $row['nim'];
     $jurusan = $row['jurusan_mahasiswa'];
     $prodi = $row['prodi_mahasiswa'];
     $nomor_surat = $row['nomor_surat'];
-    $tanggal = $row['tanggal_adminlt6_konfirmasi'];
-    $tanggalString = $tanggal->format('d-m-Y');
-    $tahun = $tanggal->format('Y');
-};
-sqlsrv_free_stmt($result);
+    $tahunLulus = $row['tahun_lulus_mahasiswa']->format('Y');
+    $tanggalTerbit = $row['tanggal_adminlt6_konfirmasi']->format('d-m-Y');
+}
+
+$sqlNama = "SELECT nama_mahasiswa FROM dbo.mahasiswa WHERE nim = ?";
+$paramsNama = array($nim);
+$resultNama = sqlsrv_query($conn, $sqlNama, $paramsNama);
+
+if ($resultNama === false) {
+    die("Kesalahan saat menjalankan query nama: " . print_r(sqlsrv_errors(), true));
+}
+
+if ($rowNama = sqlsrv_fetch_array($resultNama, SQLSRV_FETCH_ASSOC)) {
+    $nama = $rowNama['nama_mahasiswa'];
+}
+
+// Tutup koneksi
+sqlsrv_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -134,8 +250,8 @@ sqlsrv_free_stmt($result);
                 const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
                 const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
                 const nomor_surat = "<?php echo htmlspecialchars($nomor_surat, ENT_QUOTES, 'UTF-8'); ?>";
-                const tanggal = "<?php echo htmlspecialchars($tanggalString, ENT_QUOTES, 'UTF-8'); ?>";
-                const tahun = "<?php echo htmlspecialchars($tahun, ENT_QUOTES, 'UTF-8'); ?>";
+                const tahunLulus = "<?php echo htmlspecialchars($tahunLulus, ENT_QUOTES, 'UTF-8'); ?>";
+                const tanggalTerbit = "<?php echo htmlspecialchars($tanggalTerbit, ENT_QUOTES, 'UTF-8'); ?>";
 
                 // Tentukan posisi teks untuk setiap field
                 firstPage.drawText(`${nama}`, {
@@ -154,7 +270,7 @@ sqlsrv_free_stmt($result);
                     color: rgb(0, 0, 0),
                 });
 
-                firstPage.drawText(`${tahun}`, {
+                firstPage.drawText(`${tahunLulus}`, {
                     x: 190, // Ganti dengan koordinat X yang sesuai
                     y: 425.3, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
@@ -178,7 +294,7 @@ sqlsrv_free_stmt($result);
                     color: rgb(0, 0, 0),
                 });
 
-                firstPage.drawText(`${nomor_surat}/PLT2.TI/${tahun}`, {
+                firstPage.drawText(`${nomor_surat}`, {
                     x: 260, // Ganti dengan koordinat X yang sesuai
                     y: 622.5, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
@@ -186,7 +302,7 @@ sqlsrv_free_stmt($result);
                     color: rgb(0, 0, 0),
                 });
 
-                firstPage.drawText(`${tanggal}`, {
+                firstPage.drawText(`${tanggalTerbit}`, {
                     x: 333, // Ganti dengan koordinat X yang sesuai
                     y: 235, // Ganti dengan koordinat Y yang sesuai
                     size: 12,
@@ -207,6 +323,8 @@ sqlsrv_free_stmt($result);
                 link.click();
             });
         });
+
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
@@ -330,7 +448,7 @@ sqlsrv_free_stmt($result);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($nama_mahasiswa); ?>
+                                    <?php echo htmlspecialchars($nama); ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -498,16 +616,17 @@ sqlsrv_free_stmt($result);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+
         fetch('get_persentase.php')
             .then(response => response.json())
             .then(data => {
                 // Data and labels for the chart
-                const labels = ['Terkonfirmasi', 'Belum Upload', 'Pending', 'Tidak Terkonfirmasi'];
+                const labels = ['Terverifikasi', 'Belum Upload', 'Pending', 'Ditolak'];
                 const values = [
-                    data.terkonfirmasi,
+                    data.terverifikasi,
                     data.belum_upload,
                     data.pending,
-                    data.tidak_terkonfirmasi
+                    data.ditolak
                 ];
 
                 // Chart data structure
@@ -520,7 +639,7 @@ sqlsrv_free_stmt($result);
                             '#1cc88a', // Terkonfirmasi
                             '#858796', // Belum Upload
                             '#f6c23e', // Pending
-                            '#e74a3b' // Tidak Terkonfirmasi
+                            '#e74a3b'  // Tidak Terkonfirmasi
                         ],
                         borderWidth: 1
                     }]
@@ -547,7 +666,7 @@ sqlsrv_free_stmt($result);
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(tooltipItem) {
+                                    label: function (tooltipItem) {
                                         return tooltipItem.raw + ' items'; // Format tooltip
                                     }
                                 }
@@ -576,7 +695,7 @@ sqlsrv_free_stmt($result);
                 const downloadButton = document.getElementById('downloadButton');
 
                 // Update logic to check if all statuses are confirmed
-                if (data.belum_upload > 0 || data.pending > 0 || data.tidak_terkonfirmasi > 0) {
+                if (data.belum_upload > 0 || data.pending > 0 || data.ditolak > 0) {
                     downloadButton.disabled = true;
                     downloadButton.classList.add('btn-secondary');
                     downloadButton.classList.remove('btn-success');
@@ -589,6 +708,7 @@ sqlsrv_free_stmt($result);
 
             })
             .catch(error => console.error('Error loading data:', error));
+
     </script>
 
 </body>

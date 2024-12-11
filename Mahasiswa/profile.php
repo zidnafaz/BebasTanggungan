@@ -4,7 +4,7 @@ include '../koneksi.php';
 
 try {
     $sql = " 
-            SELECT nim, nama_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, tanggal_lahir_mahasiswa, tahun_angkatan_mahasiswa, jenis_kelamin_mahasiswa, alamat_mahasiswa, nomor_telfon_mahasiswa
+            SELECT nim, nama_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, tanggal_lahir_mahasiswa, tahun_angkatan_mahasiswa, jenis_kelamin_mahasiswa, alamat_mahasiswa, nomor_telfon_mahasiswa, tahun_lulus_mahasiswa
             FROM dbo.mahasiswa m
             WHERE m.nim = ?";
 
@@ -229,6 +229,12 @@ try {
                                                 <strong>Alamat :</strong>
                                                 <p class="text-muted">
                                                     <?= htmlspecialchars($result['alamat_mahasiswa'] ?? '') ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Tahun Lulus :</strong>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['tahun_lulus_mahasiswa']->format('Y') ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>

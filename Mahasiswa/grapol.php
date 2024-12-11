@@ -8,6 +8,7 @@ if (!isset($_COOKIE['id'])) {
 
 $nim = $_COOKIE['id'];
 
+// Mengecek status pengumpulan dari berbagai tabel
 $query = "
     SELECT 
         (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
@@ -37,12 +38,12 @@ if ($row === false) {
     die("Gagal mengambil data");
 }
 
-// Mengecek apakah semua status sudah terkonfirmasi
+// Mengecek apakah semua status sudah "terverifikasi"
 $allConfirmed = $row['penyerahan_hardcopy'] && $row['tugas_akhir_softcopy'] && $row['bebas_pinjam_buku_perpustakaan'] && $row['hasil_kuisioner'];
 sqlsrv_free_stmt($stmt);
 
-//CEK APAKAH NOMOR SURAT SUDAH ADA
-$cekSurat = "select * from dbo.nomor_surat where nim = ? and nama_surat = 'bebas tanggungan perpus'";
+// Cek apakah nomor surat sudah ada
+$cekSurat = "SELECT * FROM dbo.nomor_surat_perpustakaan WHERE nim = ?";
 $paramsCek = array($nim);
 $resultCek = sqlsrv_query($conn, $cekSurat, $paramsCek);
 
@@ -51,21 +52,48 @@ if ($resultCek === false) {
 }
 
 if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
-    // ...
+    // Nomor surat sudah ada, tidak perlu membuat lagi
+    $nomor_surat = $rowCek['nomor_surat'];
 } else {
-    $sqlNomorSurat = "EXEC InsertSurat @nama_surat = 'bebas tanggungan perpus',
-            @nim = ?";
-    $paramsNomor = array($nim);
-    $stmtNomor = sqlsrv_query($conn, $sqlNomorSurat, $paramsNomor);
+    // Nomor surat belum ada, buat nomor surat baru jika semua terverifikasi
+    if ($allConfirmed) {
+        // Ambil nomor urut terakhir
+        $queryUrut = "SELECT MAX(CAST(LEFT(nomor_surat, CHARINDEX('/', nomor_surat) - 1) AS INT)) AS last_number FROM dbo.nomor_surat_perpustakaan";
+        $resultUrut = sqlsrv_query($conn, $queryUrut);
 
-    sqlsrv_free_stmt($stmtNomor);
+        if ($resultUrut === false) {
+            die("Gagal mengambil nomor urut terakhir: " . print_r(sqlsrv_errors(), true));
+        }
+
+        $rowUrut = sqlsrv_fetch_array($resultUrut, SQLSRV_FETCH_ASSOC);
+        $lastNumber = $rowUrut['last_number'] ?? 1000;
+
+        // Buat nomor surat baru
+        $newNumber = $lastNumber + 1;
+        $tahun = date("Y");
+        $nomor_surat = sprintf("%04d/PL.2.UPA.PERPUS/%s", $newNumber, $tahun);
+
+        // Masukkan ke tabel nomor_surat
+        $insertSurat = "INSERT INTO dbo.nomor_surat_perpustakaan (nim, nomor_surat) 
+                        VALUES (?, ?)";
+        $paramsInsert = array($nim, $nomor_surat);
+        $stmtInsert = sqlsrv_query($conn, $insertSurat, $paramsInsert);
+
+        if ($stmtInsert === false) {
+            die("Gagal menyimpan nomor surat: " . print_r(sqlsrv_errors(), true));
+        }
+    } else {
+        $nomor_surat = "Belum memenuhi syarat";
+    }
 }
 
-$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ak.tanggal_adminPerpus_konfirmasi
-            FROM dbo.mahasiswa m
-            join dbo.nomor_surat ns on m.nim = ns.nim
-            join dbo.adminPerpus_konfirmasi ak on m.nim = ak.nim
-            WHERE m.nim = ? AND ns.nama_surat = 'bebas tanggungan perpus'";
+// Menampilkan data mahasiswa dan nomor surat
+$sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ap.tanggal_adminPerpus_konfirmasi, ph.judul_tugas_akhir
+        FROM dbo.mahasiswa m
+        JOIN dbo.nomor_surat_perpustakaan ns ON m.nim = ns.nim
+        JOIN dbo.adminPerpus_konfirmasi ap ON ns.nim = ap.nim
+        JOIN dbo.penyerahan_hardcopy ph ON ap.nim = ph.nim
+        WHERE m.nim = ?";
 
 $params = array($nim);
 $result = sqlsrv_query($conn, $sql, $params);
@@ -74,22 +102,28 @@ if ($result === false) {
     die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
 }
 
-$nama_mahasiswa = "";
-
-// Ambil data dan cek apakah ada
+// Ambil data
 if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $nama_mahasiswa = $row['nama_mahasiswa'];
     $nim = $row['nim'];
     $jurusan = $row['jurusan_mahasiswa'];
     $prodi = $row['prodi_mahasiswa'];
     $nomor_surat = $row['nomor_surat'];
-    $tanggal = $row['tanggal_adminPerpus_konfirmasi'];
-    $tanggalString = $tanggal->format('d-m-Y');
-    $tahun = $tanggal->format('Y');
+    $tanggalTerbit = $row['tanggal_adminPerpus_konfirmasi']->format('d-m-Y');
+    $judul = $row['judul_tugas_akhir'];
 }
 
-// Fungsi untuk membebaskan sumber daya yang digunakan oleh statement query
-sqlsrv_free_stmt($result);
+$sqlNama = "SELECT nama_mahasiswa FROM dbo.mahasiswa WHERE nim = ?";
+$paramsNama = array($nim);
+$resultNama = sqlsrv_query($conn, $sqlNama, $paramsNama);
+
+if ($resultNama === false) {
+    die("Kesalahan saat menjalankan query nama: " . print_r(sqlsrv_errors(), true));
+}
+
+if ($rowNama = sqlsrv_fetch_array($resultNama, SQLSRV_FETCH_ASSOC)) {
+    $nama = $rowNama['nama_mahasiswa'];
+}
 
 // Tutup koneksi
 sqlsrv_close($conn);
@@ -227,8 +261,42 @@ sqlsrv_close($conn);
                         const jurusan = "<?php echo htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>";
                         const prodi = "<?php echo htmlspecialchars($prodi, ENT_QUOTES, 'UTF-8'); ?>";
                         const nomor_surat = "<?php echo htmlspecialchars($nomor_surat, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tanggal = "<?php echo htmlspecialchars($tanggalString, ENT_QUOTES, 'UTF-8'); ?>";
-                        const tahun = "<?php echo htmlspecialchars($tahun, ENT_QUOTES, 'UTF-8'); ?>";
+                        const tanggal = "<?php echo htmlspecialchars($tanggalTerbit, ENT_QUOTES, 'UTF-8'); ?>";
+                        const judul = "<?php echo htmlspecialchars($judul, ENT_QUOTES, 'UTF-8'); ?>";
+
+                        // Fungsi untuk memecah teks menjadi beberapa baris
+                        function splitTextIntoLines(text, maxLength) {
+                            const lines = [];
+                            let currentLine = '';
+                            const words = text.split(' ');
+
+                            words.forEach(word => {
+                                if (currentLine.length + word.length + 1 <= maxLength) {
+                                    // Jika kata dapat ditambahkan ke baris saat ini, tambahkan
+                                    currentLine += (currentLine.length ? ' ' : '') + word;
+                                } else {
+                                    // Jika kata tidak dapat ditambahkan, buat baris baru
+                                    lines.push(currentLine);
+                                    currentLine = word;
+                                }
+                            });
+
+                            // Tambahkan baris terakhir jika ada
+                            if (currentLine) {
+                                lines.push(currentLine);
+                            }
+
+                            return lines;
+                        }
+
+                        // Menentukan panjang maksimum karakter dalam satu baris
+                        const maxLineLength = 65; // Misalnya 50 karakter per baris
+
+                        // Memecah judul jika terlalu panjang
+                        const titleLines = splitTextIntoLines(judul, maxLineLength);
+
+                        // Menentukan posisi Y awal untuk judul
+                        let yPosition = 548.3;
 
                         firstPage.drawText(`${nama}`, {
                             x: 190, // Ganti dengan koordinat X yang sesuai
@@ -258,7 +326,7 @@ sqlsrv_close($conn);
                             font: timesFont,
                             color: rgb(0, 0, 0),
                         });
-                        firstPage.drawText(`${nomor_surat}/PL.2.UPA.PERPUS/${tahun}`, {
+                        firstPage.drawText(`${nomor_surat}`, {
                             x: 215, // Ganti dengan koordinat X yang sesuai
                             y: 660.5, // Ganti dengan koordinat Y yang sesuai
                             size: 12,
@@ -273,6 +341,17 @@ sqlsrv_close($conn);
                             color: rgb(0, 0, 0),
                         });
 
+                        titleLines.forEach(line => {
+                            firstPage.drawText(line, {
+                                x: 190, // Posisi X yang tetap
+                                y: yPosition, // Posisi Y yang berubah
+                                size: 12,
+                                font: timesFont,
+                                color: rgb(0, 0, 0),
+                            });
+                            yPosition -= 14; // Menurunkan posisi Y untuk baris berikutnya
+                        });
+
                         // Simpan PDF baru
                         const modifiedPdf = await pdfDoc.save();
                         const blob = new Blob([modifiedPdf], {
@@ -282,7 +361,7 @@ sqlsrv_close($conn);
                         // Unduh PDF yang sudah diedit
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(blob);
-                        link.download = `${nim}_Bebas_Tanggungan_Akademik.pdf`;
+                        link.download = `${nim}_Bebas_Tanggungan_Perpustakaan.pdf`;
                         link.click();
                     } catch (error) {
                         console.error('Terjadi error:', error);
@@ -380,7 +459,7 @@ sqlsrv_close($conn);
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($rowUser['nama_mahasiswa'] ?? '') ?>
+                                    <?php echo htmlspecialchars($nama); ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -468,7 +547,7 @@ sqlsrv_close($conn);
                         <div class="card-body">
                             <p>Surat ini meliputi Bebas Tanggungan Perpustakaan Polinema.</p>
                             <?php if ($allConfirmed): ?>
-                                <button class="btn btn-success"id="downloadButton">
+                                <button class="btn btn-success" id="downloadButton">
                                     <i class="fas fa-download"></i> Download</button>
                             <?php else: ?>
                                 <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
@@ -554,7 +633,8 @@ sqlsrv_close($conn);
                                 <input type="file" class="form-control-file d-none" id="file" name="file" required
                                     onchange="updateFileName()">
                             </div>
-                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for aplikasi)</small>
+                            <small class="form-text text-muted">Accepted file type: pdf only (rar/zip for
+                                aplikasi)</small>
                         </div>
 
                         <!-- Preview Filename -->
@@ -563,9 +643,15 @@ sqlsrv_close($conn);
                             <input type="text" class="form-control" id="fileName" placeholder="No file chosen" readonly>
                         </div>
 
+                        <!-- Input for judul_tugas_akhir (hidden initially) -->
+                        <div class="form-group" id="judulTugasAkhirGroup">
+                            <label for="judul_tugas_akhir" class="col-form-label">Judul Tugas Akhir :</label>
+                            <input type="text" class="form-control" id="judul_tugas_akhir" name="judul_tugas_akhir">
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="form-group text-center">
-                            <button type="submit" class="btn btn-primary btn-lg w-100">Upload</button>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadButton">Upload</button>
                         </div>
                     </form>
                 </div>
@@ -616,12 +702,12 @@ sqlsrv_close($conn);
 
     <script>
         // Ajax untuk mengambil data dan menginisialisasi DataTables
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Memuat data dari data.php
             $.ajax({
                 url: 'data_grapol.php', // File PHP untuk memuat data
                 type: 'GET', // Gunakan metode GET
-                success: function(response) {
+                success: function (response) {
                     // Masukkan data ke dalam tabel
                     $('#table').html(`<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -644,14 +730,14 @@ sqlsrv_close($conn);
                         "info": true // Menampilkan informasi jumlah data
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error:', error);
                 }
             });
         });
 
-        $(document).ready(function() {
-            $('#uploadForm').submit(function(e) {
+        $(document).ready(function () {
+            $('#uploadForm').submit(function (e) {
                 e.preventDefault();
                 var formData = new FormData(this);
 
@@ -661,7 +747,7 @@ sqlsrv_close($conn);
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(response) {
+                    success: function (response) {
                         // Tutup modal upload
                         $('#uploadModal').modal('hide');
 
@@ -690,7 +776,7 @@ sqlsrv_close($conn);
 
                         loadTableData();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('Error:', error);
                     }
                 });
@@ -701,19 +787,51 @@ sqlsrv_close($conn);
             $.ajax({
                 url: 'data_grapol.php', // Endpoint untuk mengambil data tabel
                 type: 'GET',
-                success: function(data) {
+                success: function (data) {
                     // Perbarui isi tabel dengan data yang diterima
                     $('#table tbody').html(data);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error loading table data:', error);
                 }
             });
         }
 
-        function setUploadDir(directory) {
-            $('#uploadDir').val(directory);
+        function setUploadDir(key) {
+            // Menyimpan nama direktori untuk upload
+            $('#uploadDir').val(key);
+
+            // Menangani penampilan input judul_tugas_akhir
+            if (key === 'penyerahan_hardcopy') {
+                $('#judulTugasAkhirGroup').show();  // Tampilkan input judul_tugas_akhir jika penyerahan_hardcopy
+            } else {
+                $('#judulTugasAkhirGroup').hide();  // Sembunyikan input judul_tugas_akhir jika bukan penyerahan_hardcopy
+            }
+
+            // Panggil fungsi untuk memeriksa status judul_tugas_akhir dan tombol upload
+            checkJudulTugasAkhir();
         }
+
+        function checkJudulTugasAkhir() {
+            // Cek apakah key adalah 'penyerahan_hardcopy' dan apakah judul_tugas_akhir sudah diisi
+            if ($('#uploadDir').val() === 'penyerahan_hardcopy') {
+                const judulTugasAkhir = $('#judul_tugas_akhir').val().trim();
+
+                // Menonaktifkan tombol upload jika judul_tugas_akhir kosong
+                if (judulTugasAkhir === '') {
+                    $('#uploadButton').prop('disabled', true);
+                } else {
+                    $('#uploadButton').prop('disabled', false);
+                }
+            } else {
+                $('#uploadButton').prop('disabled', false);  // Aktifkan tombol upload untuk key lain
+            }
+        }
+
+        // Tambahkan event listener untuk memantau perubahan pada input judul_tugas_akhir
+        $('#judul_tugas_akhir').on('input', function () {
+            checkJudulTugasAkhir();
+        });
 
         function updateFileName() {
             var fileName = document.getElementById('file').files[0]?.name || "No file chosen";
@@ -721,12 +839,12 @@ sqlsrv_close($conn);
         }
 
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Menangani perubahan input file
             const fileInput = document.getElementById("file");
             const fileNameInput = document.getElementById("fileName");
 
-            fileInput.addEventListener("change", function() {
+            fileInput.addEventListener("change", function () {
                 const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
                 fileNameInput.value = fileName;
             });

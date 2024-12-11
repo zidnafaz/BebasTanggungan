@@ -1,6 +1,6 @@
 <?php
 include '../koneksi.php';
-include '../data/dataAdmin.php';
+
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
     $messageType = htmlspecialchars($_GET['type']); // "success" atau "danger"
@@ -122,7 +122,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active" id="nav-dashboard">
+            <li class="nav-item" id="nav-dashboard">
                 <a class="nav-link" href="home.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -138,28 +138,25 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
 
             <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-hardcopy">
+                <a class="nav-link" href="hardcopy.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Hardcopy</span></a>
+            </li>
             <li class="nav-item" id="nav-tugas_akhir">
                 <a class="nav-link" href="softcopy.php">
                     <i class="fas fa-solid fa-book"></i>
-                    <span>Tugas Akhir</span></a>
+                    <span>Softcopy</span></a>
             </li>
-
+            <li class="nav-item active" id="nav-bebas_pinjaman">
+                <a class="nav-link" href="bebas_pinjaman.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Bebas Pinjaman Buku</span></a>
+            </li>
             <li class="nav-item" id="nav-kuisioner">
                 <a class="nav-link" href="kuisioner.php">
                     <i class="fas fa-solid fa-file"></i>
                     <span>Kuisioner</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-hardcopy">
-                <a class="nav-link" href="hardcopy.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Hard Copy</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-bebas_pinjaman">
-                <a class="nav-link" href="bebas_pinjaman.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Bebas Pinjaman</span></a>
             </li>
 
             <!-- Divider -->
@@ -175,7 +172,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -191,7 +187,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -214,13 +210,12 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">DATA LAPORAN UPLOAD BEBAS PINJAMAN BUKU PERPUSTAKAAN</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Data Verifikasi Bebas Pinjam Buku Perpustakaan</h1>
                     <p class="mb-4">Konfirmasi Data Mahasiswa dengan seksama!</p>
 
                     <!-- DataTables Example -->
@@ -234,8 +229,9 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
                                 <option value="">Filter by Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="terverifikasi">terverifikasi</option>
+                                <option value="terverifikasi">Terverifikasi</option>
                                 <option value="belum upload">Belum Upload</option>
+                                <option value="ditolak">Ditolak</option>
                             </select>
 
                             <table class="table table-striped table-bordered" id="dataTable" width="100%"
@@ -244,7 +240,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     <tr>
                                         <th>NIM</th>
                                         <th>Nama Mahasiswa</th>
-                                        <th>Status Upload Bebas Pinjaman Buku Perpustakaan</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -253,8 +249,17 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                     try {
                                         // Query untuk mengambil data
                                         $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_bebas_pinjam_buku_perpustakaan AS status
-                                                    FROM dbo.mahasiswa m
-                                                    JOIN dbo.bebas_pinjam_buku_perpustakaan pk ON m.nim = pk.nim";
+                                                FROM dbo.mahasiswa m
+                                                JOIN dbo.bebas_pinjam_buku_perpustakaan pk ON m.nim = pk.nim
+                                                ORDER BY 
+                                                    CASE 
+                                                        WHEN pk.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' THEN 1
+                                                        WHEN pk.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 2
+                                                        WHEN pk.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' THEN 3
+                                                        WHEN pk.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 4
+                                                        ELSE 5
+                                                    END";
+
                                         $result = sqlsrv_query($conn, $sql);
 
                                         if ($result === false) {
@@ -520,14 +525,21 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                }
+                },
+                "order": [[2, 'asc']],  // Menyortir berdasarkan kolom status (kolom 2) dengan urutan ascending
+                "columnDefs": [
+                    {
+                        "targets": 2,
+                        "orderData": [2]  // Menetapkan status sebagai kolom untuk pengurutan
+                    }
+                ]
             });
 
+            // Menambahkan filter berdasarkan status
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
-                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status bebas_pinjam_buku_perpustakaan
+                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
             });
-
         });
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -544,6 +556,27 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 }
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('navbar.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading navbar:', error));
+        });
+
+        fetch('topbar.php')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('topbar').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading topbar:', error));
 
         document.addEventListener("DOMContentLoaded", function () {
             const buttons = document.querySelectorAll(".edit-data");

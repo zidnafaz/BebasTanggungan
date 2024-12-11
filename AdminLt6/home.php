@@ -204,7 +204,6 @@ sqlsrv_close($conn);
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -243,7 +242,6 @@ sqlsrv_close($conn);
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->

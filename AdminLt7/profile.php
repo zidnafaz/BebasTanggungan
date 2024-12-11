@@ -1,7 +1,37 @@
-<?php  
+<?php
 include '../login.php';
 include '../koneksi.php';
-include '../data/dataAdmin.php';
+
+try {
+    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
+    FROM dbo.admin a
+    WHERE a.id_karyawan = ?";
+
+    session_start();
+
+    if (isset($_COOKIE['id'])) {
+        $inputUsername = $_COOKIE['id'];
+    } else {
+        die("Anda harus login terlebih dahulu.");
+    }
+
+    $param = array($inputUsername);
+    $stmt = sqlsrv_query($conn, $sql, $param);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true)); // Tangani error query
+    }
+
+    // Ambil hasil query
+    if (sqlsrv_has_rows($stmt)) {
+        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
+    } else {
+        echo "Data tidak ditemukan.";
+        $result = null; // Pastikan $result diset null jika data tidak ditemukan
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -19,26 +49,14 @@ include '../data/dataAdmin.php';
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
-
-    <style>
-        .card-fixed-height {
-            height: 200px;
-        }
-
-        strong {
-            font-size: 22px;
-        }
-
-        p {
-            font-size: 20px;
-        }
-    </style>
 
 </head>
 
@@ -47,58 +65,57 @@ include '../data/dataAdmin.php';
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        
-<!-- Sidebar -->
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-<!-- Sidebar - Brand -->
-<a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
-    <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
-</a>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
+                <div class="sidebar-brand-text mx-3">Bebas Tanggungan</div>
+            </a>
 
-<!-- Divider -->
-<hr class="sidebar-divider my-0">
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
 
-<!-- Nav Item - Dashboard -->
-<li class="nav-item active" id="nav-dashboard">
-    <a class="nav-link" href="home.php">
-        <i class="fas fa-fw fa-tachometer-alt"></i>
-        <span>Dashboard</span></a>
-</li>
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item" id="nav-dashboard">
+                <a class="nav-link" href="home.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
 
-<!-- Divider -->
-<hr class="sidebar-divider">
+            <!-- Divider -->
+            <hr class="sidebar-divider">
 
-<!-- Heading -->
-<div class="sidebar-heading">
-    Verifikasi
-</div>
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Verifikasi
+            </div>
 
 
-<!-- Nav Item - Verifikasi -->
-<li class="nav-item" id="nav-upload_skripsi">
-            <a class="nav-link" href="upload_skripsi.php">
-                <i class="fas fa-solid fa-book"></i>
-                <span>Upload Skripsi</span></a>
-        </li>
+            <!-- Nav Item - Verifikasi -->
+            <li class="nav-item" id="nav-upload_skripsi">
+                <a class="nav-link" href="upload_skripsi.php">
+                    <i class="fas fa-solid fa-book"></i>
+                    <span>Upload Skripsi</span></a>
+            </li>
 
-        <li class="nav-item" id="nav-program_mahasiswa">
-            <a class="nav-link" href="program_mahasiswa.php">
-                <i class="fas fa-solid fa-file-lines"></i>
-                <span>Program Mahasiswa</span></a>
-        </li>
+            <li class="nav-item" id="nav-program_mahasiswa">
+                <a class="nav-link" href="program_mahasiswa.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Aplikasi</span></a>
+            </li>
 
-        <li class="nav-item" id="nav-publikasi_jurnal">
-            <a class="nav-link" href="publikasi_jurnal.php">
-                <i class="fas fa-solid fa-file"></i>
-                <span>Publikasi Jurnal</span></a>
-        </li>
+            <li class="nav-item" id="nav-publikasi_jurnal">
+                <a class="nav-link" href="publikasi_jurnal.php">
+                    <i class="fas fa-solid fa-file"></i>
+                    <span>Publikasi Jurnal</span></a>
+            </li>
 
-<!-- Divider -->
-<hr class="sidebar-divider d-none d-md-block">
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
 
-</ul>
-<!-- End of Sidebar -->
+        </ul>
+        <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -107,7 +124,6 @@ include '../data/dataAdmin.php';
             <div id="content">
 
                 <!-- Topbar -->
-
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
@@ -123,7 +139,7 @@ include '../data/dataAdmin.php';
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
+                                    <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
@@ -146,7 +162,6 @@ include '../data/dataAdmin.php';
                     </ul>
 
                 </nav>
-
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -154,48 +169,57 @@ include '../data/dataAdmin.php';
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></h1>
+                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?>
+                        </h1>
                     </div>
 
                     <!-- Content Row -->
-                    <div class="container rounded shadow mt-5">
-                        <div class="row" style="size : 200px;">
+                    <div class="container rounded shadow-lg mt-5 p-4 bg-light">
+                        <div class="row">
                             <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h1>Informasi Pribadi</h1>
+                                <div class="card shadow-sm">
+                                    <div class="card-header text-center bg-primary text-white">
+                                        <h3>Informasi Pribadi</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row mb-5">
+                                        <div class="row mb-4">
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
-                                                <p><?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
-                                                <p>
-                                                <?php
-                                                        if ($resultUser['jenis_kelamin_karyawan'] == 'L') {
-                                                            echo 'Laki-Laki';
-                                                        } elseif ($resultUser['jenis_kelamin_karyawan'] == 'P') {
-                                                            echo 'Perempuan';
-                                                        }
+                                                <p class="text-muted">
+                                                    <?php
+                                                    if ($result['jenis_kelamin_karyawan'] == 'L') {
+                                                        echo 'Laki-Laki';
+                                                    } elseif ($result['jenis_kelamin_karyawan'] == 'P') {
+                                                        echo 'Perempuan';
+                                                    }
                                                     ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
-                                                <p><?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['alamat_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
-                                                <p><?= htmlspecialchars($resultUser['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
-                                                <p><?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?></p>
+                                                <p class="text-muted">
+                                                    <?= htmlspecialchars($result['nomor_telfon_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
-                                    </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -250,8 +274,8 @@ include '../data/dataAdmin.php';
     </div>
 
     <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -266,30 +290,6 @@ include '../data/dataAdmin.php';
     <script src="../js/demo/chart-area-demo.js"></script>
     <script src="../js/demo/chart-pie-demo.js"></script>
 
-    <script>
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('navbar').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading navbar:', error));
-        });
-
-        fetch('topbar.php')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('topbar').innerHTML = data;
-            })
-            .catch(error => console.error('Error loading topbar:', error));
-
-    </script>
 </body>
 
 </html>

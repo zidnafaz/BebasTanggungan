@@ -348,6 +348,12 @@ sqlsrv_close($conn);
             color: #fff !important;
             cursor: not-allowed;
         }
+
+        .welcome-name {
+            font-size: 18px;
+            color: #5a5c69;
+            font-weight: normal;
+        }
     </style>
 
 </head>
@@ -468,7 +474,11 @@ sqlsrv_close($conn);
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard Mahasiswa</h1>
+                        <h1 class="h3 mb-0 text-gray-800">
+                            Dashboard Mahasiswa -
+                            <span
+                                class="welcome-name">Selamat Datang <?= htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?></span>
+                        </h1>
                     </div>
 
                     <!-- Content Row -->

@@ -2,6 +2,8 @@
 include '../koneksi.php';
 include '../data/dataAdmin.php';
 
+$nim = isset($_GET['nim']) ? $_GET['nim'] : null;
+
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
     $messageType = htmlspecialchars($_GET['type']); // "success" atau "danger"
@@ -242,6 +244,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                         <th>Nama Mahasiswa</th>
                                         <th>Status</th>
                                         <th>Action</th>
+                                        <th>Pindah Halaman</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -250,8 +253,15 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                         // Query untuk mengambil data
                                         $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_data_alumni AS status
                                                 FROM dbo.mahasiswa m
-                                                JOIN dbo.data_alumni pk ON m.nim = pk.nim
-                                                ORDER BY 
+                                                JOIN dbo.data_alumni pk ON m.nim = pk.nim";
+
+                                        // Tambahkan kondisi WHERE jika ada NIM
+                                        if ($nim) {
+                                            $sql .= " WHERE m.nim = ?";
+                                        }
+
+                                        // Urutkan data berdasarkan status
+                                        $sql .= " ORDER BY 
                                                     CASE 
                                                         WHEN pk.status_pengumpulan_data_alumni = 'pending' THEN 1
                                                         WHEN pk.status_pengumpulan_data_alumni = 'ditolak' THEN 2
@@ -260,7 +270,9 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                         ELSE 5
                                                     END";
 
-                                        $result = sqlsrv_query($conn, $sql);
+                                        // Tentukan parameter untuk query
+                                        $params = $nim ? array($nim) : array();
+                                        $result = sqlsrv_query($conn, $sql, $params);
 
                                         if ($result === false) {
                                             die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
@@ -310,6 +322,18 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                             <i class="fa fa-edit"></i> Verifikasi
                                                         </button>
                                                     <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <select class="pageDropdown form-control" style="width: 60%;"
+                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>">
+                                                            <option value="">Pilih Halaman</option>
+                                                            <option value="data_alumni">Pengisian Data Alumni</option>
+                                                            <option value="skkm">SKKM</option>
+                                                            <option value="foto">Foto Ijazah</option>
+                                                            <option value="ukt">UKT</option>
+                                                        </select>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <?php
@@ -505,8 +529,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
     <script>
 
-$(document).ready(function () {
-            // Inisialisasi DataTable
+        $(document).ready(function () {
+            // Inisialisasi DataTables
             var table = $('#dataTable').DataTable({
                 "ordering": true,
                 "searching": true,
@@ -526,11 +550,12 @@ $(document).ready(function () {
                         "previous": "Sebelumnya"
                     }
                 },
-                "order": [[2, 'asc']],  // Menyortir berdasarkan kolom status (kolom 2) dengan urutan ascending
+                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
                 "columnDefs": [
                     {
                         "targets": 2,
-                        "orderData": [2]  // Menetapkan status sebagai kolom untuk pengurutan
+                        "type": "num",  // Atur untuk menggunakan urutan numerik
+                        "orderData": [2]
                     }
                 ]
             });
@@ -539,6 +564,19 @@ $(document).ready(function () {
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
                 table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
+            });
+
+            // Event listener untuk dropdown di dalam tabel (untuk memilih halaman tujuan)
+            $('#dataTable').on('change', '.pageDropdown', function () {
+                var selectedPage = $(this).val(); // Ambil halaman yang dipilih
+                var nim = $(this).data('nim'); // Ambil NIM dari data-nim atribut
+
+                // Jika halaman tujuan dipilih dan NIM ada, arahkan ke halaman dengan NIM
+                if (selectedPage && nim) {
+                    window.location.href = selectedPage + ".php?nim=" + encodeURIComponent(nim);
+                } else if (selectedPage) {
+                    window.location.href = selectedPage + ".php"; // Jika tidak ada NIM, tetap arahkan ke halaman
+                }
             });
         });
 

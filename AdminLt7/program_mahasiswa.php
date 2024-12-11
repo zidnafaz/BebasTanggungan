@@ -1,5 +1,8 @@
 <?php
 include '../koneksi.php';
+include '../data/dataAdmin.php';
+
+$nim = isset($_GET['nim']) ? $_GET['nim'] : null;
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -239,16 +242,24 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                         <th>Nama Mahasiswa</th>
                                         <th>Status</th>
                                         <th>Action</th>
+                                        <th>Pindah Halaman</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
                                     try {
-                                        // Query untuk mengambil data
+                                        // Query untuk mengambil data mahasiswa dan status, dengan filter berdasarkan NIM jika ada
                                         $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_aplikasi AS status
                                                 FROM dbo.mahasiswa m
-                                                JOIN dbo.aplikasi pk ON m.nim = pk.nim
-                                                ORDER BY 
+                                                JOIN dbo.aplikasi pk ON m.nim = pk.nim";
+
+                                        // Tambahkan kondisi WHERE jika ada NIM
+                                        if ($nim) {
+                                            $sql .= " WHERE m.nim = ?";
+                                        }
+
+                                        // Urutkan data berdasarkan status
+                                        $sql .= " ORDER BY 
                                                     CASE 
                                                         WHEN pk.status_pengumpulan_aplikasi = 'pending' THEN 1
                                                         WHEN pk.status_pengumpulan_aplikasi = 'ditolak' THEN 2
@@ -257,7 +268,8 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                         ELSE 5
                                                     END";
 
-                                        $result = sqlsrv_query($conn, $sql);
+                                        $params = $nim ? array($nim) : array();
+                                        $result = sqlsrv_query($conn, $sql, $params);
 
                                         if ($result === false) {
                                             die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
@@ -285,6 +297,26 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                     </span>
                                                 </td>
                                                 <td>
+                                                    <?php
+                                                    // Tentukan nama file tanpa ekstensi
+                                                    $fileName = $row['nim'] . "_aplikasi";
+
+                                                    // Tentukan direktori file
+                                                    $fileDirectory = "../Documents/uploads/aplikasi/";
+
+                                                    // Cek apakah file dengan ekstensi .zip atau .rar ada
+                                                    $fileExtension = "";
+                                                    if (file_exists($fileDirectory . $fileName . ".zip")) {
+                                                        $fileExtension = "zip";
+                                                    } elseif (file_exists($fileDirectory . $fileName . ".rar")) {
+                                                        $fileExtension = "rar";
+                                                    }
+
+                                                    // Jika ditemukan file dengan ekstensi yang valid, set filePath
+                                                    if ($fileExtension) {
+                                                        $filePath = $fileDirectory . $fileName . "." . $fileExtension;
+                                                    }
+                                                    ?>
                                                     <?php if (strtolower($row['status']) === 'belum upload'): ?>
                                                         <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
                                                             Disabled</button>
@@ -292,21 +324,32 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                         <button class="btn btn-info btn-sm edit-data"
                                                             data-nim="<?= htmlspecialchars($row['nim']) ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_aplikasi.zip" ?>"
-                                                            data-pdf="../Documents/uploads/aplikasi/<?= $row['nim'] ?>_aplikasi.zip"
-                                                            data-target="#verifikasiModal" data-toggle="modal">
+                                                            data-nama-berkas="<?= $fileName . "." . $fileExtension ?>"
+                                                            data-pdf="<?= $filePath ?>" data-target="#verifikasiModal"
+                                                            data-toggle="modal">
                                                             <i class="fa fa-solid fa-file-lines"></i> Preview
                                                         </button>
                                                     <?php else: ?>
                                                         <button class="btn btn-primary btn-sm edit-data"
                                                             data-nim="<?= htmlspecialchars($row['nim']) ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $row['nim'] . "_aplikasi.zip" ?>"
-                                                            data-pdf="../Documents/uploads/aplikasi/<?= $row['nim'] ?>_aplikasi.zip"
-                                                            data-target="#verifikasiModal" data-toggle="modal">
+                                                            data-nama-berkas="<?= $fileName . "." . $fileExtension ?>"
+                                                            data-pdf="<?= $filePath ?>" data-target="#verifikasiModal"
+                                                            data-toggle="modal">
                                                             <i class="fa fa-edit"></i> Verifikasi
                                                         </button>
                                                     <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <select class="pageDropdown form-control" style="width: 60%;"
+                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>">
+                                                            <option value="">Pilih Halaman</option>
+                                                            <option value="program_mahasiswa">Aplikasi</option>
+                                                            <option value="publikasi_jurnal">Publikasi Jurnal</option>
+                                                            <option value="upload_skripsi">Skripsi</option>
+                                                        </select>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <?php
@@ -504,7 +547,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <script>
 
         $(document).ready(function () {
-            // Inisialisasi DataTable
+            // Inisialisasi DataTables
             var table = $('#dataTable').DataTable({
                 "ordering": true,
                 "searching": true,
@@ -524,11 +567,12 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         "previous": "Sebelumnya"
                     }
                 },
-                "order": [[2, 'asc']],  // Menyortir berdasarkan kolom status (kolom 2) dengan urutan ascending
+                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
                 "columnDefs": [
                     {
                         "targets": 2,
-                        "orderData": [2]  // Menetapkan status sebagai kolom untuk pengurutan
+                        "type": "num",  // Atur untuk menggunakan urutan numerik
+                        "orderData": [2]
                     }
                 ]
             });
@@ -537,6 +581,19 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
                 table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
+            });
+
+            // Event listener untuk dropdown di dalam tabel (untuk memilih halaman tujuan)
+            $('#dataTable').on('change', '.pageDropdown', function () {
+                var selectedPage = $(this).val(); // Ambil halaman yang dipilih
+                var nim = $(this).data('nim'); // Ambil NIM dari data-nim atribut
+
+                // Jika halaman tujuan dipilih dan NIM ada, arahkan ke halaman dengan NIM
+                if (selectedPage && nim) {
+                    window.location.href = selectedPage + ".php?nim=" + encodeURIComponent(nim);
+                } else if (selectedPage) {
+                    window.location.href = selectedPage + ".php"; // Jika tidak ada NIM, tetap arahkan ke halaman
+                }
             });
         });
 

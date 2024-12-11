@@ -1,37 +1,7 @@
 <?php
 include '../login.php';
 include '../koneksi.php';
-
-try {
-    $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
-    FROM dbo.admin a
-    WHERE a.id_karyawan = ?";
-
-    session_start();
-
-    if (isset($_COOKIE['id'])) {
-        $inputUsername = $_COOKIE['id'];
-    } else {
-        die("Anda harus login terlebih dahulu.");
-    }
-
-    $param = array($inputUsername);
-    $stmt = sqlsrv_query($conn, $sql, $param);
-
-    if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true)); // Tangani error query
-    }
-
-    // Ambil hasil query
-    if (sqlsrv_has_rows($stmt)) {
-        $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
-    } else {
-        echo "Data tidak ditemukan.";
-        $result = null; // Pastikan $result diset null jika data tidak ditemukan
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+include '../data/dataAdmin.php';
 ?>
 
 <!DOCTYPE html>
@@ -170,7 +140,7 @@ try {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?>
+                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                         </h1>
                     </div>
 
@@ -187,15 +157,15 @@ try {
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['nama_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
                                                 <p class="text-muted">
                                                     <?php
-                                                    if ($result['jenis_kelamin_karyawan'] == 'L') {
+                                                    if ($resultUser['jenis_kelamin_karyawan'] == 'L') {
                                                         echo 'Laki-Laki';
-                                                    } elseif ($result['jenis_kelamin_karyawan'] == 'P') {
+                                                    } elseif ($resultUser['jenis_kelamin_karyawan'] == 'P') {
                                                         echo 'Perempuan';
                                                     }
                                                     ?>
@@ -204,18 +174,18 @@ try {
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['alamat_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
+                                                    <?= htmlspecialchars($resultUser['tanggal_lahir_karyawan']->format('Y-m-d') ?? 'Tanggal tidak tersedia') ?>
                                                 </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($result['nomor_telfon_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?></p>
                                             </div>
                                         </div>
                                     </div>

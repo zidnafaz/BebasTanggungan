@@ -1,4 +1,4 @@
-<?php  
+<?php
 include '../login.php';
 include '../koneksi.php';
 
@@ -7,12 +7,13 @@ try {
     FROM dbo.admin a
     WHERE a.id_karyawan = ?";
 
-    session_start(); 
-    
+    session_start();
+
     if (isset($_COOKIE['id'])) {
         $inputUsername = $_COOKIE['id'];
     } else {
-        die("Anda harus login terlebih dahulu.");
+        header("Location: ../index.html");
+        exit();
     }
 
     $param = array($inputUsername);
@@ -26,8 +27,8 @@ try {
     if (sqlsrv_has_rows($stmt)) {
         $resultUser = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC); // Ambil data sebagai array asosiatif
     } else {
-        echo "Data tidak ditemukan.";
-        $resultUser = null; // Pastikan $result diset null jika data tidak ditemukan
+        header("Location: ../index.html");
+        exit();
     }
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();

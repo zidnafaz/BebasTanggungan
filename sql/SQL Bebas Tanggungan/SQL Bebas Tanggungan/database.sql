@@ -15,13 +15,13 @@ select * from dbo.mahasiswa
 
 -- Insert Dummy Data Mahasiswa
 
-INSERT INTO mahasiswa (nim, nama_mahasiswa, nomor_telfon_mahasiswa, alamat_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, jenis_kelamin_mahasiswa, tahun_angkatan_mahasiswa, tanggal_lahir_mahasiswa)
+INSERT INTO mahasiswa (nim, nama_mahasiswa, nomor_telfon_mahasiswa, alamat_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, jenis_kelamin_mahasiswa, tahun_angkatan_mahasiswa, tahun_lulus_mahasiswa, tanggal_lahir_mahasiswa)
 VALUES
-('20230001', 'Ahmad Maulana', '081234567890', 'Jl. Mawar No. 1', 'Teknologi Informasi', 'Sistem Informasi', 'L', '2023-08-01', '2004-02-15'),
-('20230002', 'Budi Santoso', '081345678901', 'Jl. Melati No. 2', 'Teknologi Informasi', 'Teknik Informatika', 'L', '2023-08-01', '2003-09-20'),
-('20230003', 'Citra Ayu', '081456789012', 'Jl. Kenanga No. 3', 'Teknik Elektro', 'Teknik Elektronika', 'P', '2023-08-01', '2004-05-30'),
-('20230004', 'Dewi Lestari', '081567890123', 'Jl. Anggrek No. 4', 'Teknik Sipil', 'Manajemen Proyek', 'P', '2023-08-01', '2003-12-10'),
-('20230005', 'Eko Prasetyo', '081678901234', 'Jl. Tulip No. 5', 'Teknologi Informasi', 'Sistem Informasi', 'L', '2023-08-01', '2004-06-25');
+('20230001', 'Ahmad Maulana', '081234567890', 'Jl. Mawar No. 1', 'Teknologi Informasi', 'Sistem Informasi', 'L', '2020-08-01', '2024-08-01', '2004-02-15'),
+('20230002', 'Budi Santoso', '081345678901', 'Jl. Melati No. 2', 'Teknologi Informasi', 'Teknik Informatika', 'L', '2020-08-01', '2024-08-01', '2003-09-20'),
+('20230003', 'Citra Ayu', '081456789012', 'Jl. Kenanga No. 3', 'Teknik Elektro', 'Teknik Elektronika', 'P', '2019-08-01', '2023-08-01', '2004-05-30'),
+('20230004', 'Dewi Lestari', '081567890123', 'Jl. Anggrek No. 4', 'Teknik Sipil', 'Manajemen Proyek', 'P', '2021-08-01', '2024-08-01', '2003-12-10'),
+('20230005', 'Eko Prasetyo', '081678901234', 'Jl. Tulip No. 5', 'Teknologi Informasi', 'Sistem Informasi', 'L', '2019-08-01', '2023-08-01', '2004-06-25');
 
 SELECT * from login
 
@@ -228,7 +228,6 @@ VALUES
 ('20230004', '2024-12-01'), 
 ('20230005', '2024-12-02');
 
-SELECT * FROM adminPerpus_konfirmasi
 -- Query Konfirmasi Admin Tiap User
 
 SELECT 

@@ -14,6 +14,7 @@ CREATE TABLE [dbo].[mahasiswa] (
     [prodi_mahasiswa]          NVARCHAR (20) NULL,
     [jenis_kelamin_mahasiswa]  CHAR(1) CHECK (jenis_kelamin_mahasiswa IN ('L', 'P')),
     [tahun_angkatan_mahasiswa] DATE          NULL,
+	[tahun_lulus_mahasiswa]	   DATE          NULL,
     [tanggal_lahir_mahasiswa]  DATE          NULL,
     CONSTRAINT [PK_mahasiswa] PRIMARY KEY CLUSTERED ([nim] ASC)
 );
@@ -69,7 +70,7 @@ CREATE TABLE [dbo].[penyerahan_hardcopy] (
     status_pengumpulan_penyerahan_hardcopy NVARCHAR(50) CHECK (status_pengumpulan_penyerahan_hardcopy IN ('terverifikasi', 'belum upload', 'pending', 'ditolak')) DEFAULT 'pending',
     keterangan_pengumpulan_penyerahan_hardcopy NVARCHAR(50) ,
     [nim]        NVARCHAR (10) NULL,
-	judul_tugas_akhir NVARCHAR(100),
+	judul_tugas_akhir NVARCHAR(200),
     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
     CONSTRAINT [PK_penyerahan_hardcopy] PRIMARY KEY CLUSTERED ([id_penyerahan_hardcopy] ASC)
 );
@@ -205,58 +206,32 @@ CREATE TABLE [dbo].[adminPerpus_konfirmasi] (
     CONSTRAINT [PK_adminPerpus_konfirmasi] PRIMARY KEY CLUSTERED ([id_adminPerpus_konfirmasi] ASC)
 );
 
---MEMBUAT DATABASE UNTUK NOMOR SURAT
-CREATE TABLE dbo.nomor_surat (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    [nim]        NVARCHAR (10) NOT NULL,
-    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
-    nomor_surat INT NOT NULL,
-    nama_surat VARCHAR(50) NOT NULL
+--MEMBUAT TABEL UNTUK NOMOR SURAT
+
+CREATE TABLE [dbo].[nomor_surat_perpustakaan] (
+    [id_surat] INT IDENTITY (1, 1) NOT NULL,
+    [nim] NVARCHAR(10) NOT NULL,
+    [nomor_surat] NVARCHAR(50) NOT NULL,
+    CONSTRAINT [PK_nomor_surat_perpustakaan] PRIMARY KEY CLUSTERED ([id_surat] ASC),
+    CONSTRAINT [FK_nomor_surat_perpustakaan_mahasiswa] FOREIGN KEY ([nim]) REFERENCES [dbo].[mahasiswa]([nim])
 );
--- TABEL melacak nilai terakhir untuk setiap jenis surat.
-CREATE TABLE dbo.nomor_surat_tracker (
-    nama_surat VARCHAR(50) PRIMARY KEY,
-    last_number INT NOT NULL
+
+CREATE TABLE [dbo].[nomor_surat_akademik_pusat] (
+    [id_surat] INT IDENTITY (1, 1) NOT NULL,
+    [nim] NVARCHAR(10) NOT NULL,
+    [nomor_surat] NVARCHAR(50) NOT NULL,
+    CONSTRAINT [PK_nomor_surat_akademik_pusat] PRIMARY KEY CLUSTERED ([id_surat] ASC),
+    CONSTRAINT [FK_nomor_surat_akademik_pusat_mahasiswa] FOREIGN KEY ([nim]) REFERENCES [dbo].[mahasiswa]([nim])
 );
--- Insert nilai awal untuk setiap jenis surat
-INSERT INTO nomor_surat_tracker (nama_surat, last_number)
-VALUES 
-('bebas tanggungan perpus', 1000),
-('bebas tanggungan akademik', 2000),
-('rekomendasi', 3000);
 
-GO;
---Prosedur ini akan secara otomatis meningkatkan nomor_surat berdasarkan jenis nama_surat.
-CREATE PROCEDURE InsertSurat
-    @nama_surat VARCHAR(50),
-    @nim NVARCHAR(10)
-AS
-BEGIN
-    DECLARE @last_number INT;
-    DECLARE @new_number INT;
+CREATE TABLE [dbo].[nomor_surat_rekomendasi] (
+    [id_surat] INT IDENTITY (1, 1) NOT NULL,
+    [nim] NVARCHAR(10) NOT NULL,
+    [nomor_surat] NVARCHAR(50) NOT NULL,
+    CONSTRAINT [PK_nomor_surat_rekomendasi] PRIMARY KEY CLUSTERED ([id_surat] ASC),
+    CONSTRAINT [FK_nomor_surat_rekomendasi_mahasiswa] FOREIGN KEY ([nim]) REFERENCES [dbo].[mahasiswa]([nim])
+);
 
-    -- Ambil nomor terakhir dari tracker
-    SELECT @last_number = last_number
-    FROM nomor_surat_tracker
-    WHERE nama_surat = @nama_surat;
-
-    -- Tingkatkan nomor
-    SET @new_number = @last_number + 1;
-
-    -- Insert ke tabel surat
-    INSERT INTO dbo.nomor_surat (nim, nomor_surat, nama_surat)
-    VALUES (@nim, @new_number, @nama_surat);
-
-    -- Update tracker dengan nomor terakhir yang baru
-    UPDATE nomor_surat_tracker
-    SET last_number = @new_number
-    WHERE nama_surat = @nama_surat;
-END;
---QUERY UNTUK INSERT TABLE SURAT
-EXEC InsertSurat @nama_surat = 'rekomendasi',
-    @nim = '20230001';
-SELECT * FROM dbo.nomor_surat;
-DELETE FROM dbo.nomor_surat
 -- TRIGGER
 
 IF OBJECT_ID('dbo.autoAddKonfirmasi') IS NOT NULL 
@@ -352,6 +327,9 @@ SELECT * FROM publikasi_jurnal;
 SELECT * FROM aplikasi;
 SELECT * FROM skripsi;
 SELECT * FROM adminlt6_konfirmasi;
+SELECT * FROM dbo.nomor_surat_perpustakaan;
+SELECT * FROM dbo.nomor_surat_akademik_pusat;
+SELECT * FROM [dbo].[adminPusat_konfirmasi];
 
 SELECT * FROM dbo.admin
 delete from dbo.admin

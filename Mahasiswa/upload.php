@@ -79,12 +79,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Tentukan path lengkap untuk menyimpan file
     $target_file = $uploadDir . '/' . $newFileName;
 
-    // Cek apakah file sudah ada
-    if (file_exists($target_file)) {
+    // Cek apakah sudah ada file dengan nama yang sama (tanpa melihat ekstensi)
+    $existingFile = glob($uploadDir . '/' . $id . '_' . $directoryLabel . '.*'); // Menangkap semua file dengan NIM + directoryLabel
+
+    // Jika file dengan NIM + directoryLabel sudah ada, hapus file lama dan simpan file baru
+    if ($existingFile) {
         // Hapus file lama
-        if (!unlink($target_file)) {
-            echo "Gagal menghapus file lama.";
-            exit;
+        foreach ($existingFile as $file) {
+            if (!unlink($file)) {
+                echo "Gagal menghapus file lama.";
+                exit;
+            }
         }
     }
 
@@ -93,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Jika upload ke penyerahan_hardcopy, insert judul_tugas_akhir dan update status
         if ($directoryLabel === 'penyerahan_hardcopy') {
             $judulTugasAkhir = htmlspecialchars($_POST['judul_tugas_akhir']);
-            
+
             if (strlen($judulTugasAkhir) > 200) {
                 echo "Judul tugas akhir tidak boleh lebih dari 200 karakter.";
                 exit;

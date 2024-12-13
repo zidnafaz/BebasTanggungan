@@ -90,7 +90,7 @@ if ($rowCek = sqlsrv_fetch_array($resultCek, SQLSRV_FETCH_ASSOC)) {
 $sql = "SELECT m.nim, m.nama_mahasiswa, m.jurusan_mahasiswa, m.prodi_mahasiswa, ns.nomor_surat, ap.tanggal_adminPusat_konfirmasi
         FROM dbo.mahasiswa m
         JOIN dbo.nomor_surat_akademik_pusat ns ON m.nim = ns.nim
-        JOIN dbo.adminPusat_konfirmasi ap ON m.nim = ns.nim
+        JOIN dbo.adminPusat_konfirmasi ap ON ns.nim = ap.nim
         WHERE m.nim = ?";
 
 $params = array($nim);

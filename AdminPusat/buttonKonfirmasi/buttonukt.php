@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keterangan = isset($_POST['keterangan']) && $_POST['keterangan'] !== '' ? $_POST['keterangan'] : '-';
 
     // Query untuk update status
-    $sql = "UPDATE dbo.foto_ijazah
-            SET status_pengumpulan_foto_ijazah = ?, keterangan_pengumpulan_foto_ijazah = ?
+    $sql = "UPDATE dbo.ukt
+            SET status_pengumpulan_ukt = ?, keterangan_pengumpulan_ukt = ?
             WHERE nim = ?";
     $params = [$statusVerifikasi, $keterangan, $nim];
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  */
 function redirectToUpload($nim = null) {
     // Ambil URL sebelumnya jika tersedia
-    $previousUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../ukt.php';
+    $previousUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../skkm.php';
 
     // Tambahkan parameter nim jika ada
     if ($nim) {

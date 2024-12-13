@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keterangan = isset($_POST['keterangan']) && $_POST['keterangan'] !== '' ? $_POST['keterangan'] : '-';
 
     // Query untuk update status
-    $sql = "UPDATE dbo.foto_ijazah
-            SET status_pengumpulan_foto_ijazah = ?, keterangan_pengumpulan_foto_ijazah = ?
+    $sql = "UPDATE dbo.skkm
+            SET status_pengumpulan_skkm = ?, keterangan_pengumpulan_skkm = ?
             WHERE nim = ?";
     $params = [$statusVerifikasi, $keterangan, $nim];
 

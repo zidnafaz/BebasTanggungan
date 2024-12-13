@@ -327,7 +327,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                             <option value="">Pilih Halaman</option>
                                                             <option value="hardcopy">Hardcopy</option>
                                                             <option value="softcopy">Softcopy</option>
-                                                            <option value="bebas_pinjam">Bebas Pinjam Buku</option>
+                                                            <option value="bebas_pinjaman">Bebas Pinjam Buku</option>
                                                             <option value="kuisioner">Kuisioner</option>
                                                         </select>
                                                     </div>
@@ -563,18 +563,47 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
             });
 
-            // Event listener untuk dropdown di dalam tabel (untuk memilih halaman tujuan)
+            // Dropdown untuk halaman tujuan
             $('#dataTable').on('change', '.pageDropdown', function () {
-                var selectedPage = $(this).val(); // Ambil halaman yang dipilih
-                var nim = $(this).data('nim'); // Ambil NIM dari data-nim atribut
+                var selectedPage = $(this).val(); // Halaman yang dipilih
+                var nim = $(this).data('nim'); // NIM dari data-nim atribut
+                var currentUrl = window.location.href; // URL saat ini
 
-                // Jika halaman tujuan dipilih dan NIM ada, arahkan ke halaman dengan NIM
-                if (selectedPage && nim) {
-                    window.location.href = selectedPage + ".php?nim=" + encodeURIComponent(nim);
-                } else if (selectedPage) {
-                    window.location.href = selectedPage + ".php"; // Jika tidak ada NIM, tetap arahkan ke halaman
+                // Jika halaman dipilih
+                if (selectedPage) {
+                    let newUrl = selectedPage + ".php"; // Halaman tujuan
+
+                    // Tambahkan NIM ke URL jika ada
+                    if (nim) {
+                        newUrl += "?nim=" + encodeURIComponent(nim);
+                    }
+
+                    window.location.href = newUrl;
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusModal = document.getElementById('uploadModalStatus');
+            const messageContent = document.getElementById('uploadMessage');
+            const successIcon = document.getElementById('successIcon');
+            const errorIcon = document.getElementById('errorIcon');
+
+            fetch('../fetchMessage.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        messageContent.textContent = data.message.content;
+                        if (data.message.type === 'success') {
+                            successIcon.style.display = 'block';
+                            errorIcon.style.display = 'none';
+                        } else {
+                            successIcon.style.display = 'none';
+                            errorIcon.style.display = 'block';
+                        }
+                        $(statusModal).modal('show');
+                    }
+                });
         });
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -625,42 +654,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     document.getElementById('namaBerkas').value = `${nim}_hasil_kuisioner.pdf`;
                     document.getElementById('pdfPreview').setAttribute('src', pdfUrl); // Update src iframe
                 });
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusModal = document.getElementById('uploadModalStatus');
-            const messageContent = document.getElementById('uploadMessage');
-            const successIcon = document.getElementById('successIcon');
-            const errorIcon = document.getElementById('errorIcon');
-
-            // Show modal with message when it's triggered by URL parameters
-            if (window.location.search.includes('message') && window.location.search.includes('type')) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const message = urlParams.get('message');
-                const messageType = urlParams.get('type');
-
-                messageContent.textContent = message;
-                if (messageType === 'success') {
-                    successIcon.style.display = 'block';
-                    errorIcon.style.display = 'none';
-                } else {
-                    successIcon.style.display = 'none';
-                    errorIcon.style.display = 'block';
-                }
-                $(statusModal).modal('show');
-            }
-
-            // When the modal is closed, clear the URL parameters and message content
-            $(statusModal).on('hidden.bs.modal', function () {
-                // Clear URL parameters from the browser history
-                const cleanUrl = window.location.pathname;
-                window.history.replaceState(null, null, cleanUrl);
-
-                // Clear message content and hide icons
-                messageContent.textContent = '';
-                successIcon.style.display = 'none';
-                errorIcon.style.display = 'none';
             });
         });
 

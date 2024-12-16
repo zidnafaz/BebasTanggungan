@@ -4,7 +4,7 @@ require_once '../Koneksi.php';
 class Admin {
     private $conn;
 
-    public function getAdminById($nim)
+    public function getAdminById($id)
     {
         $db = new Koneksi();
         $this->conn = $db->connect();
@@ -12,7 +12,7 @@ class Admin {
         $sql = "SELECT id_karyawan, nama_karyawan, nomor_telfon_karyawan, alamat_karyawan, tanggal_lahir_karyawan, jenis_kelamin_karyawan 
                 FROM dbo.admin a
                 WHERE a.id_karyawan = ?";
-        $params = array($nim);
+        $params = array($id);
         $stmt = sqlsrv_query($this->conn, $sql, $params);
 
         if ($stmt === false) {

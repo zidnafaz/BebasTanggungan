@@ -1,8 +1,20 @@
 <?php
-include '../koneksi.php';
-include '../data/dataAdmin.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Admin.php';
 
-$nim = isset($_GET['nim']) ? $_GET['nim'] : null;
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$id = $_SESSION['id'];
+
+$admin = new Admin();
+$resultUser = $admin->getAdminById($id);
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -189,7 +201,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                                     <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                                <img class="img-profile rounded-circle" src="../img/circle-user-solid.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"

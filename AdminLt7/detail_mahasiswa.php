@@ -1,8 +1,26 @@
 <?php
-include '../koneksi.php';
-include '../data/dataAdmin.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Admin.php';
+require_once '../OOP/Mahasiswa.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$id = $_SESSION['id'];
+
+$admin = new Admin();
+$resultUser = $admin->getAdminById($id);
 
 $nim = isset($_GET['nim']) ? $_GET['nim'] : null;
+
+$mahasiswa = new Mahasiswa();
+$resultUserMahasiswa = $mahasiswa->getMahasiswaByNIM($nim);
 
 if (isset($_GET['message']) && isset($_GET['type'])) {
     $message = htmlspecialchars($_GET['message']);
@@ -36,7 +54,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Verifikasi</title>
+    <title>Verifikasi <?php echo htmlspecialchars($resultUserMahasiswa['nama_mahasiswa'] ?? '') ?></title>
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -139,24 +157,11 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 Verifikasi
             </div>
 
-
             <!-- Nav Item - Verifikasi -->
             <li class="nav-item" id="nav-upload_skripsi">
-                <a class="nav-link" href="upload_skripsi.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Upload Skripsi</span></a>
-            </li>
-
-            <li class="nav-item active" id="nav-aplikasi">
-                <a class="nav-link" href="program_mahasiswa.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Aplikasi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-publikasi_jurnal">
-                <a class="nav-link" href="publikasi_jurnal.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Publikasi Jurnal</span></a>
+                <a class="nav-link" href="daftar_mahasiswa.php">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Daftar Mahasiswa</span></a>
             </li>
 
             <!-- Divider -->
@@ -189,7 +194,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                                     <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                                <img class="img-profile rounded-circle" src="../img/circle-user-solid.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -214,70 +219,94 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Verifikasi Aplikasi</h1>
-                    <p class="mb-4">Konfirmasi Data Mahasiswa dengan seksama!</p>
+                    <!-- Identitas Mahasiswa -->
+                    <h1 class="h3 mb-2 text-gray-800">Detail Mahasiswa</h1>
+                    <p class="mb-4">Pastikan informasi sesuai dengan dokumen yang telah dikumpulkan.</p>
 
-                    <!-- DataTables Example -->
-                    <div class="card shadow mb-4">
+                    <!-- Identitas Mahasiswa -->
+                    <div class="card mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Data Mahasiswa</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Identitas Mahasiswa</h6>
                         </div>
                         <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label><strong>Nama :</strong></label>
+                                    <input type="text" id="nama" class="form-control"
+                                        value="<?= htmlspecialchars($resultUserMahasiswa['nama_mahasiswa']) ?>"
+                                        readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label><strong>NIM :</strong></label>
+                                    <input type="text" id="nim" class="form-control"
+                                        value="<?= htmlspecialchars($nim) ?>" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label><strong>Jurusan :</strong></label>
+                                    <input type="text" id="jurusan" class="form-control"
+                                        value="<?= htmlspecialchars($resultUserMahasiswa['jurusan_mahasiswa']) ?>"
+                                        readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label><strong>Prodi :</strong></label>
+                                    <input type="text" id="prodi" class="form-control"
+                                        value="<?= htmlspecialchars($resultUserMahasiswa['prodi_mahasiswa']) ?>"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <!-- Filter Dropdown -->
-                            <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
-                                <option value="">Filter by Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="terverifikasi">Terverifikasi</option>
-                                <option value="belum upload">Belum Upload</option>
-                                <option value="ditolak">Ditolak</option>
-                            </select>
+                    <!-- Tabel Berkas Mahasiswa -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Daftar Berkas Mahasiswa</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Berkas</th>
+                                            <th>Status</th>
+                                            <th>Keterangan</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        // Query untuk mengambil data berkas mahasiswa
+                                        $sqlFiles = "
+                                                    SELECT 'Publikasi Jurnal' AS nama_berkas, 
+                                                        status_pengumpulan_publikasi_jurnal AS status, 
+                                                        keterangan_pengumpulan_publikasi_jurnal AS keterangan, 
+                                                        'publikasi_jurnal' AS jenis_berkas
+                                                    FROM publikasi_jurnal WHERE nim = ?
+                                                    UNION ALL
+                                                    SELECT 'Aplikasi' AS nama_berkas, 
+                                                        status_pengumpulan_aplikasi AS status, 
+                                                        keterangan_pengumpulan_aplikasi AS keterangan, 
+                                                        'aplikasi' AS jenis_berkas
+                                                    FROM aplikasi WHERE nim = ?
+                                                    UNION ALL
+                                                    SELECT 'Skripsi' AS nama_berkas, 
+                                                        status_pengumpulan_skripsi AS status, 
+                                                        keterangan_pengumpulan_skripsi AS keterangan, 
+                                                        'skripsi' AS jenis_berkas
+                                                    FROM skripsi WHERE nim = ?";
 
-                            <table class="table table-striped table-bordered" id="dataTable" width="100%"
-                                cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>NIM</th>
-                                        <th>Nama Mahasiswa</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                        <th>Pindah Halaman</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    try {
-                                        // Query untuk mengambil data mahasiswa dan status, dengan filter berdasarkan NIM jika ada
-                                        $sql = "SELECT m.nim, m.nama_mahasiswa, pk.status_pengumpulan_aplikasi AS status
-                                                FROM dbo.mahasiswa m
-                                                JOIN dbo.aplikasi pk ON m.nim = pk.nim";
+                                        $stmtFiles = sqlsrv_prepare($conn, $sqlFiles, [$nim, $nim, $nim]);
+                                        sqlsrv_execute($stmtFiles);
 
-                                        // Tambahkan kondisi WHERE jika ada NIM
-                                        if ($nim) {
-                                            $sql .= " WHERE m.nim = ?";
-                                        }
+                                        while ($file = sqlsrv_fetch_array($stmtFiles, SQLSRV_FETCH_ASSOC)):
+                                            // Ambil status dari query
+                                            $status = $file['status'] ?? '';
+                                            $keterangan = $file['keterangan'] ?? '-';
 
-                                        // Urutkan data berdasarkan status
-                                        $sql .= " ORDER BY 
-                                                    CASE 
-                                                        WHEN pk.status_pengumpulan_aplikasi = 'pending' THEN 1
-                                                        WHEN pk.status_pengumpulan_aplikasi = 'ditolak' THEN 2
-                                                        WHEN pk.status_pengumpulan_aplikasi = 'belum upload' THEN 3
-                                                        WHEN pk.status_pengumpulan_aplikasi = 'terverifikasi' THEN 4
-                                                        ELSE 5
-                                                    END";
-
-                                        $params = $nim ? array($nim) : array();
-                                        $result = sqlsrv_query($conn, $sql, $params);
-
-                                        if ($result === false) {
-                                            die("Kesalahan saat menjalankan query: " . print_r(sqlsrv_errors(), true));
-                                        }
-
-                                        while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)):
-                                            // Gunakan match expression untuk kelas badge
-                                            $statusClass = match (strtolower($row['status'])) {
+                                            // Tentukan kelas badge berdasarkan status
+                                            $statusClass = match (strtolower($status)) {
                                                 'belum upload' => 'bg-secondary text-white',
                                                 'pending' => 'bg-warning text-dark',
                                                 'ditolak' => 'bg-danger text-white',
@@ -285,82 +314,43 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                                 default => 'bg-light text-dark'
                                             };
 
+                                            // Tentukan ekstensi file berdasarkan jenis berkas
+                                            $fileExtension = '';
+                                            $fileDirectory = "../Documents/uploads/" . $file['jenis_berkas'] . "/";
+                                            $fileName = $nim . "_" . $file['jenis_berkas'];
+
+                                            if (file_exists($fileDirectory . $fileName . ".zip")) {
+                                                $fileExtension = 'zip';
+                                            } elseif (file_exists($fileDirectory . $fileName . ".rar")) {
+                                                $fileExtension = 'rar';
+                                            }
                                             ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($row['nim']) ?></td>
-                                                <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
-                                                <td class="status">
-                                                    <span class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
-                                                        style="cursor: pointer;"
-                                                        title="<?= htmlspecialchars($row['status']) ?>">
-                                                        <?= htmlspecialchars($row['status']) ?>
+                                                <td><?= htmlspecialchars($file['nama_berkas']) ?></td>
+                                                <td class='status'>
+                                                    <span class='badge <?= $statusClass ?> p-2 rounded text-uppercase'
+                                                        style='cursor: pointer;' title="<?= htmlspecialchars($status) ?>">
+                                                        <?= htmlspecialchars($status) ?>
                                                     </span>
                                                 </td>
+                                                <td><?= htmlspecialchars($keterangan) ?></td>
                                                 <td>
-                                                    <?php
-                                                    // Tentukan nama file tanpa ekstensi
-                                                    $fileName = $row['nim'] . "_aplikasi";
-
-                                                    // Tentukan direktori file
-                                                    $fileDirectory = "../Documents/uploads/aplikasi/";
-
-                                                    // Cek apakah file dengan ekstensi .zip atau .rar ada
-                                                    $fileExtension = "";
-                                                    if (file_exists($fileDirectory . $fileName . ".zip")) {
-                                                        $fileExtension = "zip";
-                                                    } elseif (file_exists($fileDirectory . $fileName . ".rar")) {
-                                                        $fileExtension = "rar";
-                                                    }
-
-                                                    // Jika ditemukan file dengan ekstensi yang valid, set filePath
-                                                    if ($fileExtension) {
-                                                        $filePath = $fileDirectory . $fileName . "." . $fileExtension;
-                                                    }
-                                                    ?>
-                                                    <?php if (strtolower($row['status']) === 'belum upload'): ?>
-                                                        <button class="btn btn-secondary btn-sm" disabled><i class="fa fa-ban"></i>
-                                                            Disabled</button>
-                                                    <?php elseif (strtolower($row['status']) === 'terverifikasi'): ?>
-                                                        <button class="btn btn-info btn-sm edit-data"
-                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
-                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $fileName . "." . $fileExtension ?>"
-                                                            data-pdf="<?= $filePath ?>" data-target="#verifikasiModal"
-                                                            data-toggle="modal">
-                                                            <i class="fa fa-solid fa-file-lines"></i> Preview
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-primary btn-sm edit-data"
-                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>"
-                                                            data-nama="<?= htmlspecialchars($row['nama_mahasiswa']) ?>"
-                                                            data-nama-berkas="<?= $fileName . "." . $fileExtension ?>"
-                                                            data-pdf="<?= $filePath ?>" data-target="#verifikasiModal"
-                                                            data-toggle="modal">
-                                                            <i class="fa fa-edit"></i> Verifikasi
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
-                                                    <div>
-                                                        <select class="pageDropdown form-control" style="width: 60%;"
-                                                            data-nim="<?= htmlspecialchars($row['nim']) ?>">
-                                                            <option value="">Pilih Halaman</option>
-                                                            <option value="program_mahasiswa">Aplikasi</option>
-                                                            <option value="publikasi_jurnal">Publikasi Jurnal</option>
-                                                            <option value="upload_skripsi">Skripsi</option>
-                                                        </select>
-                                                    </div>
+                                                    <button class="btn btn-primary btn-sm" data-toggle="modal"
+                                                        data-target="#verifikasiModal"
+                                                        data-nama="<?= htmlspecialchars($resultUserMahasiswa['nama_mahasiswa']) ?>"
+                                                        data-nim="<?= htmlspecialchars($nim) ?>"
+                                                        data-berkas="<?= htmlspecialchars($file['nama_berkas']) ?>"
+                                                        data-file="<?= $fileDirectory . $fileName . '.' . $fileExtension ?>"
+                                                        data-jenis_berkas="<?= htmlspecialchars($file['jenis_berkas']) ?>"
+                                                        data-status_pengumpulan="<?= htmlspecialchars($file['status']) ?>">
+                                                        <i class="fa-solid fa-file-pen"></i> Verifikasi
+                                                    </button>
                                                 </td>
                                             </tr>
-                                            <?php
-                                        endwhile;
-                                        sqlsrv_free_stmt($result);
-                                    } catch (Exception $e) {
-                                        echo "Error: " . $e->getMessage();
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -389,26 +379,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal untuk Verifikasi -->
     <div class="modal fade" id="verifikasiModal" tabindex="-1" role="dialog" aria-labelledby="verifikasiModalLabel"
@@ -446,9 +416,16 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         </div>
                     </div>
 
+                    <!-- Tampilan PDF menggunakan iframe -->
+                    <div class="embed-responsive embed-responsive-4by3 mb-4" id="pdfPreviewContainer">
+                        <iframe id="pdfPreview" src="" width="100%" height="400px" style="display: none;">
+                            PDF tidak dapat ditampilkan.
+                        </iframe>
+                    </div>
+
                     <!-- Tombol Download -->
-                    <div class="text-center mb-3">
-                        <a id="downloadButton" src="" download class="btn btn-success">
+                    <div class="text-center mb-3" id="downloadButtonContainer" style="display: none;">
+                        <a id="downloadButton" href="#" download class="btn btn-success">
                             <i class="fas fa-download"></i> Download File Zip/Rar
                         </a>
                     </div>
@@ -457,18 +434,16 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     <div class="card">
                         <div class="card-body">
                             <h6><strong>Status Verifikasi:</strong></h6>
-                            <form id="verifikasiForm" action="buttonKonfirmasi/buttonprogram_mahasiswa.php"
-                                method="POST">
+                            <form id="verifikasiForm" action="konfirmasi.php" method="POST">
                                 <div class="form-group">
                                     <label>
                                         <input type="radio" id="terverifikasi" name="status_verifikasi"
                                             value="terverifikasi">
-                                        terverifikasi
+                                        Terverifikasi
                                     </label>
                                     <label>
-                                        <input type="radio" id="tidak_terverifikasi" name="status_verifikasi"
-                                            value="ditolak">
-                                        ditolak
+                                        <input type="radio" id="ditolak" name="status_verifikasi" value="ditolak">
+                                        Ditolak
                                     </label>
                                 </div>
                                 <div class="form-group">
@@ -479,6 +454,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                 </div>
                                 <input type="hidden" name="nim" id="formNim">
                                 <input type="hidden" name="nama" id="formNama">
+                                <input type="hidden" name="jenis_berkas" id="jenis_berkas">
                             </form>
                         </div>
                     </div>
@@ -490,6 +466,26 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     <button type="submit" class="btn btn-primary" form="verifikasiForm" id="simpanVerifikasi">
                         <i class="fas fa-save"></i> Simpan
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="../index.html">Logout</a>
                 </div>
             </div>
         </div>
@@ -518,7 +514,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
         </div>
     </div>
 
-
     <!-- jQuery (dari CDN atau file lokal, pilih salah satu saja) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -545,7 +540,6 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
-
         $(document).ready(function () {
             // Inisialisasi DataTables
             var table = $('#dataTable').DataTable({
@@ -566,107 +560,66 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                },
-                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
-                "columnDefs": [
-                    {
-                        "targets": 2,
-                        "type": "num",  // Atur untuk menggunakan urutan numerik
-                        "orderData": [2]
-                    }
-                ]
-            });
-
-            // Menambahkan filter berdasarkan status
-            $('#statusFilter').on('change', function () {
-                var status = $(this).val();
-                table.column(2).search(status).draw();  // Kolom ke-2 adalah Status tugas_akhir_softcopy
-            });
-
-            // Dropdown untuk halaman tujuan
-            $('#dataTable').on('change', '.pageDropdown', function () {
-                var selectedPage = $(this).val(); // Halaman yang dipilih
-                var nim = $(this).data('nim'); // NIM dari data-nim atribut
-                var currentUrl = window.location.href; // URL saat ini
-
-                // Jika halaman dipilih
-                if (selectedPage) {
-                    let newUrl = selectedPage + ".php"; // Halaman tujuan
-
-                    // Tambahkan NIM ke URL jika ada
-                    if (nim) {
-                        newUrl += "?nim=" + encodeURIComponent(nim);
-                    }
-
-                    window.location.href = newUrl;
                 }
             });
-        });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const statusCells = document.querySelectorAll(".status span");
-            statusCells.forEach(cell => {
-                if (cell.textContent.trim() === "terverifikasi") {
-                    cell.classList.add("badge-success");
-                } else if (cell.textContent.trim() === "belum upload") {
-                    cell.classList.add("badge-secondary");
-                } else if (cell.textContent.trim() === "pending") {
-                    cell.classList.add("badge-warning");
-                } else if (cell.textContent.trim() === "ditolak") {
-                    cell.classList.add("badge-danger");
-                }
-            });
-        });
+            // Ketika tombol Verifikasi diklik
+            $('#verifikasiModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Tombol yang diklik
+                var nama = button.data('nama'); // Nama mahasiswa
+                var nim = button.data('nim'); // NIM mahasiswa
+                var berkas = button.data('berkas'); // Nama berkas
+                var file = button.data('file'); // Lokasi file untuk preview
+                var jenis_berkas = button.data('jenis_berkas'); // Jenis berkas (aplikasi, skripsi, publikasi jurnal)
 
-        document.addEventListener("DOMContentLoaded", function () {
-            // Event listener untuk setiap tombol Verifikasi
-            const buttons = document.querySelectorAll(".edit-data");
-            buttons.forEach(button => {
-                button.addEventListener("click", function () {
-                    const nim = this.getAttribute("data-nim");
-                    const nama = this.getAttribute("data-nama");
-                    const namaBerkas = this.getAttribute("data-nama-berkas");
-                    const pdfSrc = this.getAttribute("data-pdf");
+                // Setel nilai input di modal
+                $('#nama').val(nama);
+                $('#nim').val(nim);
+                $('#namaBerkas').val(berkas);
+                $('#formNim').val(nim);
+                $('#formNama').val(nama);
 
-                    // Set data ke modal
-                    document.getElementById("formNim").value = nim;
-                    document.getElementById("formNama").value = nama;
-                    document.getElementById("nama").value = nama;
-                    document.getElementById("nim").value = nim;
-                    document.getElementById("namaBerkas").value = namaBerkas;
+                // Reset modal
+                $('#pdfPreview').hide();
+                $('#downloadButtonContainer').hide();
+                $('#keterangan').prop('disabled', true); // Menonaktifkan input keterangan
 
-                    // Set href untuk tombol download
-                    const downloadButton = document.getElementById("downloadButton");
-                    downloadButton.setAttribute("href", pdfSrc); // Menetapkan URL file yang akan didownload
-                    downloadButton.setAttribute("download", namaBerkas); // Menetapkan nama file yang akan didownload
-                });
-            });
-        });
+                console.log('File yang dipilih: ', file);
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusModal = document.getElementById('uploadModalStatus');
-            const messageContent = document.getElementById('uploadMessage');
-            const successIcon = document.getElementById('successIcon');
-            const errorIcon = document.getElementById('errorIcon');
+                // Periksa jenis file dan sesuaikan tampilan
+                var fileExtension = file.split('.').pop().toLowerCase();
 
-            fetch('../fetchMessage.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        messageContent.textContent = data.message.content;
-                        if (data.message.type === 'success') {
-                            successIcon.style.display = 'block';
-                            errorIcon.style.display = 'none';
-                        } else {
-                            successIcon.style.display = 'none';
-                            errorIcon.style.display = 'block';
+                if (berkas === 'Aplikasi') {
+
+                    console.log('Ekstensi file: ', fileExtension);  // Debugging ekstensi
+
+                    if (fileExtension === 'rar' || fileExtension === 'zip') {
+                        $('#downloadButtonContainer').show();
+                        $('#downloadButton').attr('href', file); // Tautkan ke file zip/rar yang sesuai
+                    } else {
+                        $('#downloadButtonContainer').hide(); // Sembunyikan tombol download jika bukan rar atau zip
+                    }
+                } else if (berkas === 'Skripsi' || berkas === 'Publikasi Jurnal') {
+                    var pdfPath = `../Documents/uploads/${jenis_berkas}/${nim}_${jenis_berkas}.pdf`; // Path PDF sesuai jenis berkas
+
+                    // Cek apakah file PDF ada
+                    $.ajax({
+                        url: pdfPath,
+                        type: 'HEAD', // Hanya periksa apakah file ada
+                        success: function () {
+                            $('#pdfPreview').attr('src', pdfPath).show(); // Tampilkan preview PDF jika file ada
+                        },
+                        error: function () {
+                            $('#pdfPreview').hide(); // Sembunyikan preview jika file tidak ada
                         }
-                        $(statusModal).modal('show');
-                    }
-                });
-        });
+                    });
+                }
 
-        // Keterangan pada verifikasi
+                // Menambahkan jenis berkas ke form
+                $('#verifikasiForm').attr('action', 'konfirmasi.php?jenis_berkas=' + jenis_berkas);
+                $('#jenis_berkas').val(jenis_berkas);  // Set nilai hidden input jenis_berkas
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             const verifikasiTrue = document.getElementById('verifikasiTrue');
@@ -774,6 +727,30 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusModal = document.getElementById('uploadModalStatus');
+            const messageContent = document.getElementById('uploadMessage');
+            const successIcon = document.getElementById('successIcon');
+            const errorIcon = document.getElementById('errorIcon');
+
+            fetch('../fetchMessage.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        messageContent.textContent = data.message.content;
+                        if (data.message.type === 'success') {
+                            successIcon.style.display = 'block';
+                            errorIcon.style.display = 'none';
+                        } else {
+                            successIcon.style.display = 'none';
+                            errorIcon.style.display = 'block';
+                        }
+                        $(statusModal).modal('show');
+                    }
+                });
+        });
+
     </script>
 
 </body>

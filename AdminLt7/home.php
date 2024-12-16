@@ -1,8 +1,22 @@
 <!-- Admin Lantai 7 -->
 
 <?php
-include '../koneksi.php';
-include '../data/dataAdmin.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Admin.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$id = $_SESSION['id'];
+
+$admin = new Admin();
+$resultUser = $admin->getAdminById($id);
 
 // Query untuk publikasi_jurnal
 $publikasi_jurnalQuery = "
@@ -135,24 +149,11 @@ sqlsrv_close($conn);
                 Verifikasi
             </div>
 
-
             <!-- Nav Item - Verifikasi -->
             <li class="nav-item" id="nav-upload_skripsi">
-                <a class="nav-link" href="upload_skripsi.php">
+                <a class="nav-link" href="daftar_mahasiswa.php">
                     <i class="fas fa-solid fa-book"></i>
-                    <span>Upload Skripsi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-program_mahasiswa">
-                <a class="nav-link" href="program_mahasiswa.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Aplikasi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-publikasi_jurnal">
-                <a class="nav-link" href="publikasi_jurnal.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Publikasi Jurnal</span></a>
+                    <span>Daftar Mahasiswa</span></a>
             </li>
 
             <!-- Divider -->
@@ -186,7 +187,7 @@ sqlsrv_close($conn);
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                                     <?php echo htmlspecialchars($resultUser['nama_karyawan']?? '') ?>
                                 </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                                <img class="img-profile rounded-circle" src="../img/circle-user-solid.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"

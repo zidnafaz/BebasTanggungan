@@ -1,14 +1,18 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 
-include '../koneksi.php';
+require_once '../Koneksi.php';
 
-if (!isset($_COOKIE['id'])) {
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
     header("Location: ../index.html");
     exit();
 }
 
-$nim = $_COOKIE['id'];
+$nim = $_SESSION['id'];
 
 $query = "
     SELECT 

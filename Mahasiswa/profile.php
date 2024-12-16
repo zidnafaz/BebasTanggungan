@@ -1,7 +1,20 @@
 <?php
-include '../login.php';
-include '../koneksi.php';
-include '../data/dataMahasiswa.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Mahasiswa.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$nim = $_SESSION['id'];
+
+$mahasiswa = new Mahasiswa();
+$resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -267,7 +280,7 @@ include '../data/dataMahasiswa.php';
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.html">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>

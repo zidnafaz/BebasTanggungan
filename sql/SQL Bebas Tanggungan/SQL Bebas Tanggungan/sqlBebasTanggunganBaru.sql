@@ -330,6 +330,11 @@ SELECT * FROM adminlt6_konfirmasi;
 SELECT * FROM dbo.nomor_surat_perpustakaan;
 SELECT * FROM dbo.nomor_surat_akademik_pusat;
 SELECT * FROM [dbo].[adminPusat_konfirmasi];
+SELECT * FROM [dbo].[adminPerpus_konfirmasi];
+SELECT * FROM [dbo].[adminlt6_konfirmasi];
+SELECT * FROM [dbo].[nomor_surat_rekomendasi];
+
+use Bebas_Tanggungan;
 
 SELECT * FROM dbo.admin
 delete from dbo.admin

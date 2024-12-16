@@ -1,15 +1,20 @@
 <?php
-include '../koneksi.php';
-include '../data/dataMahasiswa.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Mahasiswa.php';
 
-if (!isset($_COOKIE['id'])) {
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
     header("Location: ../index.html");
     exit();
-} else {
-    $username = $_COOKIE['id'];
 }
 
-$nim = $_COOKIE['id'];
+$nim = $_SESSION['id'];
+
+$mahasiswa = new Mahasiswa();
+$resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
 $query = "
     SELECT 
@@ -562,7 +567,7 @@ sqlsrv_close($conn);
                                 <button class="btn btn-success" id="downloadButton" download><i class="fas fa-download"></i>
                                     Download</button>
                             <?php else: ?>
-                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Disable</button>
+                                <button class="btn btn-secondary" disabled><i class="fas fa-download"></i> Download</button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -608,7 +613,7 @@ sqlsrv_close($conn);
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.html">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>

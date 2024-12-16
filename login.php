@@ -1,5 +1,8 @@
 <?php
-include 'koneksi.php';
+require_once 'Koneksi.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
@@ -17,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Memeriksa apakah ada hasil
     if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
         // Pastikan cookie 'nim' diset sebelum header
-        setcookie('id', $row['username'], time() + 3600, "/"); // Mengatur path cookie agar dapat diakses di seluruh aplikasi
+        session_start();
+        $_SESSION['id'] = $row['username'];
 
         // Pengalihan berdasarkan status
         switch ($row['status']) {
@@ -42,8 +46,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         exit;
     } else {
-        // echo "<script> alert('Username atau Password salah');
-        // window.location.href='index.html';</script>";
         echo json_encode(['success' => false, 'message' => 'Username atau password salah!']);
     }
 

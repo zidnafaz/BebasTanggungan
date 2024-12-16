@@ -1,13 +1,20 @@
 <?php
-include '../koneksi.php';
-include '../data/dataMahasiswa.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Mahasiswa.php';
 
-if (!isset($_COOKIE['id'])) {
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
     header("Location: ../index.html");
     exit();
 }
 
-$nim = $_COOKIE['id'];
+$nim = $_SESSION['id'];
+
+$mahasiswa = new Mahasiswa();
+$resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
 $query = "
         SELECT 
@@ -519,7 +526,7 @@ sqlsrv_close($conn);
                                         ini.</p>
 
                                     <!-- Download Button -->
-                                    <button class="btn btn-success btn-block" id="downloadButton" disabled>
+                                    <button class="btn btn-block" id="downloadButton" disabled>
                                         <i class="fas fa-download"></i> Download
                                     </button>
                                 </div>
@@ -595,7 +602,7 @@ sqlsrv_close($conn);
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.html">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>
@@ -698,7 +705,7 @@ sqlsrv_close($conn);
                     downloadButton.disabled = true;
                     downloadButton.classList.add('btn-secondary');
                     downloadButton.classList.remove('btn-success');
-                    downloadButton.innerHTML = '<i class="fas fa-download"></i> Disabled';
+                    downloadButton.innerHTML = '<i class="fas fa-download"></i> Download';
                 } else {
                     downloadButton.disabled = false;
                     downloadButton.classList.add('btn-success');

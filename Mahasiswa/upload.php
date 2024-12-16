@@ -1,14 +1,18 @@
 <?php
-include '../koneksi.php';
+session_start();
+require_once '../Koneksi.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validasi ID dari cookie
-    if (!isset($_COOKIE['id'])) {
-        echo "ID tidak ditemukan dalam cookie.";
-        exit;
+    if (!isset($_SESSION['id'])) {
+        header("Location: ../index.html");
+        exit();
     }
 
-    $id = htmlspecialchars($_COOKIE['id']); // Amankan data dari cookie
+    $id = htmlspecialchars($_SESSION['id']); // Amankan data dari cookie
 
     // Mendapatkan direktori dari input hidden
     $uploadDir = '../Documents/Uploads/' . htmlspecialchars($_POST['uploadDir']);

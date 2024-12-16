@@ -1,8 +1,12 @@
 <?php
-include '../koneksi.php';
+session_start();
+require_once '../Koneksi.php';
 
-if (isset($_COOKIE['id'])) {
-    $nim = $_COOKIE['id'];
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (isset($_SESSION['id'])) {
+    $nim = $_SESSION['id'];
 
     // Query untuk tiap tabel
     $query = [
@@ -40,7 +44,7 @@ if (isset($_COOKIE['id'])) {
                                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload 
                                   </button>";
             } else {
-                $uploadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Disable</button>";
+                $uploadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload</button>";
             }
 
             // Tombol Download: aktif jika statusnya 'pending', 'ditolak', atau 'terverifikasi', dan file ada
@@ -49,7 +53,7 @@ if (isset($_COOKIE['id'])) {
                                     <i class='fas fa-download'></i> Download
                                   </a>";
             } else {
-                $downloadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class='fas fa-download'></i> Disable</button>";
+                $downloadButton = "<button class=\"btn btn-secondary btn-sm\" disabled><i class='fas fa-download'></i> Download</button>";
             }
 
             echo "<tr>
@@ -66,7 +70,8 @@ if (isset($_COOKIE['id'])) {
         sqlsrv_free_stmt($stmt);
     }
 } else {
-    echo "<tr><td colspan='5'>NIM belum diatur. Silakan login terlebih dahulu.</td></tr>";
+    header("Location: ../index.html");
+    exit();
 }
 
 sqlsrv_close($conn);

@@ -212,37 +212,43 @@ $resultUser = $admin->getAdminById($id);
                                 <tbody>
                                     <?php
                                     $sql = "SELECT 
-                                                m.nim,
-                                                m.nama_mahasiswa,
-                                                CASE
-                                                    WHEN pj.status_pengumpulan_publikasi_jurnal = 'ditolak' OR a.status_pengumpulan_aplikasi = 'ditolak' OR s.status_pengumpulan_skripsi = 'ditolak' THEN 'ditolak'
-                                                    WHEN pj.status_pengumpulan_publikasi_jurnal = 'pending' OR a.status_pengumpulan_aplikasi = 'pending' OR s.status_pengumpulan_skripsi = 'pending' THEN 'pending'
-                                                    WHEN pj.status_pengumpulan_publikasi_jurnal = 'belum upload' OR a.status_pengumpulan_aplikasi = 'belum upload' OR s.status_pengumpulan_skripsi = 'belum upload' THEN 'belum upload'
-                                                    ELSE 'terverifikasi'
-                                                END AS status,
-                                                CONCAT(
-                                                    (CASE WHEN pj.status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END +
-                                                    CASE WHEN a.status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END +
-                                                    CASE WHEN s.status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END),
-                                                    '/3'
-                                                ) AS jumlah_verifikasi
-                                            FROM 
-                                                mahasiswa m
-                                            LEFT JOIN 
-                                                publikasi_jurnal pj ON m.nim = pj.nim
-                                            LEFT JOIN 
-                                                aplikasi a ON m.nim = a.nim
-                                            LEFT JOIN 
-                                                skripsi s ON m.nim = s.nim
-                                            ORDER BY 
-                                                CASE 
-                                                    WHEN (pj.status_pengumpulan_publikasi_jurnal = 'pending' OR a.status_pengumpulan_aplikasi = 'pending' OR s.status_pengumpulan_skripsi = 'pending') THEN 1
-                                                    WHEN (pj.status_pengumpulan_publikasi_jurnal = 'ditolak' OR a.status_pengumpulan_aplikasi = 'ditolak' OR s.status_pengumpulan_skripsi = 'ditolak') THEN 2
-                                                    WHEN (pj.status_pengumpulan_publikasi_jurnal = 'belum upload' OR a.status_pengumpulan_aplikasi = 'belum upload' OR s.status_pengumpulan_skripsi = 'belum upload') THEN 3
-                                                    WHEN (pj.status_pengumpulan_publikasi_jurnal = 'terverifikasi' AND a.status_pengumpulan_aplikasi = 'terverifikasi' AND s.status_pengumpulan_skripsi = 'terverifikasi') THEN 4
-                                                    ELSE 5
-                                                END ASC";
-
+                                    m.nim,
+                                    m.nama_mahasiswa,
+                                    CASE
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' OR pp.status_pengumpulan_penyerahan_pkl = 'ditolak' OR t.status_pengumpulan_toeic = 'ditolak' OR bk.status_pengumpulan_bebas_kompen = 'ditolak' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 'ditolak'
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'pending' OR pp.status_pengumpulan_penyerahan_pkl = 'pending' OR t.status_pengumpulan_toeic = 'pending' OR bk.status_pengumpulan_bebas_kompen = 'pending' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 'pending'
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' OR pp.status_pengumpulan_penyerahan_pkl = 'belum upload' OR t.status_pengumpulan_toeic = 'belum upload' OR bk.status_pengumpulan_bebas_kompen = 'belum upload' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 'belum upload'
+                                        ELSE 'terverifikasi'
+                                    END AS status,
+                                    CONCAT(
+                                        (CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END +
+                                        CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END +
+                                        CASE WHEN t.status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END +
+                                        CASE WHEN bk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END +
+                                        CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END),
+                                        '/5'
+                                    ) AS jumlah_verifikasi
+                                FROM 
+                                    mahasiswa m
+                                LEFT JOIN 
+                                    penyerahan_skripsi ps ON m.nim = ps.nim
+                                LEFT JOIN 
+                                    penyerahan_pkl pp ON m.nim = pp.nim
+                                LEFT JOIN 
+                                    toeic t ON m.nim = t.nim
+                                LEFT JOIN 
+                                    bebas_kompen bk ON m.nim = bk.nim
+                                LEFT JOIN 
+                                    penyerahan_kebenaran_data pkd ON m.nim = pkd.nim
+                                ORDER BY 
+                                    CASE 
+                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'pending' OR pp.status_pengumpulan_penyerahan_pkl = 'pending' OR t.status_pengumpulan_toeic = 'pending' OR bk.status_pengumpulan_bebas_kompen = 'pending' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending') THEN 1
+                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' OR pp.status_pengumpulan_penyerahan_pkl = 'ditolak' OR t.status_pengumpulan_toeic = 'ditolak' OR bk.status_pengumpulan_bebas_kompen = 'ditolak' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak') THEN 2
+                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' OR pp.status_pengumpulan_penyerahan_pkl = 'belum upload' OR t.status_pengumpulan_toeic = 'belum upload' OR bk.status_pengumpulan_bebas_kompen = 'belum upload' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload') THEN 3
+                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' AND pp.status_pengumpulan_penyerahan_pkl = 'terverifikasi' AND t.status_pengumpulan_toeic = 'terverifikasi' AND bk.status_pengumpulan_bebas_kompen = 'terverifikasi' AND pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi') THEN 4
+                                        ELSE 5
+                                    END ASC";
+                        
                                     $stmt = sqlsrv_query($conn, $sql);
                                     if ($stmt === false) {
                                         die(print_r(sqlsrv_errors(), true));

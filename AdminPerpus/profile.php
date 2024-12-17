@@ -1,7 +1,20 @@
 <?php
-include '../login.php';
-include '../koneksi.php';
-include '../data/dataAdmin.php';
+session_start();
+require_once '../Koneksi.php';
+require_once '../OOP/Admin.php';
+
+$db = new Koneksi();
+$conn = $db->connect();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$id = $_SESSION['id'];
+
+$admin = new Admin();
+$resultUser = $admin->getAdminById($id);
 ?>
 
 <!DOCTYPE html>
@@ -59,27 +72,11 @@ include '../data/dataAdmin.php';
                 Verifikasi
             </div>
 
-
             <!-- Nav Item - Verifikasi -->
-            <li class="nav-item" id="nav-hardcopy">
-                <a class="nav-link" href="hardcopy.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Hardcopy</span></a>
-            </li>
-            <li class="nav-item" id="nav-tugas_akhir">
-                <a class="nav-link" href="softcopy.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Softcopy</span></a>
-            </li>
-            <li class="nav-item" id="nav-bebas_pinjaman">
-                <a class="nav-link" href="bebas_pinjaman.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Bebas Pinjaman Buku</span></a>
-            </li>
-            <li class="nav-item" id="nav-kuisioner">
-                <a class="nav-link" href="kuisioner.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Kuisioner</span></a>
+            <li class="nav-item" id="nav-upload_skripsi">
+                <a class="nav-link" href="daftar_mahasiswa.php">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Daftar Mahasiswa</span></a>
             </li>
 
             <!-- Divider -->
@@ -112,7 +109,19 @@ include '../data/dataAdmin.php';
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                                     <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_95_26" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0"
+                                        y="0" width="24" height="24">
+                                        <circle cx="12" cy="12" r="12" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_95_26)">
+                                        <circle cx="12" cy="7" r="5" fill="#6C757D" />
+                                        <path
+                                            d="M22.5 21.5042C22.5 25.6463 17.799 29.0042 12 29.0042C6.20101 29.0042 1.5 25.6463 1.5 21.5042C1.5 18.5 3.5 14.0042 12 14.0042C20.5 14.0042 22.5 18.5 22.5 21.5042Z"
+                                            fill="#6C757D" />
+                                    </g>
+                                </svg>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -140,7 +149,8 @@ include '../data/dataAdmin.php';
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
+                        <h1 class="h3 mb-0 text-gray-800">Profil
+                            <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                         </h1>
                     </div>
 
@@ -157,7 +167,8 @@ include '../data/dataAdmin.php';
                                             <div class="col-md-6">
                                                 <strong>Nama Lengkap :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Jenis Kelamin :</strong>
@@ -174,7 +185,8 @@ include '../data/dataAdmin.php';
                                             <div class="col-md-6">
                                                 <strong>Alamat :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['alamat_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>Tanggal Lahir :</strong>
@@ -185,7 +197,8 @@ include '../data/dataAdmin.php';
                                             <div class="col-md-6">
                                                 <strong>No Telepon :</strong>
                                                 <p class="text-muted">
-                                                    <?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?></p>
+                                                    <?= htmlspecialchars($resultUser['nomor_telfon_karyawan'] ?? '') ?>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -204,7 +217,7 @@ include '../data/dataAdmin.php';
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
+                        <span>Copyright &copy; Bebas Tanggungan - JTI - 2024</span>
                     </div>
                 </div>
             </footer>

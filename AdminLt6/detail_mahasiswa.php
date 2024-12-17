@@ -263,25 +263,37 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                         <?php
                                         // Query untuk mengambil data berkas mahasiswa
                                         $sqlFiles = "
-                                                    SELECT 'Publikasi Jurnal' AS nama_berkas, 
-                                                        status_pengumpulan_publikasi_jurnal AS status, 
-                                                        keterangan_pengumpulan_publikasi_jurnal AS keterangan, 
-                                                        'publikasi_jurnal' AS jenis_berkas
-                                                    FROM publikasi_jurnal WHERE nim = ?
+                                                    SELECT 'Penyerahan Laporan Skripsi' AS nama_berkas, 
+                                                        status_pengumpulan_penyerahan_skripsi AS status, 
+                                                        keterangan_pengumpulan_penyerahan_skripsi AS keterangan, 
+                                                        'penyerahan_skripsi' AS jenis_berkas
+                                                    FROM penyerahan_skripsi WHERE nim = ?
                                                     UNION ALL
-                                                    SELECT 'Aplikasi' AS nama_berkas, 
-                                                        status_pengumpulan_aplikasi AS status, 
-                                                        keterangan_pengumpulan_aplikasi AS keterangan, 
-                                                        'aplikasi' AS jenis_berkas
-                                                    FROM aplikasi WHERE nim = ?
+                                                    SELECT 'Penyerahan Laporan PKL' AS nama_berkas, 
+                                                        status_pengumpulan_penyerahan_pkl AS status, 
+                                                        keterangan_pengumpulan_penyerahan_pkl AS keterangan, 
+                                                        'penyerahan_pkl' AS jenis_berkas
+                                                    FROM penyerahan_pkl WHERE nim = ?
                                                     UNION ALL
-                                                    SELECT 'Skripsi' AS nama_berkas, 
-                                                        status_pengumpulan_skripsi AS status, 
-                                                        keterangan_pengumpulan_skripsi AS keterangan, 
-                                                        'skripsi' AS jenis_berkas
-                                                    FROM skripsi WHERE nim = ?";
+                                                    SELECT 'TOEIC' AS nama_berkas, 
+                                                        status_pengumpulan_toeic AS status, 
+                                                        keterangan_pengumpulan_toeic AS keterangan, 
+                                                        'toeic' AS jenis_berkas
+                                                    FROM toeic WHERE nim = ?
+                                                    UNION ALL
+                                                    SELECT 'Bebas Kompen' AS nama_berkas, 
+                                                        status_pengumpulan_bebas_kompen AS status, 
+                                                        keterangan_pengumpulan_bebas_kompen AS keterangan, 
+                                                        'bebas_kompen' AS jenis_berkas
+                                                    FROM bebas_kompen WHERE nim = ?
+                                                    UNION ALL
+                                                    SELECT 'Pernyataan Kebenaran Data' AS nama_berkas, 
+                                                        status_pengumpulan_penyerahan_kebenaran_data AS status, 
+                                                        keterangan_pengumpulan_penyerahan_kebenaran_data AS keterangan, 
+                                                        'penyerahan_kebenaran_data' AS jenis_berkas
+                                                    FROM penyerahan_kebenaran_data WHERE nim = ?";
 
-                                        $stmtFiles = sqlsrv_prepare($conn, $sqlFiles, [$nim, $nim, $nim]);
+                                        $stmtFiles = sqlsrv_prepare($conn, $sqlFiles, [$nim, $nim, $nim, $nim, $nim]);
                                         sqlsrv_execute($stmtFiles);
 
                                         while ($file = sqlsrv_fetch_array($stmtFiles, SQLSRV_FETCH_ASSOC)):
@@ -577,7 +589,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     } else {
                         $('#downloadButtonContainer').hide(); // Sembunyikan tombol download jika bukan rar atau zip
                     }
-                } else if (berkas === 'Skripsi' || berkas === 'Publikasi Jurnal') {
+                } else {
                     var pdfPath = `../Documents/uploads/${jenis_berkas}/${nim}_${jenis_berkas}.pdf`; // Path PDF sesuai jenis berkas
 
                     // Cek apakah file PDF ada

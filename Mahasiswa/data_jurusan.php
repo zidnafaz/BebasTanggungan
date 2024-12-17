@@ -32,8 +32,17 @@ if (isset($_SESSION['id'])) {
             };
 
             // Tentukan file download berdasarkan key
-            $fileExtension = $key === 'aplikasi' ? ['zip', 'rar'] : ['pdf']; // Tentukan ekstensi file sesuai dengan key
-            $filePath = '../Documents/Uploads/' . $key . '/' . $nim . '_' . basename($key) . '.' . (in_array($key, ['aplikasi']) ? 'zip' : 'pdf'); // Sesuaikan ekstensi untuk aplikasi
+            $fileExtensions = $key === 'aplikasi' ? ['zip', 'rar'] : ['pdf']; // Tentukan ekstensi file sesuai dengan key
+            $filePath = '';
+
+            foreach ($fileExtensions as $extension) {
+                $path = "../Documents/Uploads/{$key}/{$nim}_" . basename($key) . ".{$extension}";
+                if (file_exists($path)) {
+                    $filePath = $path; // Pilih file pertama yang ditemukan
+                    break;
+                }
+            }
+            
             $downloadButton = '';
             $uploadButton = '';
 
@@ -47,7 +56,7 @@ if (isset($_SESSION['id'])) {
             }
 
             // Tombol Download: aktif jika statusnya 'pending', 'ditolak', atau 'terverifikasi', dan file ada
-            if (in_array($row['status'], ['pending', 'ditolak', 'terverifikasi']) && file_exists($filePath)) {
+            if (in_array($row['status'], ['pending', 'ditolak', 'terverifikasi']) && !empty($filePath)) {
                 $downloadButton = "<a href='{$filePath}' class='btn btn-success btn-sm' download>
                                     <i class='fas fa-download'></i> Download
                                   </a>";

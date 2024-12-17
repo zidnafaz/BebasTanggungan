@@ -263,25 +263,31 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                         <?php
                                         // Query untuk mengambil data berkas mahasiswa
                                         $sqlFiles = "
-                                                    SELECT 'Publikasi Jurnal' AS nama_berkas, 
-                                                        status_pengumpulan_publikasi_jurnal AS status, 
-                                                        keterangan_pengumpulan_publikasi_jurnal AS keterangan, 
-                                                        'publikasi_jurnal' AS jenis_berkas
-                                                    FROM publikasi_jurnal WHERE nim = ?
+                                                    SELECT 'Bukti Penyerahan Hardcopy Skripsi' AS nama_berkas, 
+                                                        status_pengumpulan_penyerahan_hardcopy AS status, 
+                                                        keterangan_pengumpulan_penyerahan_hardcopy AS keterangan, 
+                                                        'penyerahan_hardcopy' AS jenis_berkas
+                                                    FROM penyerahan_hardcopy WHERE nim = ?
                                                     UNION ALL
-                                                    SELECT 'Aplikasi' AS nama_berkas, 
-                                                        status_pengumpulan_aplikasi AS status, 
-                                                        keterangan_pengumpulan_aplikasi AS keterangan, 
-                                                        'aplikasi' AS jenis_berkas
-                                                    FROM aplikasi WHERE nim = ?
+                                                    SELECT 'Bukti Upload Softcopy Skripsi' AS nama_berkas, 
+                                                        status_pengumpulan_tugas_akhir_softcopy AS status, 
+                                                        keterangan_pengumpulan_tugas_akhir_softcopy AS keterangan, 
+                                                        'tugas_akhir_softcopy' AS jenis_berkas
+                                                    FROM tugas_akhir_softcopy WHERE nim = ?
                                                     UNION ALL
-                                                    SELECT 'Skripsi' AS nama_berkas, 
-                                                        status_pengumpulan_skripsi AS status, 
-                                                        keterangan_pengumpulan_skripsi AS keterangan, 
-                                                        'skripsi' AS jenis_berkas
-                                                    FROM skripsi WHERE nim = ?";
+                                                    SELECT 'Bukti Bebas Pinjam Buku Perpustakaan' AS nama_berkas, 
+                                                        status_pengumpulan_bebas_pinjam_buku_perpustakaan AS status, 
+                                                        keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan AS keterangan, 
+                                                        'bebas_pinjam_buku_perpustakaan' AS jenis_berkas
+                                                    FROM bebas_pinjam_buku_perpustakaan WHERE nim = ?
+                                                    UNION ALL
+                                                    SELECT 'Bukti Pengisian Kuisioner' AS nama_berkas, 
+                                                        status_pengumpulan_hasil_kuisioner AS status, 
+                                                        keterangan_pengumpulan_hasil_kuisioner AS keterangan, 
+                                                        'hasil_kuisioner' AS jenis_berkas
+                                                    FROM hasil_kuisioner WHERE nim = ?";
 
-                                        $stmtFiles = sqlsrv_prepare($conn, $sqlFiles, [$nim, $nim, $nim]);
+                                        $stmtFiles = sqlsrv_prepare($conn, $sqlFiles, [$nim, $nim, $nim, $nim]);
                                         sqlsrv_execute($stmtFiles);
 
                                         while ($file = sqlsrv_fetch_array($stmtFiles, SQLSRV_FETCH_ASSOC)):
@@ -577,7 +583,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                     } else {
                         $('#downloadButtonContainer').hide(); // Sembunyikan tombol download jika bukan rar atau zip
                     }
-                } else if (berkas === 'Skripsi' || berkas === 'Publikasi Jurnal') {
+                } else {
                     var pdfPath = `../Documents/uploads/${jenis_berkas}/${nim}_${jenis_berkas}.pdf`; // Path PDF sesuai jenis berkas
 
                     // Cek apakah file PDF ada

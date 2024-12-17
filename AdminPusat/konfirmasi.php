@@ -14,23 +14,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Tentukan nama kolom dan tabel yang sesuai berdasarkan jenis berkas
     switch ($jenisBerkas) {
-        case 'publikasi_jurnal':
-            $sqlUpdate = "UPDATE publikasi_jurnal SET status_pengumpulan_publikasi_jurnal = ?, keterangan_pengumpulan_publikasi_jurnal = ? WHERE nim = ?";
+        case 'data_alumni':
+            $sqlUpdate = "UPDATE data_alumni SET status_pengumpulan_data_alumni = ?, keterangan_pengumpulan_data_alumni = ? WHERE nim = ?";
             break;
-        case 'aplikasi':
-            $sqlUpdate = "UPDATE aplikasi SET status_pengumpulan_aplikasi = ?, keterangan_pengumpulan_aplikasi = ? WHERE nim = ?";
+        case 'skkm':
+            $sqlUpdate = "UPDATE skkm SET status_pengumpulan_skkm = ?, keterangan_pengumpulan_skkm = ? WHERE nim = ?";
             break;
-        case 'skripsi':
-            $sqlUpdate = "UPDATE skripsi SET status_pengumpulan_skripsi = ?, keterangan_pengumpulan_skripsi = ? WHERE nim = ?";
+        case 'foto_ijazah':
+            $sqlUpdate = "UPDATE foto_ijazah SET status_pengumpulan_foto_ijazah = ?, keterangan_pengumpulan_foto_ijazah = ? WHERE nim = ?";
+            break;
+        case 'ukt':
+            $sqlUpdate = "UPDATE ukt SET status_pengumpulan_ukt = ?, keterangan_pengumpulan_ukt = ? WHERE nim = ?";
             break;
         default:
             // Jika jenis berkas tidak dikenali
             exit('Jenis berkas tidak valid');
-    }
+    }        
 
     $stmt = sqlsrv_prepare($conn, $sqlUpdate, [$statusVerifikasi, $keterangan, $nim]);
 
-    $sqlTanggal = "UPDATE dbo.adminlt7_konfirmasi SET tanggal_adminlt7_konfirmasi = GETDATE() WHERE nim = ?";
+    $sqlTanggal = "UPDATE dbo.adminPusat_konfirmasi SET tanggal_adminPusat_konfirmasi = GETDATE() WHERE nim = ?";
     $params2 = [$nim];
 
     $stmt2 = sqlsrv_query($conn, $sqlTanggal, $params2);

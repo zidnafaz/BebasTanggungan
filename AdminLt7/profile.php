@@ -77,21 +77,9 @@ $resultUser = $admin->getAdminById($id);
 
             <!-- Nav Item - Verifikasi -->
             <li class="nav-item" id="nav-upload_skripsi">
-                <a class="nav-link" href="upload_skripsi.php">
-                    <i class="fas fa-solid fa-book"></i>
-                    <span>Upload Skripsi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-program_mahasiswa">
-                <a class="nav-link" href="program_mahasiswa.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Aplikasi</span></a>
-            </li>
-
-            <li class="nav-item" id="nav-publikasi_jurnal">
-                <a class="nav-link" href="publikasi_jurnal.php">
-                    <i class="fas fa-solid fa-file"></i>
-                    <span>Publikasi Jurnal</span></a>
+                <a class="nav-link" href="daftar_mahasiswa.php">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Daftar Mahasiswa</span></a>
             </li>
 
             <!-- Divider -->
@@ -124,7 +112,19 @@ $resultUser = $admin->getAdminById($id);
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                                     <?php echo htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                                 </span>
-                                <img class="img-profile rounded-circle" src="../img/circle-user-solid.svg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_95_26" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0"
+                                        y="0" width="24" height="24">
+                                        <circle cx="12" cy="12" r="12" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_95_26)">
+                                        <circle cx="12" cy="7" r="5" fill="#6C757D" />
+                                        <path
+                                            d="M22.5 21.5042C22.5 25.6463 17.799 29.0042 12 29.0042C6.20101 29.0042 1.5 25.6463 1.5 21.5042C1.5 18.5 3.5 14.0042 12 14.0042C20.5 14.0042 22.5 18.5 22.5 21.5042Z"
+                                            fill="#6C757D" />
+                                    </g>
+                                </svg>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -152,7 +152,8 @@ $resultUser = $admin->getAdminById($id);
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Profil <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
+                        <h1 class="h3 mb-0 text-gray-800">Profil
+                            <?= htmlspecialchars($resultUser['nama_karyawan'] ?? '') ?>
                         </h1>
                     </div>
 
@@ -219,7 +220,7 @@ $resultUser = $admin->getAdminById($id);
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
+                        <span>Copyright &copy; Bebas Tanggungan - JTI - 2024</span>
                     </div>
                 </div>
             </footer>

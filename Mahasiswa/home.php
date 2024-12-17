@@ -16,52 +16,159 @@ $nim = $_SESSION['id'];
 $mahasiswa = new Mahasiswa();
 $resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
-$query = "
-        SELECT 
-            -- PERPUSTAKAAN
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_hardcopy,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS tugas_akhir_softcopy,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_pinjam_buku_perpustakaan,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS hasil_kuisioner,
-
-            -- BEBAS TANGGUNGAN AKADEMIK PUSAT
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS data_alumni,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_skkm = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skkm,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS foto_ijazah,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_ukt = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS ukt,
-
-            -- ADMIN LANTAI 6 PRODI
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_skripsi,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_pkl,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data,
-
-            -- ADMIN LANTAI 7 JURUSAN
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
-            (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi
-        FROM dbo.penyerahan_hardcopy
-        LEFT JOIN dbo.tugas_akhir_softcopy ON penyerahan_hardcopy.nim = tugas_akhir_softcopy.nim
-        LEFT JOIN dbo.bebas_pinjam_buku_perpustakaan ON penyerahan_hardcopy.nim = bebas_pinjam_buku_perpustakaan.nim
-        LEFT JOIN dbo.hasil_kuisioner ON penyerahan_hardcopy.nim = hasil_kuisioner.nim
-        LEFT JOIN dbo.data_alumni ON penyerahan_hardcopy.nim = data_alumni.nim
-        LEFT JOIN dbo.skkm ON penyerahan_hardcopy.nim = skkm.nim
-        LEFT JOIN dbo.foto_ijazah ON penyerahan_hardcopy.nim = foto_ijazah.nim
-        LEFT JOIN dbo.ukt ON penyerahan_hardcopy.nim = ukt.nim
-        LEFT JOIN dbo.penyerahan_skripsi ON penyerahan_hardcopy.nim = penyerahan_skripsi.nim
-        LEFT JOIN dbo.penyerahan_pkl ON penyerahan_hardcopy.nim = penyerahan_pkl.nim
-        LEFT JOIN dbo.toeic ON penyerahan_hardcopy.nim = toeic.nim
-        LEFT JOIN dbo.bebas_kompen ON penyerahan_hardcopy.nim = bebas_kompen.nim
-        LEFT JOIN dbo.penyerahan_kebenaran_data ON penyerahan_hardcopy.nim = penyerahan_kebenaran_data.nim
-        LEFT JOIN dbo.publikasi_jurnal ON penyerahan_hardcopy.nim = publikasi_jurnal.nim
-        LEFT JOIN dbo.aplikasi ON penyerahan_hardcopy.nim = aplikasi.nim
-        LEFT JOIN dbo.skripsi ON penyerahan_hardcopy.nim = skripsi.nim
-        WHERE penyerahan_hardcopy.nim = ?
-        ";
+$query = "SELECT 
+            p.status_pengumpulan_penyerahan_hardcopy AS penyerahan_hardcopy,
+            t.status_pengumpulan_tugas_akhir_softcopy AS tugas_akhir_softcopy,
+            b.status_pengumpulan_bebas_pinjam_buku_perpustakaan AS bebas_pinjam_buku_perpustakaan,
+            k.status_pengumpulan_hasil_kuisioner AS hasil_kuisioner,
+            d.status_pengumpulan_data_alumni AS data_alumni,
+            s.status_pengumpulan_skkm AS skkm,
+            f.status_pengumpulan_foto_ijazah AS foto_ijazah,
+            u.status_pengumpulan_ukt AS ukt,
+            ps.status_pengumpulan_penyerahan_skripsi AS penyerahan_skripsi,
+            pk.status_pengumpulan_penyerahan_pkl AS penyerahan_pkl,
+            toec.status_pengumpulan_toeic AS toeic,
+            bk.status_pengumpulan_bebas_kompen AS bebas_kompen,
+            pkd.status_pengumpulan_penyerahan_kebenaran_data AS penyerahan_kebenaran_data,
+            pj.status_pengumpulan_publikasi_jurnal AS publikasi_jurnal,
+            a.status_pengumpulan_aplikasi AS aplikasi,
+            sk.status_pengumpulan_skripsi AS skripsi
+        FROM mahasiswa m
+        LEFT JOIN penyerahan_hardcopy p ON m.nim = p.nim
+        LEFT JOIN tugas_akhir_softcopy t ON m.nim = t.nim
+        LEFT JOIN bebas_pinjam_buku_perpustakaan b ON m.nim = b.nim
+        LEFT JOIN hasil_kuisioner k ON m.nim = k.nim
+        LEFT JOIN data_alumni d ON m.nim = d.nim
+        LEFT JOIN skkm s ON m.nim = s.nim
+        LEFT JOIN foto_ijazah f ON m.nim = f.nim
+        LEFT JOIN ukt u ON m.nim = u.nim
+        LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim
+        LEFT JOIN penyerahan_pkl pk ON m.nim = pk.nim
+        LEFT JOIN toeic toec ON m.nim = toec.nim
+        LEFT JOIN bebas_kompen bk ON m.nim = bk.nim
+        LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim
+        LEFT JOIN publikasi_jurnal pj ON m.nim = pj.nim
+        LEFT JOIN aplikasi a ON m.nim = a.nim
+        LEFT JOIN skripsi sk ON m.nim = sk.nim
+        WHERE m.nim = ?
+        ORDER BY 
+        CASE 
+            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'pending' THEN 1
+            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 2
+            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'belum upload' THEN 3
+            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'pending' THEN 1
+            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'ditolak' THEN 2
+            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'belum upload' THEN 3
+            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' THEN 1
+            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 2
+            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' THEN 3
+            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN k.status_pengumpulan_hasil_kuisioner = 'pending' THEN 1
+            WHEN k.status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 2
+            WHEN k.status_pengumpulan_hasil_kuisioner = 'belum upload' THEN 3
+            WHEN k.status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN d.status_pengumpulan_data_alumni = 'pending' THEN 1
+            WHEN d.status_pengumpulan_data_alumni = 'ditolak' THEN 2
+            WHEN d.status_pengumpulan_data_alumni = 'belum upload' THEN 3
+            WHEN d.status_pengumpulan_data_alumni = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN s.status_pengumpulan_skkm = 'pending' THEN 1
+            WHEN s.status_pengumpulan_skkm = 'ditolak' THEN 2
+            WHEN s.status_pengumpulan_skkm = 'belum upload' THEN 3
+            WHEN s.status_pengumpulan_skkm = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN f.status_pengumpulan_foto_ijazah = 'pending' THEN 1
+            WHEN f.status_pengumpulan_foto_ijazah = 'ditolak' THEN 2
+            WHEN f.status_pengumpulan_foto_ijazah = 'belum upload' THEN 3
+            WHEN f.status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN u.status_pengumpulan_ukt = 'pending' THEN 1
+            WHEN u.status_pengumpulan_ukt = 'ditolak' THEN 2
+            WHEN u.status_pengumpulan_ukt = 'belum upload' THEN 3
+            WHEN u.status_pengumpulan_ukt = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'pending' THEN 1
+            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' THEN 2
+            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' THEN 3
+            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN pk.status_pengumpulan_penyerahan_pkl = 'pending' THEN 1
+            WHEN pk.status_pengumpulan_penyerahan_pkl = 'ditolak' THEN 2
+            WHEN pk.status_pengumpulan_penyerahan_pkl = 'belum upload' THEN 3
+            WHEN pk.status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN toec.status_pengumpulan_toeic = 'pending' THEN 1
+            WHEN toec.status_pengumpulan_toeic = 'ditolak' THEN 2
+            WHEN toec.status_pengumpulan_toeic = 'belum upload' THEN 3
+            WHEN toec.status_pengumpulan_toeic = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN bk.status_pengumpulan_bebas_kompen = 'pending' THEN 1
+            WHEN bk.status_pengumpulan_bebas_kompen = 'ditolak' THEN 2
+            WHEN bk.status_pengumpulan_bebas_kompen = 'belum upload' THEN 3
+            WHEN bk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 1
+            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 2
+            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 3
+            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN pj.status_pengumpulan_publikasi_jurnal = 'pending' THEN 1
+            WHEN pj.status_pengumpulan_publikasi_jurnal = 'ditolak' THEN 2
+            WHEN pj.status_pengumpulan_publikasi_jurnal = 'belum upload' THEN 3
+            WHEN pj.status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN a.status_pengumpulan_aplikasi = 'pending' THEN 1
+            WHEN a.status_pengumpulan_aplikasi = 'ditolak' THEN 2
+            WHEN a.status_pengumpulan_aplikasi = 'belum upload' THEN 3
+            WHEN a.status_pengumpulan_aplikasi = 'terverifikasi' THEN 4
+            ELSE 5
+        END,
+        CASE 
+            WHEN sk.status_pengumpulan_skripsi = 'pending' THEN 1
+            WHEN sk.status_pengumpulan_skripsi = 'ditolak' THEN 2
+            WHEN sk.status_pengumpulan_skripsi = 'belum upload' THEN 3
+            WHEN sk.status_pengumpulan_skripsi = 'terverifikasi' THEN 4
+            ELSE 5
+        END
+    ";
 
 $params = array($nim);
 $stmt = sqlsrv_prepare($conn, $query, $params);
+
 if (!$stmt) {
     die(print_r(sqlsrv_errors(), true));
 }
@@ -72,28 +179,49 @@ if (!$result) {
 }
 
 $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
 if ($row === false) {
     die("Gagal mengambil data");
 }
 
-// Mengecek apakah semua status sudah "terverifikasi"
+// Cek apakah semua status adalah 'terverifikasi'
 $allConfirmed =
-    $row['penyerahan_hardcopy'] &&
-    $row['tugas_akhir_softcopy'] &&
-    $row['bebas_pinjam_buku_perpustakaan'] &&
-    $row['hasil_kuisioner'] &&
-    $row['data_alumni'] &&
-    $row['skkm'] &&
-    $row['foto_ijazah'] &&
-    $row['ukt'] &&
-    $row['penyerahan_skripsi'] &&
-    $row['penyerahan_pkl'] &&
-    $row['toeic'] &&
-    $row['bebas_kompen'] &&
-    $row['penyerahan_kebenaran_data'] &&
-    $row['publikasi_jurnal'] &&
-    $row['aplikasi'] &&
-    $row['skripsi'];
+    $row['penyerahan_hardcopy'] === 'terverifikasi' &&
+    $row['tugas_akhir_softcopy'] === 'terverifikasi' &&
+    $row['bebas_pinjam_buku_perpustakaan'] === 'terverifikasi' &&
+    $row['hasil_kuisioner'] === 'terverifikasi' &&
+    $row['data_alumni'] === 'terverifikasi' &&
+    $row['skkm'] === 'terverifikasi' &&
+    $row['foto_ijazah'] === 'terverifikasi' &&
+    $row['ukt'] === 'terverifikasi' &&
+    $row['penyerahan_skripsi'] === 'terverifikasi' &&
+    $row['penyerahan_pkl'] === 'terverifikasi' &&
+    $row['toeic'] === 'terverifikasi' &&
+    $row['bebas_kompen'] === 'terverifikasi' &&
+    $row['penyerahan_kebenaran_data'] === 'terverifikasi' &&
+    $row['publikasi_jurnal'] === 'terverifikasi' &&
+    $row['aplikasi'] === 'terverifikasi' &&
+    $row['skripsi'] === 'terverifikasi';
+
+// Data untuk tabel
+$data = [
+    ["nama_tabel" => "Penyerahan Hardcopy", "status" => $row['penyerahan_hardcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Tugas Akhir Softcopy", "status" => $row['tugas_akhir_softcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Bebas Pinjam Buku", "status" => $row['bebas_pinjam_buku_perpustakaan'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Hasil Kuisioner", "status" => $row['hasil_kuisioner'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Data Alumni", "status" => $row['data_alumni'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "SKKM", "status" => $row['skkm'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Foto Ijazah", "status" => $row['foto_ijazah'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "UKT", "status" => $row['ukt'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Penyerahan Skripsi", "status" => $row['penyerahan_skripsi'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Penyerahan PKL", "status" => $row['penyerahan_pkl'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "TOEIC", "status" => $row['toeic'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Bebas Kompen", "status" => $row['bebas_kompen'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Pernyataan Kebenaran Data", "status" => $row['penyerahan_kebenaran_data'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Publikasi Jurnal", "status" => $row['publikasi_jurnal'], "tempat" => "Jurusan", "link" => "jurusan.php"],
+    ["nama_tabel" => "Aplikasi", "status" => $row['aplikasi'], "tempat" => "Jurusan", "link" => "jurusan.php"],
+    ["nama_tabel" => "Skripsi", "status" => $row['skripsi'], "tempat" => "Jurusan", "link" => "jurusan.php"]
+];
 
 sqlsrv_free_stmt($stmt);
 
@@ -334,6 +462,15 @@ sqlsrv_close($conn);
 
         .card-body {
             padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 320px;
+        }
+
+        .card-body .btn {
+            margin-top: auto;
+            /* Memastikan tombol berada di bawah */
         }
 
         .card-header {
@@ -360,6 +497,35 @@ sqlsrv_close($conn);
             font-size: 18px;
             color: #5a5c69;
             font-weight: normal;
+        }
+
+        /* Mengubah warna latar belakang baris tabel */
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: #fff;
+            /* Lebih gelap dari warna default */
+        }
+
+        table.dataTable tbody tr:nth-child(even) {
+            background-color: #fff;
+            /* Lebih gelap dari warna default */
+        }
+
+        /* Mengubah warna baris yang sedang dipilih */
+        table.dataTable tbody tr.selected {
+            background-color: #d6d6d6 !important;
+            /* Warna ketika baris dipilih */
+        }
+
+        /* Menyesuaikan warna header */
+        table.dataTable thead th {
+            background-color: #4e73df;
+            /* Warna header tabel */
+            color: white;
+        }
+
+        .dataTables_filter {
+            float: right;
+            /* Menempatkan search box ke kanan */
         }
     </style>
 
@@ -495,8 +661,8 @@ sqlsrv_close($conn);
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">
                             Dashboard Mahasiswa -
-                            <span
-                                class="welcome-name">Selamat Datang <?= htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?></span>
+                            <span class="welcome-name">Selamat Datang
+                                <?= htmlspecialchars($resultUser['nama_mahasiswa'] ?? '') ?></span>
                         </h1>
                     </div>
 
@@ -505,7 +671,7 @@ sqlsrv_close($conn);
 
                         <!-- Donut Chart Section -->
                         <div class="col-xl-4 col-lg-4">
-                            <div class="card shadow mb-4">
+                            <div class="card shadow mb-4 ">
                                 <!-- Card Header - Title -->
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Status Bebas Tanggungan</h6>
@@ -522,7 +688,7 @@ sqlsrv_close($conn);
 
                         <!-- Info and Download Section -->
                         <div class="col-xl-4 col-lg-4">
-                            <div class="card shadow mb-4">
+                            <div class="card shadow mb-4  ">
                                 <!-- Card Header -->
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Rekomendasi Pengambilan Transkrip,
@@ -532,13 +698,11 @@ sqlsrv_close($conn);
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <p class="text-gray-600">Untuk mengambil Transkrip, Ijazah, dan SKPI, pastikan Anda
-                                        sudah memenuhi
-                                        seluruh persyaratan yang diperlukan. Jika sudah,
-                                        silakan unduh Surat Rekomendasi Pengambilan Transkrip, Ijazah, dan SKPI di bawah
-                                        ini.</p>
+                                        sudah memenuhi seluruh persyaratan yang diperlukan. Jika sudah, silakan unduh
+                                        Surat Rekomendasi Pengambilan Transkrip, Ijazah, dan SKPI di bawah ini.</p>
 
                                     <!-- Download Button -->
-                                    <button class="btn btn-block" id="downloadButton" disabled>
+                                    <button class="btn btn-primary btn-block" id="downloadButton" disabled>
                                         <i class="fas fa-download"></i> Download
                                     </button>
                                 </div>
@@ -547,7 +711,7 @@ sqlsrv_close($conn);
 
                         <!-- Panduan Alur Bebas Tanggungan -->
                         <div class="col-xl-4 col-lg-4">
-                            <div class="card shadow mb-4">
+                            <div class="card shadow mb-4  ">
                                 <!-- Card Header -->
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Panduan Alur Bebas Tanggungan</h6>
@@ -564,6 +728,70 @@ sqlsrv_close($conn);
                                         class="btn btn-success btn-block" download>
                                         <i class="fas fa-download"></i> Download Panduan
                                     </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Pengumpulan Section -->
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Status Pengumpulan</h6>
+                                </div>
+                                <div class="card-body">
+
+                                    <!-- Filter Dropdown -->
+                                    <select id="statusFilter" class="form-control mb-3" style="width: 200px;">
+                                        <option value="">Filter by Status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="terverifikasi">Terverifikasi</option>
+                                        <option value="belum upload">Belum Upload</option>
+                                        <option value="ditolak">Ditolak</option>
+                                    </select>
+
+                                    <div class="table-responsive">
+                                        <table id="statusPengumpulanTable" class="table table-bordered table-striped"
+                                            width="100%" cellspacing="0">
+                                            <thead class="thead-primary">
+                                                <tr>
+                                                    <th>Nama Berkas</th>
+                                                    <th>Tempat Pengumpulan</th>
+                                                    <th>Status</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($data as $item): ?>
+                                                    <?php
+                                                    $status = strtolower($item['status']);
+                                                    $statusClass = match ($status) {
+                                                        'belum upload' => 'bg-secondary text-white',
+                                                        'pending' => 'bg-warning text-dark',
+                                                        'ditolak' => 'bg-danger text-white',
+                                                        'terverifikasi' => 'bg-success text-white',
+                                                        default => 'bg-light text-dark'
+                                                    };
+                                                    ?>
+                                                    <tr>
+                                                        <td><?= htmlspecialchars($item['nama_tabel']) ?></td>
+                                                        <td><?= htmlspecialchars($item['tempat']) ?></td>
+                                                        <td>
+                                                            <span
+                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase">
+                                                                <?= htmlspecialchars($item['status']) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <a href="<?= htmlspecialchars($item['link']) ?>"
+                                                                class="btn btn-primary btn-sm" target="_blank">
+                                                                Lihat
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -620,20 +848,65 @@ sqlsrv_close($conn);
         </div>
     </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (dari CDN atau file lokal, pilih salah satu saja) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
+    <!-- Bootstrap 5 JS Bundle (termasuk Popper.js) -->
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery Easing Plugin -->
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Custom scripts for all pages-->
+    <!-- sb-admin-2 Script -->
     <script src="../js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Bootstrap 5 JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <!-- Page level plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+
+        $(document).ready(function () {
+            var table = $('#statusPengumpulanTable').DataTable({
+                "ordering": true,
+                "searching": true,
+                "paging": true,
+                "info": true,
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ entri per halaman",
+                    "zeroRecords": "Tidak ada data yang ditemukan",
+                    "info": "Menampilkan _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total entri)",
+                    "search": "Cari:",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Berikutnya",
+                        "previous": "Sebelumnya"
+                    }
+                },
+                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
+                "columnDefs": [
+                    {
+                        "targets": 2,
+                        "type": "num",  // Atur untuk menggunakan urutan numerik
+                        "orderData": [2]
+                    }
+                ]
+            });
+
+            // Filter rows based on the status from the dropdown
+            $('#statusFilter').on('change', function () {
+                var status = $(this).val();
+                table.column(2).search(status).draw(); // Kolom 3 adalah Status
+            });
+        });
 
         fetch('get_persentase.php')
             .then(response => response.json())

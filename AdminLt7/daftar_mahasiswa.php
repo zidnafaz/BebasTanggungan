@@ -373,12 +373,12 @@ $resultUser = $admin->getAdminById($id);
                         "previous": "Sebelumnya"
                     }
                 },
-                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
+                "order": [[3, 'asc']], // Mengurutkan berdasarkan kolom status
                 "columnDefs": [
                     {
-                        "targets": 2,
+                        "targets": 3,
                         "type": "num",  // Atur untuk menggunakan urutan numerik
-                        "orderData": [2]
+                        "orderData": [3]
                     }
                 ]
             });

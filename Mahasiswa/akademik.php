@@ -18,10 +18,10 @@ $resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
 $query = "
     SELECT 
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS data_alumni,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skkm = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skkm,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS foto_ijazah,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_ukt = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS ukt
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_data_alumni = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS data_alumni,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skkm = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skkm,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_foto_ijazah = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS foto_ijazah,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_ukt = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS ukt
     FROM dbo.data_alumni
     LEFT JOIN dbo.skkm ON data_alumni.nim = skkm.nim
     LEFT JOIN dbo.foto_ijazah ON data_alumni.nim = foto_ijazah.nim

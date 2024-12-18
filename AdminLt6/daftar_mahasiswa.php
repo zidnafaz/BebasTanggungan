@@ -215,17 +215,17 @@ $resultUser = $admin->getAdminById($id);
                                     m.nim,
                                     m.nama_mahasiswa,
                                     CASE
-                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' OR pp.status_pengumpulan_penyerahan_pkl = 'ditolak' OR t.status_pengumpulan_toeic = 'ditolak' OR bk.status_pengumpulan_bebas_kompen = 'ditolak' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 'ditolak'
-                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'pending' OR pp.status_pengumpulan_penyerahan_pkl = 'pending' OR t.status_pengumpulan_toeic = 'pending' OR bk.status_pengumpulan_bebas_kompen = 'pending' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 'pending'
-                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' OR pp.status_pengumpulan_penyerahan_pkl = 'belum upload' OR t.status_pengumpulan_toeic = 'belum upload' OR bk.status_pengumpulan_bebas_kompen = 'belum upload' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 'belum upload'
-                                        ELSE 'terverifikasi'
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = '2' OR pp.status_pengumpulan_penyerahan_pkl = '2' OR t.status_pengumpulan_toeic = '2' OR bk.status_pengumpulan_bebas_kompen = '2' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = '2' THEN '2'
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = '1' OR pp.status_pengumpulan_penyerahan_pkl = '1' OR t.status_pengumpulan_toeic = '1' OR bk.status_pengumpulan_bebas_kompen = '1' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = '1' THEN '1'
+                                        WHEN ps.status_pengumpulan_penyerahan_skripsi = '3' OR pp.status_pengumpulan_penyerahan_pkl = '3' OR t.status_pengumpulan_toeic = '3' OR bk.status_pengumpulan_bebas_kompen = '3' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = '3' THEN '3'
+                                        ELSE '4'
                                     END AS status,
                                     CONCAT(
-                                        (CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN pp.status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN t.status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN bk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END),
+                                        (CASE WHEN ps.status_pengumpulan_penyerahan_skripsi = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN pp.status_pengumpulan_penyerahan_pkl = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN t.status_pengumpulan_toeic = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN bk.status_pengumpulan_bebas_kompen = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = '4' THEN 1 ELSE 0 END),
                                         '/5'
                                     ) AS jumlah_verifikasi
                                 FROM 
@@ -240,56 +240,60 @@ $resultUser = $admin->getAdminById($id);
                                     bebas_kompen bk ON m.nim = bk.nim
                                 LEFT JOIN 
                                     penyerahan_kebenaran_data pkd ON m.nim = pkd.nim
-                                ORDER BY 
-                                    CASE 
-                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'pending' OR pp.status_pengumpulan_penyerahan_pkl = 'pending' OR t.status_pengumpulan_toeic = 'pending' OR bk.status_pengumpulan_bebas_kompen = 'pending' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending') THEN 1
-                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' OR pp.status_pengumpulan_penyerahan_pkl = 'ditolak' OR t.status_pengumpulan_toeic = 'ditolak' OR bk.status_pengumpulan_bebas_kompen = 'ditolak' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak') THEN 2
-                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' OR pp.status_pengumpulan_penyerahan_pkl = 'belum upload' OR t.status_pengumpulan_toeic = 'belum upload' OR bk.status_pengumpulan_bebas_kompen = 'belum upload' OR pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload') THEN 3
-                                        WHEN (ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' AND pp.status_pengumpulan_penyerahan_pkl = 'terverifikasi' AND t.status_pengumpulan_toeic = 'terverifikasi' AND bk.status_pengumpulan_bebas_kompen = 'terverifikasi' AND pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi') THEN 4
-                                        ELSE 5
-                                    END ASC";
-                        
+                                ORDER BY status ASC";
+
                                     $stmt = sqlsrv_query($conn, $sql);
                                     if ($stmt === false) {
                                         die(print_r(sqlsrv_errors(), true));
                                     }
 
                                     $no = 1;
-                                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-                                        $nim = $row['nim'];
-                                        $nama = $row['nama_mahasiswa'];
-                                        $status = $row['status'];
-                                        $jumlah_verifikasi = $row['jumlah_verifikasi'];
+                                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)):
+                                        $nim = $row['nim'] ?? '-';
+                                        $nama = $row['nama_mahasiswa'] ?? '-';
+                                        $status = $row['status'] ?? '-';
+                                        $jumlah_verifikasi = $row['jumlah_verifikasi'] ?? 0;
 
                                         // Tentukan kelas badge berdasarkan status
-                                        $statusClass = match (strtolower($status)) {
-                                            'belum upload' => 'bg-secondary text-white',
-                                            'pending' => 'bg-warning text-dark',
-                                            'ditolak' => 'bg-danger text-white',
-                                            'terverifikasi' => 'bg-success text-white',
+                                        $statusClass = match ($status) {
+                                            '3' => 'bg-secondary text-white', // Belum Upload
+                                            '1' => 'bg-warning text-dark',   // Pending
+                                            '2' => 'bg-danger text-white',   // Ditolak
+                                            '4' => 'bg-success text-white',  // Terverifikasi
                                             default => 'bg-light text-dark'
                                         };
 
-                                        echo "<tr>";
-                                        echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . htmlspecialchars($nim) . "</td>";
-                                        echo "<td>" . htmlspecialchars($nama) . "</td>";
-                                        echo "<td class='status'>
-                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                    style='cursor: pointer;'
-                                                    title='" . htmlspecialchars($status) . "'>
-                                                    " . htmlspecialchars($status) . "
+                                        // Tentukan teks status berdasarkan nilai status
+                                        $statusText = match ($status) {
+                                            '3' => 'Belum Upload',
+                                            '1' => 'Pending',
+                                            '2' => 'Ditolak',
+                                            '4' => 'Terverifikasi',
+                                            default => 'Unknown'
+                                        };
+                                        ?>
+                                        <tr>
+                                            <td><?= $no++ ?></td>
+                                            <td><?= htmlspecialchars($nim) ?></td>
+                                            <td><?= htmlspecialchars($nama) ?></td>
+                                            <td class='status'>
+                                                <span class='badge <?= $statusClass ?> p-2 rounded text-uppercase'
+                                                    style='cursor: pointer;' title="<?= htmlspecialchars($statusText) ?>">
+                                                    <?= htmlspecialchars($statusText) ?>
                                                 </span>
-                                            </td>";
-                                        echo "<td>" . htmlspecialchars($jumlah_verifikasi) . "</td>";
-                                        echo "<td><a href='detail_mahasiswa.php?nim=" . urlencode($nim) . "' class='btn btn-primary btn-sm' target='_blank'><i class='fa fa-edit'></i> Detail</a></td>";
-                                        echo "</tr>";
-                                    }
-
-                                    sqlsrv_free_stmt($stmt);
-                                    ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($jumlah_verifikasi) ?></td>
+                                            <td>
+                                                <a href="detail_mahasiswa.php?nim=<?= urlencode($nim) ?>"
+                                                    class="btn btn-primary btn-sm" target="_blank">
+                                                    <i class="fa fa-edit"></i> Detail
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                    <!-- Bebaskan resource statement setelah selesai -->
+                                    <?php sqlsrv_free_stmt($stmt); ?>
                                 </tbody>
-
                             </table>
                         </div>
                     </div>
@@ -378,15 +382,7 @@ $resultUser = $admin->getAdminById($id);
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                },
-                "order": [[3, 'asc']], // Mengurutkan berdasarkan kolom status
-                "columnDefs": [
-                    {
-                        "targets": 3,
-                        "type": "num",  // Atur untuk menggunakan urutan numerik
-                        "orderData": [3]
-                    }
-                ]
+                }
             });
 
             // Filter the rows based on the status from the dropdown

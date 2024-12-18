@@ -17,154 +17,58 @@ $mahasiswa = new Mahasiswa();
 $resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
 $query = "SELECT 
-            p.status_pengumpulan_penyerahan_hardcopy AS penyerahan_hardcopy,
-            t.status_pengumpulan_tugas_akhir_softcopy AS tugas_akhir_softcopy,
-            b.status_pengumpulan_bebas_pinjam_buku_perpustakaan AS bebas_pinjam_buku_perpustakaan,
-            k.status_pengumpulan_hasil_kuisioner AS hasil_kuisioner,
-            d.status_pengumpulan_data_alumni AS data_alumni,
-            s.status_pengumpulan_skkm AS skkm,
-            f.status_pengumpulan_foto_ijazah AS foto_ijazah,
-            u.status_pengumpulan_ukt AS ukt,
-            ps.status_pengumpulan_penyerahan_skripsi AS penyerahan_skripsi,
-            pk.status_pengumpulan_penyerahan_pkl AS penyerahan_pkl,
-            toec.status_pengumpulan_toeic AS toeic,
-            bk.status_pengumpulan_bebas_kompen AS bebas_kompen,
-            pkd.status_pengumpulan_penyerahan_kebenaran_data AS penyerahan_kebenaran_data,
-            pj.status_pengumpulan_publikasi_jurnal AS publikasi_jurnal,
-            a.status_pengumpulan_aplikasi AS aplikasi,
-            sk.status_pengumpulan_skripsi AS skripsi
-        FROM mahasiswa m
-        LEFT JOIN penyerahan_hardcopy p ON m.nim = p.nim
-        LEFT JOIN tugas_akhir_softcopy t ON m.nim = t.nim
-        LEFT JOIN bebas_pinjam_buku_perpustakaan b ON m.nim = b.nim
-        LEFT JOIN hasil_kuisioner k ON m.nim = k.nim
-        LEFT JOIN data_alumni d ON m.nim = d.nim
-        LEFT JOIN skkm s ON m.nim = s.nim
-        LEFT JOIN foto_ijazah f ON m.nim = f.nim
-        LEFT JOIN ukt u ON m.nim = u.nim
-        LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim
-        LEFT JOIN penyerahan_pkl pk ON m.nim = pk.nim
-        LEFT JOIN toeic toec ON m.nim = toec.nim
-        LEFT JOIN bebas_kompen bk ON m.nim = bk.nim
-        LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim
-        LEFT JOIN publikasi_jurnal pj ON m.nim = pj.nim
-        LEFT JOIN aplikasi a ON m.nim = a.nim
-        LEFT JOIN skripsi sk ON m.nim = sk.nim
-        WHERE m.nim = ?
-        ORDER BY 
-        CASE 
-            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'pending' THEN 1
-            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 2
-            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'belum upload' THEN 3
-            WHEN p.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'pending' THEN 1
-            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'ditolak' THEN 2
-            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'belum upload' THEN 3
-            WHEN t.status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' THEN 1
-            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 2
-            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' THEN 3
-            WHEN b.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN k.status_pengumpulan_hasil_kuisioner = 'pending' THEN 1
-            WHEN k.status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 2
-            WHEN k.status_pengumpulan_hasil_kuisioner = 'belum upload' THEN 3
-            WHEN k.status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN d.status_pengumpulan_data_alumni = 'pending' THEN 1
-            WHEN d.status_pengumpulan_data_alumni = 'ditolak' THEN 2
-            WHEN d.status_pengumpulan_data_alumni = 'belum upload' THEN 3
-            WHEN d.status_pengumpulan_data_alumni = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN s.status_pengumpulan_skkm = 'pending' THEN 1
-            WHEN s.status_pengumpulan_skkm = 'ditolak' THEN 2
-            WHEN s.status_pengumpulan_skkm = 'belum upload' THEN 3
-            WHEN s.status_pengumpulan_skkm = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN f.status_pengumpulan_foto_ijazah = 'pending' THEN 1
-            WHEN f.status_pengumpulan_foto_ijazah = 'ditolak' THEN 2
-            WHEN f.status_pengumpulan_foto_ijazah = 'belum upload' THEN 3
-            WHEN f.status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN u.status_pengumpulan_ukt = 'pending' THEN 1
-            WHEN u.status_pengumpulan_ukt = 'ditolak' THEN 2
-            WHEN u.status_pengumpulan_ukt = 'belum upload' THEN 3
-            WHEN u.status_pengumpulan_ukt = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'pending' THEN 1
-            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'ditolak' THEN 2
-            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'belum upload' THEN 3
-            WHEN ps.status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN pk.status_pengumpulan_penyerahan_pkl = 'pending' THEN 1
-            WHEN pk.status_pengumpulan_penyerahan_pkl = 'ditolak' THEN 2
-            WHEN pk.status_pengumpulan_penyerahan_pkl = 'belum upload' THEN 3
-            WHEN pk.status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN toec.status_pengumpulan_toeic = 'pending' THEN 1
-            WHEN toec.status_pengumpulan_toeic = 'ditolak' THEN 2
-            WHEN toec.status_pengumpulan_toeic = 'belum upload' THEN 3
-            WHEN toec.status_pengumpulan_toeic = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN bk.status_pengumpulan_bebas_kompen = 'pending' THEN 1
-            WHEN bk.status_pengumpulan_bebas_kompen = 'ditolak' THEN 2
-            WHEN bk.status_pengumpulan_bebas_kompen = 'belum upload' THEN 3
-            WHEN bk.status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 1
-            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 2
-            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 3
-            WHEN pkd.status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN pj.status_pengumpulan_publikasi_jurnal = 'pending' THEN 1
-            WHEN pj.status_pengumpulan_publikasi_jurnal = 'ditolak' THEN 2
-            WHEN pj.status_pengumpulan_publikasi_jurnal = 'belum upload' THEN 3
-            WHEN pj.status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN a.status_pengumpulan_aplikasi = 'pending' THEN 1
-            WHEN a.status_pengumpulan_aplikasi = 'ditolak' THEN 2
-            WHEN a.status_pengumpulan_aplikasi = 'belum upload' THEN 3
-            WHEN a.status_pengumpulan_aplikasi = 'terverifikasi' THEN 4
-            ELSE 5
-        END,
-        CASE 
-            WHEN sk.status_pengumpulan_skripsi = 'pending' THEN 1
-            WHEN sk.status_pengumpulan_skripsi = 'ditolak' THEN 2
-            WHEN sk.status_pengumpulan_skripsi = 'belum upload' THEN 3
-            WHEN sk.status_pengumpulan_skripsi = 'terverifikasi' THEN 4
-            ELSE 5
-        END
-    ";
+    pj.status_pengumpulan_publikasi_jurnal AS publikasi_jurnal,
+    a.status_pengumpulan_aplikasi AS aplikasi,
+    sk.status_pengumpulan_skripsi AS skripsi,
+    ps.status_pengumpulan_penyerahan_skripsi AS penyerahan_skripsi,
+    pk.status_pengumpulan_penyerahan_pkl AS penyerahan_pkl,
+    toec.status_pengumpulan_toeic AS toeic,
+    bk.status_pengumpulan_bebas_kompen AS bebas_kompen,
+    pkd.status_pengumpulan_penyerahan_kebenaran_data AS penyerahan_kebenaran_data,
+    d.status_pengumpulan_data_alumni AS data_alumni,
+    s.status_pengumpulan_skkm AS skkm,
+    f.status_pengumpulan_foto_ijazah AS foto_ijazah,
+    u.status_pengumpulan_ukt AS ukt,
+    p.status_pengumpulan_penyerahan_hardcopy AS penyerahan_hardcopy,
+    t.status_pengumpulan_tugas_akhir_softcopy AS tugas_akhir_softcopy,
+    b.status_pengumpulan_bebas_pinjam_buku_perpustakaan AS bebas_pinjam_buku_perpustakaan,
+    k.status_pengumpulan_hasil_kuisioner AS hasil_kuisioner
+FROM mahasiswa m
+LEFT JOIN publikasi_jurnal pj ON m.nim = pj.nim
+LEFT JOIN aplikasi a ON m.nim = a.nim
+LEFT JOIN skripsi sk ON m.nim = sk.nim
+LEFT JOIN penyerahan_skripsi ps ON m.nim = ps.nim
+LEFT JOIN penyerahan_pkl pk ON m.nim = pk.nim
+LEFT JOIN toeic toec ON m.nim = toec.nim
+LEFT JOIN bebas_kompen bk ON m.nim = bk.nim
+LEFT JOIN penyerahan_kebenaran_data pkd ON m.nim = pkd.nim
+LEFT JOIN data_alumni d ON m.nim = d.nim
+LEFT JOIN skkm s ON m.nim = s.nim
+LEFT JOIN foto_ijazah f ON m.nim = f.nim
+LEFT JOIN ukt u ON m.nim = u.nim
+LEFT JOIN penyerahan_hardcopy p ON m.nim = p.nim
+LEFT JOIN tugas_akhir_softcopy t ON m.nim = t.nim
+LEFT JOIN bebas_pinjam_buku_perpustakaan b ON m.nim = b.nim
+LEFT JOIN hasil_kuisioner k ON m.nim = k.nim
+WHERE m.nim = ?
+ORDER BY 
+    CAST(pj.status_pengumpulan_publikasi_jurnal AS INT) ASC,
+    CAST(a.status_pengumpulan_aplikasi AS INT) ASC,
+    CAST(sk.status_pengumpulan_skripsi AS INT) ASC,
+    CAST(ps.status_pengumpulan_penyerahan_skripsi AS INT) ASC,
+    CAST(pk.status_pengumpulan_penyerahan_pkl AS INT) ASC,
+    CAST(toec.status_pengumpulan_toeic AS INT) ASC,
+    CAST(bk.status_pengumpulan_bebas_kompen AS INT) ASC,
+    CAST(pkd.status_pengumpulan_penyerahan_kebenaran_data AS INT) ASC,
+    CAST(d.status_pengumpulan_data_alumni AS INT) ASC,
+    CAST(s.status_pengumpulan_skkm AS INT) ASC,
+    CAST(f.status_pengumpulan_foto_ijazah AS INT) ASC,
+    CAST(u.status_pengumpulan_ukt AS INT) ASC,
+    CAST(p.status_pengumpulan_penyerahan_hardcopy AS INT) ASC,
+    CAST(t.status_pengumpulan_tugas_akhir_softcopy AS INT) ASC,
+    CAST(b.status_pengumpulan_bebas_pinjam_buku_perpustakaan AS INT) ASC,
+    CAST(k.status_pengumpulan_hasil_kuisioner AS INT) ASC;
+";
 
 $params = array($nim);
 $stmt = sqlsrv_prepare($conn, $query, $params);
@@ -184,44 +88,49 @@ if ($row === false) {
     die("Gagal mengambil data");
 }
 
-// Cek apakah semua status adalah 'terverifikasi'
-$allConfirmed =
-    $row['penyerahan_hardcopy'] === 'terverifikasi' &&
-    $row['tugas_akhir_softcopy'] === 'terverifikasi' &&
-    $row['bebas_pinjam_buku_perpustakaan'] === 'terverifikasi' &&
-    $row['hasil_kuisioner'] === 'terverifikasi' &&
-    $row['data_alumni'] === 'terverifikasi' &&
-    $row['skkm'] === 'terverifikasi' &&
-    $row['foto_ijazah'] === 'terverifikasi' &&
-    $row['ukt'] === 'terverifikasi' &&
-    $row['penyerahan_skripsi'] === 'terverifikasi' &&
-    $row['penyerahan_pkl'] === 'terverifikasi' &&
-    $row['toeic'] === 'terverifikasi' &&
-    $row['bebas_kompen'] === 'terverifikasi' &&
-    $row['penyerahan_kebenaran_data'] === 'terverifikasi' &&
-    $row['publikasi_jurnal'] === 'terverifikasi' &&
-    $row['aplikasi'] === 'terverifikasi' &&
-    $row['skripsi'] === 'terverifikasi';
-
-// Data untuk tabel
+// Data tabel
 $data = [
-    ["nama_tabel" => "Penyerahan Hardcopy", "status" => $row['penyerahan_hardcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
-    ["nama_tabel" => "Tugas Akhir Softcopy", "status" => $row['tugas_akhir_softcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
-    ["nama_tabel" => "Bebas Pinjam Buku", "status" => $row['bebas_pinjam_buku_perpustakaan'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
-    ["nama_tabel" => "Hasil Kuisioner", "status" => $row['hasil_kuisioner'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
-    ["nama_tabel" => "Data Alumni", "status" => $row['data_alumni'], "tempat" => "Akademik", "link" => "akademik.php"],
-    ["nama_tabel" => "SKKM", "status" => $row['skkm'], "tempat" => "Akademik", "link" => "akademik.php"],
-    ["nama_tabel" => "Foto Ijazah", "status" => $row['foto_ijazah'], "tempat" => "Akademik", "link" => "akademik.php"],
-    ["nama_tabel" => "UKT", "status" => $row['ukt'], "tempat" => "Akademik", "link" => "akademik.php"],
-    ["nama_tabel" => "Penyerahan Skripsi", "status" => $row['penyerahan_skripsi'], "tempat" => "Prodi", "link" => "prodi.php"],
-    ["nama_tabel" => "Penyerahan PKL", "status" => $row['penyerahan_pkl'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Publikasi Jurnal", "status" => $row['publikasi_jurnal'], "tempat" => "Jurusan", "link" => "jurusan.php"],
+    ["nama_tabel" => "Aplikasi", "status" => $row['aplikasi'], "tempat" => "Jurusan", "link" => "jurusan.php"],
+    ["nama_tabel" => "Skripsi", "status" => $row['skripsi'], "tempat" => "Jurusan", "link" => "jurusan.php"],
+    ["nama_tabel" => "Penyerahan Laporan Skripsi", "status" => $row['penyerahan_skripsi'], "tempat" => "Prodi", "link" => "prodi.php"],
+    ["nama_tabel" => "Penyerahan Laporan PKL", "status" => $row['penyerahan_pkl'], "tempat" => "Prodi", "link" => "prodi.php"],
     ["nama_tabel" => "TOEIC", "status" => $row['toeic'], "tempat" => "Prodi", "link" => "prodi.php"],
     ["nama_tabel" => "Bebas Kompen", "status" => $row['bebas_kompen'], "tempat" => "Prodi", "link" => "prodi.php"],
     ["nama_tabel" => "Pernyataan Kebenaran Data", "status" => $row['penyerahan_kebenaran_data'], "tempat" => "Prodi", "link" => "prodi.php"],
-    ["nama_tabel" => "Publikasi Jurnal", "status" => $row['publikasi_jurnal'], "tempat" => "Jurusan", "link" => "jurusan.php"],
-    ["nama_tabel" => "Aplikasi", "status" => $row['aplikasi'], "tempat" => "Jurusan", "link" => "jurusan.php"],
-    ["nama_tabel" => "Skripsi", "status" => $row['skripsi'], "tempat" => "Jurusan", "link" => "jurusan.php"]
+    ["nama_tabel" => "Bukti Pengisian Data Alumni", "status" => $row['data_alumni'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Bukti Memenuhi SKKM", "status" => $row['skkm'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Bukti Upload Foto Ijazah", "status" => $row['foto_ijazah'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Bukti Lunas UKT", "status" => $row['ukt'], "tempat" => "Akademik", "link" => "akademik.php"],
+    ["nama_tabel" => "Bukti Penyerahan Hardcopy Skripsi", "status" => $row['penyerahan_hardcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Bukti Upload Softcopy Skripsi", "status" => $row['tugas_akhir_softcopy'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Bukti Bebas Pinjam Buku Perpustakaan", "status" => $row['bebas_pinjam_buku_perpustakaan'], "tempat" => "Perpustakaan", "link" => "grapol.php"],
+    ["nama_tabel" => "Bukti Pengisian Kuisioner", "status" => $row['hasil_kuisioner'], "tempat" => "Perpustakaan", "link" => "grapol.php"]
 ];
+
+// Fungsi untuk mengurutkan berdasarkan status (1, 2, 3, 4)
+usort($data, function ($a, $b) {
+    return $a['status'] - $b['status']; // Mengurutkan berdasarkan status numerik
+});
+
+// Cek apakah semua status adalah 'terverifikasi'
+$allConfirmed =
+    $row['penyerahan_hardcopy'] === '4' &&
+    $row['tugas_akhir_softcopy'] === '4' &&
+    $row['bebas_pinjam_buku_perpustakaan'] === '4' &&
+    $row['hasil_kuisioner'] === '4' &&
+    $row['data_alumni'] === '4' &&
+    $row['skkm'] === '4' &&
+    $row['foto_ijazah'] === '4' &&
+    $row['ukt'] === '4' &&
+    $row['penyerahan_skripsi'] === '4' &&
+    $row['penyerahan_pkl'] === '4' &&
+    $row['toeic'] === '4' &&
+    $row['bebas_kompen'] === '4' &&
+    $row['penyerahan_kebenaran_data'] === '4' &&
+    $row['publikasi_jurnal'] === '4' &&
+    $row['aplikasi'] === '4' &&
+    $row['skripsi'] === '4';
 
 sqlsrv_free_stmt($stmt);
 
@@ -323,6 +232,9 @@ sqlsrv_close($conn);
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
     <script type="module">
         import {
@@ -702,7 +614,7 @@ sqlsrv_close($conn);
                                         Surat Rekomendasi Pengambilan Transkrip, Ijazah, dan SKPI di bawah ini.</p>
 
                                     <!-- Download Button -->
-                                    <button class="btn btn-primary btn-block" id="downloadButton" disabled>
+                                    <button class="btn btn-secondary btn-block" id="downloadButton" disabled>
                                         <i class="fas fa-download"></i> Download
                                     </button>
                                 </div>
@@ -754,6 +666,7 @@ sqlsrv_close($conn);
                                             width="100%" cellspacing="0">
                                             <thead class="thead-primary">
                                                 <tr>
+                                                    <th>No</th>
                                                     <th>Nama Berkas</th>
                                                     <th>Tempat Pengumpulan</th>
                                                     <th>Status</th>
@@ -761,30 +674,36 @@ sqlsrv_close($conn);
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($data as $item): ?>
+                                                <?php foreach ($data as $index => $item): ?>
                                                     <?php
-                                                    $status = strtolower($item['status']);
+                                                    // Menentukan kelas dan teks status berdasarkan nilai
+                                                    $status = $item['status'];
                                                     $statusClass = match ($status) {
-                                                        'belum upload' => 'bg-secondary text-white',
-                                                        'pending' => 'bg-warning text-dark',
-                                                        'ditolak' => 'bg-danger text-white',
-                                                        'terverifikasi' => 'bg-success text-white',
-                                                        default => 'bg-light text-dark'
+                                                        '1' => ['status' => 'pending', 'class' => 'bg-warning text-dark'],
+                                                        '2' => ['status' => 'ditolak', 'class' => 'bg-danger text-white'],
+                                                        '3' => ['status' => 'belum upload', 'class' => 'bg-secondary text-white'],
+                                                        '4' => ['status' => 'terverifikasi', 'class' => 'bg-success text-white'],
+                                                        default => ['status' => 'unknown', 'class' => 'bg-light text-dark'],
                                                     };
+
+                                                    // Ambil status teks dan kelas yang sesuai
+                                                    $statusText = $statusClass['status'];
+                                                    $statusBadgeClass = $statusClass['class'];
                                                     ?>
                                                     <tr>
+                                                        <td><?= $index + 1 ?></td> <!-- Menambahkan kolom nomor urut -->
                                                         <td><?= htmlspecialchars($item['nama_tabel']) ?></td>
                                                         <td><?= htmlspecialchars($item['tempat']) ?></td>
                                                         <td>
                                                             <span
-                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase">
-                                                                <?= htmlspecialchars($item['status']) ?>
+                                                                class="badge <?= $statusBadgeClass ?> p-2 rounded text-uppercase">
+                                                                <?= htmlspecialchars($statusText) ?>
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <a href="<?= htmlspecialchars($item['link']) ?>"
-                                                                class="btn btn-primary btn-sm" target="_blank">
-                                                                Lihat
+                                                                class="btn btn-primary btn-sm">
+                                                                <i class="fa-solid fa-up-right-from-square"></i> Lihat
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -873,7 +792,7 @@ sqlsrv_close($conn);
 
         $(document).ready(function () {
             var table = $('#statusPengumpulanTable').DataTable({
-                "ordering": true,
+                "ordering": false,
                 "searching": true,
                 "paging": true,
                 "info": true,
@@ -891,20 +810,14 @@ sqlsrv_close($conn);
                         "previous": "Sebelumnya"
                     }
                 },
-                "order": [[2, 'asc']], // Mengurutkan berdasarkan kolom status
-                "columnDefs": [
-                    {
-                        "targets": 2,
-                        "type": "num",  // Atur untuk menggunakan urutan numerik
-                        "orderData": [2]
-                    }
-                ]
+                "pageLength": 25, // Mengubah jumlah data yang ditampilkan per halaman menjadi 25
+                "lengthMenu": [10, 25, 50, 100] // Menentukan pilihan jumlah entri yang bisa dipilih oleh pengguna
             });
 
             // Filter rows based on the status from the dropdown
             $('#statusFilter').on('change', function () {
                 var status = $(this).val();
-                table.column(2).search(status).draw(); // Kolom 3 adalah Status
+                table.column(3).search(status).draw(); // Kolom 3 adalah Status
             });
         });
 

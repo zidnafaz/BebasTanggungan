@@ -24,13 +24,17 @@ if (isset($_SESSION['id'])) {
         }
 
         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            $statusClass = match ($row['status']) {
-                'belum upload' => 'bg-secondary text-white',
-                'pending' => 'bg-warning text-dark',
-                'ditolak' => 'bg-danger text-white',
-                'terverifikasi' => 'bg-success text-white',
-                default => 'bg-light text-dark'
+            $statusClassMap = match ($row['status']) {
+                '1' => ['status' => 'pending', 'class' => 'bg-warning text-dark'],
+                '2' => ['status' => 'ditolak', 'class' => 'bg-danger text-white'],
+                '3' => ['status' => 'belum upload', 'class' => 'bg-secondary text-white'],
+                '4' => ['status' => 'terverifikasi', 'class' => 'bg-success text-white'],
+                default => ['status' => 'unknown', 'class' => 'bg-light text-dark'],
             };
+
+            // Ambil status dan class
+            $statusText = $statusClassMap['status'];
+            $statusClass = $statusClassMap['class'];
 
             // Tentukan file download berdasarkan key
             $filePath = '../Documents/Uploads/' . $key . '/' . $nim . '_' . basename($key) . '.pdf'; // Sesuaikan dengan ekstensi file yang diharapkan (misal .pdf)
@@ -38,7 +42,7 @@ if (isset($_SESSION['id'])) {
             $uploadButton = '';
 
             // Tombol Upload: aktif jika status 'belum upload' atau 'ditolak', disabled jika status lainnya
-            if ($row['status'] === 'belum upload' || $row['status'] === 'ditolak') {
+            if (in_array($row['status'], ['3', '2'])) { // '3' untuk 'belum upload', '2' untuk 'ditolak'
                 $uploadButton = "<button onclick=\"setUploadDir('{$key}')\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#uploadModal\">
                                     <i class=\"fas fa-solid fa-cloud-arrow-up\"></i> Upload 
                                   </button>";
@@ -47,7 +51,7 @@ if (isset($_SESSION['id'])) {
             }
 
             // Tombol Download: aktif jika statusnya 'pending', 'ditolak', atau 'terverifikasi', dan file ada
-            if (in_array($row['status'], ['pending', 'ditolak', 'terverifikasi']) && file_exists($filePath)) {
+            if (in_array($row['status'], ['1', '2', '4']) && file_exists($filePath)) { // '1', '2', '4' sesuai status
                 $downloadButton = "<a href='{$filePath}' class='btn btn-success btn-sm' download>
                                     <i class='fas fa-download'></i> Download
                                   </a>";
@@ -58,8 +62,8 @@ if (isset($_SESSION['id'])) {
             echo "<tr>
                 <td>{$no}</td>
                 <td>{$row['nama']}</td>
-                <td><span class='badge {$statusClass} p-2 rounded text-uppercase fs-5' style='cursor: pointer;' title='{$row['status']}'>
-                        {$row['status']}
+                <td><span class='badge {$statusClass} p-2 rounded text-uppercase fs-5' style='cursor: pointer;' title='{$statusText}'>
+                        {$statusText}
                     </span></td>
                 <td>{$row['keterangan']}</td>
                 <td>{$uploadButton} {$downloadButton}</td>

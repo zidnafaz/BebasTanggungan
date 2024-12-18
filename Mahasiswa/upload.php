@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Update status pengumpulan tugas akhir menjadi 'pending'
             $updateSql = "UPDATE penyerahan_hardcopy
-                          SET status_pengumpulan_penyerahan_hardcopy = 'pending', 
+                          SET status_pengumpulan_penyerahan_hardcopy = '1', 
                               keterangan_pengumpulan_penyerahan_hardcopy = 'Menunggu Proses Verifikasi',
                               judul_tugas_akhir = ?
                           WHERE nim = ?";
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             // Update status untuk tabel lainnya
             $sql = "UPDATE {$tableName} 
-                    SET status_pengumpulan_{$directoryLabel} = 'pending', 
+                    SET status_pengumpulan_{$directoryLabel} = '1', 
                         keterangan_pengumpulan_{$directoryLabel} = 'Menunggu Proses Verifikasi' 
                     WHERE nim = ?";
             $params = [$id];

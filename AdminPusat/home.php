@@ -18,52 +18,54 @@ $id = $_SESSION['id'];
 $admin = new Admin();
 $resultUser = $admin->getAdminById($id);
 
-// Query untuk total mahasiswa
-$uktQuery = "
-    SELECT 
-        COUNT(CASE WHEN status_pengumpulan_ukt = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_ukt = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_ukt = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_ukt = 'ditolak' THEN 1 END) AS ditolak
-    FROM ukt;
-";
-$uktResult = sqlsrv_query($conn, $uktQuery);
-$uktRow = sqlsrv_fetch_array($uktResult, SQLSRV_FETCH_ASSOC);
-
-// Query untuk Penyerahan skkm
-$skkmQuery = "
-    SELECT 
-        COUNT(CASE WHEN status_pengumpulan_skkm = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_skkm = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_skkm = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_skkm = 'ditolak' THEN 1 END) AS ditolak
-    FROM skkm;
-";
-$skkmResult = sqlsrv_query($conn, $skkmQuery);
-$skkmRow = sqlsrv_fetch_array($skkmResult, SQLSRV_FETCH_ASSOC);
-
-// Query untuk Penyerahan data_alumni
+// Query untuk data_alumni
 $data_alumniQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_data_alumni = 'ditolak' THEN 1 END) AS ditolak
+        COUNT(CASE WHEN status_pengumpulan_data_alumni = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_data_alumni = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_data_alumni = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_data_alumni = '2' THEN 1 END) AS ditolak
     FROM data_alumni;
 ";
 $data_alumniResult = sqlsrv_query($conn, $data_alumniQuery);
 $data_alumniRow = sqlsrv_fetch_array($data_alumniResult, SQLSRV_FETCH_ASSOC);
 
+// Query untuk skkm
+$skkmQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_skkm = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_skkm = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_skkm = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_skkm = '2' THEN 1 END) AS ditolak
+    FROM skkm;
+";
+$skkmResult = sqlsrv_query($conn, $skkmQuery);
+$skkmRow = sqlsrv_fetch_array($skkmResult, SQLSRV_FETCH_ASSOC);
+
+// Query untuk foto_ijazah
 $foto_ijazahQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = 'ditolak' THEN 1 END) AS ditolak
+        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_foto_ijazah = '2' THEN 1 END) AS ditolak
     FROM foto_ijazah;
 ";
 $foto_ijazahResult = sqlsrv_query($conn, $foto_ijazahQuery);
 $foto_ijazahRow = sqlsrv_fetch_array($foto_ijazahResult, SQLSRV_FETCH_ASSOC);
+
+// Query untuk ukt
+$uktQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_ukt = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_ukt = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_ukt = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_ukt = '2' THEN 1 END) AS ditolak
+    FROM ukt;
+";
+$uktResult = sqlsrv_query($conn, $uktQuery);
+$uktRow = sqlsrv_fetch_array($uktResult, SQLSRV_FETCH_ASSOC);
+
 sqlsrv_close($conn);
 ?>
 
@@ -249,50 +251,50 @@ sqlsrv_close($conn);
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $statuses = ['terverifikasi', 'pending', 'belum_upload', 'ditolak'];
-                                                foreach ($statuses as $status) {
-                                                    // Menentukan kelas badge berdasarkan status
-                                                    $statusClass = '';
-                                                    switch ($status) {
-                                                        case 'terverifikasi':
-                                                            $statusClass = 'badge-success';
-                                                            break;
-                                                        case 'pending':
-                                                            $statusClass = 'badge-warning';
-                                                            break;
-                                                        case 'belum_upload':
-                                                            $statusClass = 'badge-secondary';
-                                                            break;
-                                                        case 'ditolak':
-                                                            $statusClass = 'badge-danger';
-                                                            break;
-                                                    }
+                                                // Data status
+                                                $statuses = [
+                                                    '4' => 'Terverifikasi',
+                                                    '1' => 'Pending',
+                                                    '3' => 'Belum Upload',
+                                                    '2' => 'Ditolak'
+                                                ];
 
+                                                // Mapping status ke class CSS
+                                                $statusClasses = [
+                                                    '4' => 'badge-success',
+                                                    '1' => 'badge-warning',
+                                                    '3' => 'badge-secondary',
+                                                    '2' => 'badge-danger'
+                                                ];
+
+                                                foreach ($statuses as $status => $statusText): ?>
+                                                    <?php
                                                     // Data tiap dokumen
-                                                    $ukt = $uktRow[$status] ?? 0;
-                                                    $skkm = $skkmRow[$status] ?? 0;
-                                                    $data_alumni = $data_alumniRow[$status] ?? 0;
-                                                    $foto_ijazah = $foto_ijazahRow[$status] ?? 0;
+                                                    $data_alumni = $data_alumniRow[strtolower($statusText)] ?? 0;
+                                                    $skkm = $skkmRow[strtolower($statusText)] ?? 0;
+                                                    $foto_ijazah = $foto_ijazahRow[strtolower($statusText)] ?? 0;
+                                                    $ukt = $uktRow[strtolower($statusText)] ?? 0;
+                                                    $total = $data_alumni + $skkm + $foto_ijazah + $ukt;
 
-                                                    $total = $ukt + $skkm + $data_alumni + $foto_ijazah;
-
-                                                    echo "<tr>
-                                                            <td class='status'>
-                                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                                    style='cursor: pointer;'
-                                                                    title='" . htmlspecialchars($status) . "'>
-                                                                    " . htmlspecialchars($status) . "
-                                                                </span>
-                                                            </td>
-                                                            <td>$data_alumni</td>
-                                                            <td>$skkm</td>
-                                                            <td>$foto_ijazah</td>
-                                                            <td>$ukt</td>
-                                                            <td><strong>$total</strong></td>
-                                                            
-                                                        </tr>";
-                                                }
-                                                ?>
+                                                    // Tentukan class CSS untuk badge
+                                                    $statusClass = $statusClasses[$status] ?? 'badge-light';
+                                                    ?>
+                                                    <tr>
+                                                        <td class="status">
+                                                            <span
+                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                                style="cursor: pointer;"
+                                                                title="<?= htmlspecialchars($statusText) ?>">
+                                                                <?= htmlspecialchars($statusText) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td><?= $data_alumni ?></td>
+                                                        <td><?= $skkm ?></td>
+                                                        <td><?= $foto_ijazah ?></td>
+                                                        <td><?= $ukt ?></td>
+                                                        <td><strong><?= $total ?></strong></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>

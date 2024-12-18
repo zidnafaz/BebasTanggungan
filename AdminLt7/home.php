@@ -21,39 +21,38 @@ $resultUser = $admin->getAdminById($id);
 // Query untuk publikasi_jurnal
 $publikasi_jurnalQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_publikasi_jurnal = '2' THEN 1 END) AS ditolak
     FROM publikasi_jurnal;
 ";
 $publikasi_jurnalResult = sqlsrv_query($conn, $publikasi_jurnalQuery);
 $publikasi_jurnalRow = sqlsrv_fetch_array($publikasi_jurnalResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan aplikasi
+// Query untuk aplikasi
 $aplikasiQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_aplikasi = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_aplikasi = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_aplikasi = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_aplikasi = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_aplikasi = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_aplikasi = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_aplikasi = '2' THEN 1 END) AS ditolak
     FROM aplikasi;
 ";
 $aplikasiResult = sqlsrv_query($conn, $aplikasiQuery);
 $aplikasiRow = sqlsrv_fetch_array($aplikasiResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan skripsi
+// Query untuk skripsi
 $skripsiQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_skripsi = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_skripsi = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_skripsi = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_skripsi = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_skripsi = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_skripsi = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_skripsi = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_skripsi = '2' THEN 1 END) AS ditolak
     FROM skripsi;
 ";
 $skripsiResult = sqlsrv_query($conn, $skripsiQuery);
 $skripsiRow = sqlsrv_fetch_array($skripsiResult, SQLSRV_FETCH_ASSOC);
-
 
 sqlsrv_close($conn);
 ?>
@@ -241,46 +240,48 @@ sqlsrv_close($conn);
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $statuses = ['terverifikasi', 'pending', 'belum_upload', 'ditolak'];
-                                                foreach ($statuses as $status) {
-                                                    // Menentukan kelas badge berdasarkan status
-                                                    $statusClass = '';
-                                                    switch ($status) {
-                                                        case 'terverifikasi':
-                                                            $statusClass = 'badge-success';
-                                                            break;
-                                                        case 'pending':
-                                                            $statusClass = 'badge-warning';
-                                                            break;
-                                                        case 'belum_upload':
-                                                            $statusClass = 'badge-secondary';
-                                                            break;
-                                                        case 'ditolak':
-                                                            $statusClass = 'badge-danger';
-                                                            break;
-                                                    }
+                                                // Data status
+                                                $statuses = [
+                                                    '4' => 'Terverifikasi',
+                                                    '1' => 'Pending',
+                                                    '3' => 'Belum Upload',
+                                                    '2' => 'Ditolak'
+                                                ];
 
+                                                // Mapping status ke class CSS
+                                                $statusClasses = [
+                                                    '4' => 'badge-success',
+                                                    '1' => 'badge-warning',
+                                                    '3' => 'badge-secondary',
+                                                    '2' => 'badge-danger'
+                                                ];
+
+                                                foreach ($statuses as $status => $statusText): ?>
+                                                    <?php
                                                     // Data tiap dokumen
-                                                    $aplikasi = $aplikasiRow[$status] ?? 0;
-                                                    $skripsi = $skripsiRow[$status] ?? 0;
-                                                    $publikasi_jurnal = $publikasi_jurnalRow[$status] ?? 0;
+                                                    $aplikasi = $aplikasiRow[strtolower($statusText)] ?? 0;
+                                                    $skripsi = $skripsiRow[strtolower($statusText)] ?? 0;
+                                                    $publikasi_jurnal = $publikasi_jurnalRow[strtolower($statusText)] ?? 0;
                                                     $total = $aplikasi + $skripsi + $publikasi_jurnal;
 
-                                                    echo "<tr>
-                                                            <td class='status'>
-                                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                                    style='cursor: pointer;'
-                                                                    title='" . htmlspecialchars($status) . "'>
-                                                                    " . htmlspecialchars($status) . "
-                                                                </span>
-                                                            </td>
-                                                            <td>$aplikasi</td>
-                                                            <td>$skripsi</td>
-                                                            <td>$publikasi_jurnal</td>
-                                                            <td><strong>$total</strong></td>
-                                                        </tr>";
-                                                }
-                                                ?>
+                                                    // Tentukan class CSS untuk badge
+                                                    $statusClass = $statusClasses[$status] ?? 'badge-light';
+                                                    ?>
+                                                    <tr>
+                                                        <td class="status">
+                                                            <span
+                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                                style="cursor: pointer;"
+                                                                title="<?= htmlspecialchars($statusText) ?>">
+                                                                <?= htmlspecialchars($statusText) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td><?= $aplikasi ?></td>
+                                                        <td><?= $skripsi ?></td>
+                                                        <td><?= $publikasi_jurnal ?></td>
+                                                        <td><strong><?= $total ?></strong></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>

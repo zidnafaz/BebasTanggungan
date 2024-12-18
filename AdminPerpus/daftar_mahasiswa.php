@@ -215,16 +215,16 @@ $resultUser = $admin->getAdminById($id);
                                     m.nim,
                                     m.nama_mahasiswa,
                                     CASE
-                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'ditolak' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'ditolak' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' OR hk.status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 'ditolak'
-                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'pending' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'pending' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' OR hk.status_pengumpulan_hasil_kuisioner = 'pending' THEN 'pending'
-                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'belum upload' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'belum upload' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' OR hk.status_pengumpulan_hasil_kuisioner = 'belum upload' THEN 'belum upload'
-                                        ELSE 'terverifikasi'
+                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = '2' OR tas.status_pengumpulan_tugas_akhir_softcopy = '2' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = '2' OR hk.status_pengumpulan_hasil_kuisioner = '2' THEN '2'
+                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = '1' OR tas.status_pengumpulan_tugas_akhir_softcopy = '1' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = '1' OR hk.status_pengumpulan_hasil_kuisioner = '1' THEN '1'
+                                        WHEN ph.status_pengumpulan_penyerahan_hardcopy = '3' OR tas.status_pengumpulan_tugas_akhir_softcopy = '3' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = '3' OR hk.status_pengumpulan_hasil_kuisioner = '3' THEN '3'
+                                        ELSE '4'
                                     END AS status,
                                     CONCAT(
-                                        (CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 ELSE 0 END +
-                                        CASE WHEN hk.status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 ELSE 0 END),
+                                        (CASE WHEN ph.status_pengumpulan_penyerahan_hardcopy = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN tas.status_pengumpulan_tugas_akhir_softcopy = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = '4' THEN 1 ELSE 0 END +
+                                        CASE WHEN hk.status_pengumpulan_hasil_kuisioner = '4' THEN 1 ELSE 0 END),
                                         '/4'
                                     ) AS jumlah_verifikasi
                                 FROM 
@@ -237,56 +237,60 @@ $resultUser = $admin->getAdminById($id);
                                     bebas_pinjam_buku_perpustakaan bp ON m.nim = bp.nim
                                 LEFT JOIN 
                                     hasil_kuisioner hk ON m.nim = hk.nim
-                                ORDER BY 
-                                    CASE 
-                                        WHEN (ph.status_pengumpulan_penyerahan_hardcopy = 'pending' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'pending' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' OR hk.status_pengumpulan_hasil_kuisioner = 'pending') THEN 1
-                                        WHEN (ph.status_pengumpulan_penyerahan_hardcopy = 'ditolak' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'ditolak' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' OR hk.status_pengumpulan_hasil_kuisioner = 'ditolak') THEN 2
-                                        WHEN (ph.status_pengumpulan_penyerahan_hardcopy = 'belum upload' OR tas.status_pengumpulan_tugas_akhir_softcopy = 'belum upload' OR bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' OR hk.status_pengumpulan_hasil_kuisioner = 'belum upload') THEN 3
-                                        WHEN (ph.status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' AND tas.status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' AND bp.status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' AND hk.status_pengumpulan_hasil_kuisioner = 'terverifikasi') THEN 4
-                                        ELSE 5
-                                    END ASC";                        
-                        
+                                ORDER BY status ASC";
+
                                     $stmt = sqlsrv_query($conn, $sql);
                                     if ($stmt === false) {
                                         die(print_r(sqlsrv_errors(), true));
                                     }
 
                                     $no = 1;
-                                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-                                        $nim = $row['nim'];
-                                        $nama = $row['nama_mahasiswa'];
-                                        $status = $row['status'];
-                                        $jumlah_verifikasi = $row['jumlah_verifikasi'];
+                                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)):
+                                        $nim = $row['nim'] ?? '-';
+                                        $nama = $row['nama_mahasiswa'] ?? '-';
+                                        $status = $row['status'] ?? '-';
+                                        $jumlah_verifikasi = $row['jumlah_verifikasi'] ?? 0;
 
                                         // Tentukan kelas badge berdasarkan status
-                                        $statusClass = match (strtolower($status)) {
-                                            'belum upload' => 'bg-secondary text-white',
-                                            'pending' => 'bg-warning text-dark',
-                                            'ditolak' => 'bg-danger text-white',
-                                            'terverifikasi' => 'bg-success text-white',
+                                        $statusClass = match ($status) {
+                                            '3' => 'bg-secondary text-white', // Belum Upload
+                                            '1' => 'bg-warning text-dark',   // Pending
+                                            '2' => 'bg-danger text-white',   // Ditolak
+                                            '4' => 'bg-success text-white',  // Terverifikasi
                                             default => 'bg-light text-dark'
                                         };
 
-                                        echo "<tr>";
-                                        echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . htmlspecialchars($nim) . "</td>";
-                                        echo "<td>" . htmlspecialchars($nama) . "</td>";
-                                        echo "<td class='status'>
-                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                    style='cursor: pointer;'
-                                                    title='" . htmlspecialchars($status) . "'>
-                                                    " . htmlspecialchars($status) . "
+                                        // Tentukan teks status berdasarkan nilai status
+                                        $statusText = match ($status) {
+                                            '3' => 'Belum Upload',
+                                            '1' => 'Pending',
+                                            '2' => 'Ditolak',
+                                            '4' => 'Terverifikasi',
+                                            default => 'Unknown'
+                                        };
+                                        ?>
+                                        <tr>
+                                            <td><?= $no++ ?></td>
+                                            <td><?= htmlspecialchars($nim) ?></td>
+                                            <td><?= htmlspecialchars($nama) ?></td>
+                                            <td class='status'>
+                                                <span class='badge <?= $statusClass ?> p-2 rounded text-uppercase'
+                                                    style='cursor: pointer;' title="<?= htmlspecialchars($statusText) ?>">
+                                                    <?= htmlspecialchars($statusText) ?>
                                                 </span>
-                                            </td>";
-                                        echo "<td>" . htmlspecialchars($jumlah_verifikasi) . "</td>";
-                                        echo "<td><a href='detail_mahasiswa.php?nim=" . urlencode($nim) . "' class='btn btn-primary btn-sm' target='_blank'><i class='fa fa-edit'></i> Detail</a></td>";
-                                        echo "</tr>";
-                                    }
-
-                                    sqlsrv_free_stmt($stmt);
-                                    ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($jumlah_verifikasi) ?></td>
+                                            <td>
+                                                <a href="detail_mahasiswa.php?nim=<?= urlencode($nim) ?>"
+                                                    class="btn btn-primary btn-sm" target="_blank">
+                                                    <i class="fa fa-edit"></i> Detail
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                    <!-- Bebaskan resource statement setelah selesai -->
+                                    <?php sqlsrv_free_stmt($stmt); ?>
                                 </tbody>
-
                             </table>
                         </div>
                     </div>
@@ -375,15 +379,7 @@ $resultUser = $admin->getAdminById($id);
                         "next": "Berikutnya",
                         "previous": "Sebelumnya"
                     }
-                },
-                "order": [[3, 'asc']], // Mengurutkan berdasarkan kolom status
-                "columnDefs": [
-                    {
-                        "targets": 3,
-                        "type": "num",  // Atur untuk menggunakan urutan numerik
-                        "orderData": [3]
-                    }
-                ]
+                }
             });
 
             // Filter the rows based on the status from the dropdown

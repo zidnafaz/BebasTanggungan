@@ -18,52 +18,53 @@ $id = $_SESSION['id'];
 $admin = new Admin();
 $resultUser = $admin->getAdminById($id);
 
-// Query untuk total mahasiswa
-$penyerahan_hardcopyQuery = "
+// Query untuk penyerahan hardcopy
+$penyerahanHardcopyQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_hardcopy = '2' THEN 1 END) AS ditolak
     FROM penyerahan_hardcopy;
 ";
-$penyerahan_hardcopyResult = sqlsrv_query($conn, $penyerahan_hardcopyQuery);
-$penyerahan_hardcopyRow = sqlsrv_fetch_array($penyerahan_hardcopyResult, SQLSRV_FETCH_ASSOC);
+$penyerahanHardcopyResult = sqlsrv_query($conn, $penyerahanHardcopyQuery);
+$penyerahanHardcopyRow = sqlsrv_fetch_array($penyerahanHardcopyResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan tugas_akhir_softcopy
-$tugas_akhir_softcopyQuery = "
+// Query untuk tugas akhir softcopy
+$tugasAkhirSoftcopyQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_tugas_akhir_softcopy = '2' THEN 1 END) AS ditolak
     FROM tugas_akhir_softcopy;
 ";
-$tugas_akhir_softcopyResult = sqlsrv_query($conn, $tugas_akhir_softcopyQuery);
-$tugas_akhir_softcopyRow = sqlsrv_fetch_array($tugas_akhir_softcopyResult, SQLSRV_FETCH_ASSOC);
+$tugasAkhirSoftcopyResult = sqlsrv_query($conn, $tugasAkhirSoftcopyQuery);
+$tugasAkhirSoftcopyRow = sqlsrv_fetch_array($tugasAkhirSoftcopyResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan hasil_kuisioner
-$hasil_kuisionerQuery = "
+// Query untuk bebas pinjam buku perpustakaan
+$bebasPinjamBukuQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = 'ditolak' THEN 1 END) AS tidak_terverifikasi
-    FROM hasil_kuisioner;
-";
-$hasil_kuisionerResult = sqlsrv_query($conn, $hasil_kuisionerQuery);
-$hasil_kuisionerRow = sqlsrv_fetch_array($hasil_kuisionerResult, SQLSRV_FETCH_ASSOC);
-
-$bebas_pinjam_buku_perpustakaanQuery = "
-    SELECT 
-        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_bebas_pinjam_buku_perpustakaan = '2' THEN 1 END) AS ditolak
     FROM bebas_pinjam_buku_perpustakaan;
 ";
-$bebas_pinjam_buku_perpustakaanResult = sqlsrv_query($conn, $bebas_pinjam_buku_perpustakaanQuery);
-$bebas_pinjam_buku_perpustakaanRow = sqlsrv_fetch_array($bebas_pinjam_buku_perpustakaanResult, SQLSRV_FETCH_ASSOC);
+$bebasPinjamBukuResult = sqlsrv_query($conn, $bebasPinjamBukuQuery);
+$bebasPinjamBukuRow = sqlsrv_fetch_array($bebasPinjamBukuResult, SQLSRV_FETCH_ASSOC);
+
+// Query untuk hasil kuisioner
+$hasilKuisionerQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_hasil_kuisioner = '2' THEN 1 END) AS ditolak
+    FROM hasil_kuisioner;
+";
+$hasilKuisionerResult = sqlsrv_query($conn, $hasilKuisionerQuery);
+$hasilKuisionerRow = sqlsrv_fetch_array($hasilKuisionerResult, SQLSRV_FETCH_ASSOC);
 
 sqlsrv_close($conn);
 ?>
@@ -252,50 +253,50 @@ sqlsrv_close($conn);
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $statuses = ['terverifikasi', 'pending', 'belum_upload', 'ditolak'];
-                                                foreach ($statuses as $status) {
-                                                    // Menentukan kelas badge berdasarkan status
-                                                    $statusClass = '';
-                                                    switch ($status) {
-                                                        case 'terverifikasi':
-                                                            $statusClass = 'badge-success';
-                                                            break;
-                                                        case 'pending':
-                                                            $statusClass = 'badge-warning';
-                                                            break;
-                                                        case 'belum_upload':
-                                                            $statusClass = 'badge-secondary';
-                                                            break;
-                                                        case 'ditolak':
-                                                            $statusClass = 'badge-danger';
-                                                            break;
-                                                    }
+                                                // Data status
+                                                $statuses = [
+                                                    '4' => 'Terverifikasi',
+                                                    '1' => 'Pending',
+                                                    '3' => 'Belum Upload',
+                                                    '2' => 'Ditolak'
+                                                ];
 
+                                                // Mapping status ke class CSS
+                                                $statusClasses = [
+                                                    '4' => 'badge-success',
+                                                    '1' => 'badge-warning',
+                                                    '3' => 'badge-secondary',
+                                                    '2' => 'badge-danger'
+                                                ];
+
+                                                foreach ($statuses as $status => $statusText): ?>
+                                                    <?php
                                                     // Data tiap dokumen
-                                                    $penyerahan_hardcopy = $penyerahan_hardcopyRow[$status] ?? 0;
-                                                    $tugas_akhir_softcopy = $tugas_akhir_softcopyRow[$status] ?? 0;
-                                                    $hasil_kuisioner = $hasil_kuisionerRow[$status] ?? 0;
-                                                    $bebas_pinjam_buku_perpustakaan = $bebas_pinjam_buku_perpustakaanRow[$status] ?? 0;
+                                                    $penyerahanHardcopy = $penyerahanHardcopyRow[strtolower($statusText)] ?? 0;
+                                                    $tugasAkhirSoftcopy = $tugasAkhirSoftcopyRow[strtolower($statusText)] ?? 0;
+                                                    $bebasPinjamBuku = $bebasPinjamBukuRow[strtolower($statusText)] ?? 0;
+                                                    $hasilKuisioner = $hasilKuisionerRow[strtolower($statusText)] ?? 0;
+                                                    $total = $penyerahanHardcopy + $tugasAkhirSoftcopy + $bebasPinjamBuku + $hasilKuisioner;
 
-                                                    $total = $penyerahan_hardcopy + $tugas_akhir_softcopy + $hasil_kuisioner + $bebas_pinjam_buku_perpustakaan;
-
-                                                    echo "<tr>
-                                                            <td class='status'>
-                                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                                    style='cursor: pointer;'
-                                                                    title='" . htmlspecialchars($status) . "'>
-                                                                    " . htmlspecialchars($status) . "
-                                                                </span>
-                                                            </td>
-                                                            <td>$penyerahan_hardcopy</td>
-                                                            <td>$tugas_akhir_softcopy</td>
-                                                            <td>$bebas_pinjam_buku_perpustakaan</td>
-                                                            <td>$hasil_kuisioner</td>
-                                                            <td><strong>$total</strong></td>
-                                                            
-                                                        </tr>";
-                                                }
-                                                ?>
+                                                    // Tentukan class CSS untuk badge
+                                                    $statusClass = $statusClasses[$status] ?? 'badge-light';
+                                                    ?>
+                                                    <tr>
+                                                        <td class="status">
+                                                            <span
+                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                                style="cursor: pointer;"
+                                                                title="<?= htmlspecialchars($statusText) ?>">
+                                                                <?= htmlspecialchars($statusText) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td><?= $penyerahanHardcopy ?></td>
+                                                        <td><?= $tugasAkhirSoftcopy ?></td>
+                                                        <td><?= $bebasPinjamBuku ?></td>
+                                                        <td><?= $hasilKuisioner ?></td>
+                                                        <td><strong><?= $total ?></strong></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>

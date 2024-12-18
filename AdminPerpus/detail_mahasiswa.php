@@ -297,18 +297,18 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                             $jenis_berkas = $file['jenis_berkas'] ?? '-';
 
                                             // Tentukan kelas badge berdasarkan status
-                                            $statusClass = match (strtolower($status)) {
-                                                'belum upload' => 'bg-secondary text-white',
-                                                'pending' => 'bg-warning text-dark',
-                                                'ditolak' => 'bg-danger text-white',
-                                                'terverifikasi' => 'bg-success text-white',
+                                            $statusClass = match ($status) {
+                                                '3' => 'bg-secondary text-white', // belum upload
+                                                '1' => 'bg-warning text-dark',   // pending
+                                                '2' => 'bg-danger text-white',   // ditolak
+                                                '4' => 'bg-success text-white',  // terverifikasi
                                                 default => 'bg-light text-dark'
                                             };
 
                                             // Tentukan ekstensi file berdasarkan jenis berkas
                                             $fileExtension = '';
-                                            $fileDirectory = "../Documents/uploads/" . $file['jenis_berkas'] . "/";
-                                            $fileName = $nim . "_" . $file['jenis_berkas'];
+                                            $fileDirectory = "../Documents/uploads/" . htmlspecialchars($jenis_berkas) . "/";
+                                            $fileName = $nim . "_" . htmlspecialchars($jenis_berkas);
 
                                             if (file_exists($fileDirectory . $fileName . ".zip")) {
                                                 $fileExtension = 'zip';
@@ -317,23 +317,35 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                                             }
                                             ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($file['nama_berkas']) ?></td>
+                                                <td><?= htmlspecialchars($file['nama_berkas'] ?? '-') ?></td>
                                                 <td class='status'>
                                                     <span class='badge <?= $statusClass ?> p-2 rounded text-uppercase'
-                                                        style='cursor: pointer;' title="<?= htmlspecialchars($status) ?>">
-                                                        <?= htmlspecialchars($status) ?>
+                                                        style='cursor: pointer;' title="<?= htmlspecialchars(match ($status) {
+                                                            '3' => 'Belum Upload',
+                                                            '1' => 'Pending',
+                                                            '2' => 'Ditolak',
+                                                            '4' => 'Terverifikasi',
+                                                            default => 'Unknown'
+                                                        }) ?>">
+                                                        <?= htmlspecialchars(match ($status) {
+                                                            '3' => 'Belum Upload',
+                                                            '1' => 'Pending',
+                                                            '2' => 'Ditolak',
+                                                            '4' => 'Terverifikasi',
+                                                            default => 'Unknown'
+                                                        }) ?>
                                                     </span>
                                                 </td>
                                                 <td><?= htmlspecialchars($keterangan) ?></td>
                                                 <td>
                                                     <button class="btn btn-primary btn-sm" data-toggle="modal"
                                                         data-target="#verifikasiModal"
-                                                        data-nama="<?= htmlspecialchars($resultUserMahasiswa['nama_mahasiswa']) ?>"
+                                                        data-nama="<?= htmlspecialchars($resultUserMahasiswa['nama_mahasiswa'] ?? '-') ?>"
                                                         data-nim="<?= htmlspecialchars($nim) ?>"
-                                                        data-berkas="<?= htmlspecialchars($file['nama_berkas']) ?>"
-                                                        data-file="<?= $fileDirectory . $fileName . '.' . $fileExtension ?>"
-                                                        data-jenis_berkas="<?= htmlspecialchars($file['jenis_berkas']) ?>"
-                                                        data-status_pengumpulan="<?= htmlspecialchars($file['status']) ?>">
+                                                        data-berkas="<?= htmlspecialchars($file['nama_berkas'] ?? '-') ?>"
+                                                        data-file="<?= htmlspecialchars($fileDirectory . $fileName . '.' . $fileExtension) ?>"
+                                                        data-jenis_berkas="<?= htmlspecialchars($jenis_berkas) ?>"
+                                                        data-status_pengumpulan="<?= htmlspecialchars($status) ?>">
                                                         <i class="fa-solid fa-file-pen"></i> Verifikasi
                                                     </button>
                                                 </td>
@@ -428,12 +440,11 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                             <form id="verifikasiForm" action="konfirmasi.php" method="POST">
                                 <div class="form-group">
                                     <label>
-                                        <input type="radio" id="terverifikasi" name="status_verifikasi"
-                                            value="terverifikasi">
+                                        <input type="radio" id="4" name="status_verifikasi" value="4">
                                         Terverifikasi
                                     </label>
                                     <label>
-                                        <input type="radio" id="ditolak" name="status_verifikasi" value="ditolak">
+                                        <input type="radio" id="2" name="status_verifikasi" value="2">
                                         Ditolak
                                     </label>
                                 </div>
@@ -657,12 +668,12 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
             function toggleFormFields() {
                 const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
-                if (statusVerifikasi === "terverifikasi") {
+                if (statusVerifikasi === "4") {
                     // Jika terverifikasi: keterangan opsional dan tombol simpan diaktifkan
                     $("#keterangan").prop("disabled", false);  // Mengaktifkan textarea keterangan
                     $("#keterangan").val('');  // Menghapus isi textarea
                     $("#simpanVerifikasi").prop("disabled", false); // Mengaktifkan tombol simpan
-                } else if (statusVerifikasi === "ditolak") {
+                } else if (statusVerifikasi === "2") {
                     // Jika ditolak: keterangan wajib diisi dan tombol simpan dinonaktifkan
                     $("#keterangan").prop("disabled", false); // Mengaktifkan textarea keterangan
                     $("#simpanVerifikasi").prop("disabled", true); // Menonaktifkan tombol simpan
@@ -679,7 +690,7 @@ if (isset($_GET['message']) && isset($_GET['type'])) {
                 const statusVerifikasi = $("input[name='status_verifikasi']:checked").val();
 
                 // Aktifkan tombol simpan hanya jika status verifikasi 'tidak_terverifikasi' dan keterangan diisi
-                if (statusVerifikasi === "ditolak" && keterangan !== '') {
+                if (statusVerifikasi === "2" && keterangan !== '') {
                     $("#simpanVerifikasi").prop("disabled", false);
                 } else {
                     $("#simpanVerifikasi").prop("disabled", false); // Nonaktifkan tombol simpan jika kondisi tidak terpenuhi

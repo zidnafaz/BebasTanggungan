@@ -18,14 +18,14 @@ $resultUser = $mahasiswa->getMahasiswaByNIM($nim);
 
 $query = "
     SELECT 
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
-        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_skripsi = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_pkl = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS pkl,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_toeic = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS toeic,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_bebas_kompen = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS bebas_kompen,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_publikasi_jurnal = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS publikasi_jurnal,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_aplikasi = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS aplikasi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_skripsi = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS status_skripsi,
+        (CASE WHEN MIN(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = '4' THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END) AS penyerahan_kebenaran_data
     FROM dbo.penyerahan_skripsi
     LEFT JOIN dbo.penyerahan_pkl ON penyerahan_skripsi.nim = penyerahan_pkl.nim
     LEFT JOIN dbo.toeic ON penyerahan_skripsi.nim = toeic.nim
@@ -53,7 +53,7 @@ if (!$row) {
     die("Gagal mengambil data: " . print_r(sqlsrv_errors(), true));
 }
 
-// Mengecek apakah semua status sudah terverifikasi
+// Mengecek apakah semua status sudah 4
 $allConfirmed = $row['skripsi'] && $row['pkl'] && $row['toeic'] && $row['bebas_kompen'] && $row['publikasi_jurnal'] && $row['aplikasi'] && $row['status_skripsi'] && $row['penyerahan_kebenaran_data'];
 
 // Query untuk mengambil data mahasiswa
@@ -84,7 +84,7 @@ if ($resultTanggal === false) {
     die("Kesalahan saat menjalankan query tanggal: " . print_r(sqlsrv_errors(), true));
 }
 
-// Mengecek apakah tanggal hanya diambil jika semua status sudah terverifikasi
+// Mengecek apakah tanggal hanya diambil jika semua status sudah 4
 $tanggalLt7 = null;
 $tanggalLt6 = null;
 if ($allConfirmed) {

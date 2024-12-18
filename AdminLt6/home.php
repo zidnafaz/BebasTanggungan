@@ -18,65 +18,65 @@ $id = $_SESSION['id'];
 $admin = new Admin();
 $resultUser = $admin->getAdminById($id);
 
+// Query untuk penyerahan skripsi
+$penyerahanSkripsiQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = '2' THEN 1 END) AS ditolak
+    FROM penyerahan_skripsi;
+";
+$penyerahanSkripsiResult = sqlsrv_query($conn, $penyerahanSkripsiQuery);
+$penyerahanSkripsiRow = sqlsrv_fetch_array($penyerahanSkripsiResult, SQLSRV_FETCH_ASSOC);
+
+// Query untuk penyerahan pkl
+$penyerahanPklQuery = "
+    SELECT 
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = '2' THEN 1 END) AS ditolak
+    FROM penyerahan_pkl;
+";
+$penyerahanPklResult = sqlsrv_query($conn, $penyerahanPklQuery);
+$penyerahanPklRow = sqlsrv_fetch_array($penyerahanPklResult, SQLSRV_FETCH_ASSOC);
+
 // Query untuk TOEIC
 $toeicQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_toeic = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_toeic = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_toeic = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_toeic = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_toeic = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_toeic = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_toeic = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_toeic = '2' THEN 1 END) AS ditolak
     FROM toeic;
 ";
 $toeicResult = sqlsrv_query($conn, $toeicQuery);
 $toeicRow = sqlsrv_fetch_array($toeicResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan Skripsi
-$skripsiQuery = "
+// Query untuk bebas kompen
+$bebasKompenQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_skripsi = 'ditolak' THEN 1 END) AS tidak_terverifikasi
-    FROM penyerahan_skripsi;
-";
-$skripsiResult = sqlsrv_query($conn, $skripsiQuery);
-$skripsiRow = sqlsrv_fetch_array($skripsiResult, SQLSRV_FETCH_ASSOC);
-
-// Query untuk Penyerahan PKL
-$pklQuery = "
-    SELECT 
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_pkl = 'ditolak' THEN 1 END) AS tidak_terverifikasi
-    FROM penyerahan_pkl;
-";
-$pklResult = sqlsrv_query($conn, $pklQuery);
-$pklRow = sqlsrv_fetch_array($pklResult, SQLSRV_FETCH_ASSOC);
-
-// Query untuk Bebas Kompen
-$kompenQuery = "
-    SELECT 
-        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_bebas_kompen = '2' THEN 1 END) AS ditolak
     FROM bebas_kompen;
 ";
-$kompenResult = sqlsrv_query($conn, $kompenQuery);
-$kompenRow = sqlsrv_fetch_array($kompenResult, SQLSRV_FETCH_ASSOC);
+$bebasKompenResult = sqlsrv_query($conn, $bebasKompenQuery);
+$bebasKompenRow = sqlsrv_fetch_array($bebasKompenResult, SQLSRV_FETCH_ASSOC);
 
-// Query untuk Penyerahan Kebenaran Data
-$kebenaranQuery = "
+// Query untuk kebenaran data
+$kebenaranDataQuery = "
     SELECT 
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'terverifikasi' THEN 1 END) AS terverifikasi,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'pending' THEN 1 END) AS pending,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'belum upload' THEN 1 END) AS belum_upload,
-        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = 'ditolak' THEN 1 END) AS tidak_terverifikasi
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = '4' THEN 1 END) AS terverifikasi,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = '1' THEN 1 END) AS pending,
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = '3' THEN 1 END) AS 'belum upload',
+        COUNT(CASE WHEN status_pengumpulan_penyerahan_kebenaran_data = '2' THEN 1 END) AS ditolak
     FROM penyerahan_kebenaran_data;
 ";
-$kebenaranResult = sqlsrv_query($conn, $kebenaranQuery);
-$kebenaranRow = sqlsrv_fetch_array($kebenaranResult, SQLSRV_FETCH_ASSOC);
+$kebenaranDataResult = sqlsrv_query($conn, $kebenaranDataQuery);
+$kebenaranDataRow = sqlsrv_fetch_array($kebenaranDataResult, SQLSRV_FETCH_ASSOC);
 
 sqlsrv_close($conn);
 
@@ -264,50 +264,52 @@ sqlsrv_close($conn);
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $statuses = ['terverifikasi', 'pending', 'belum_upload', 'ditolak'];
-                                                foreach ($statuses as $status) {
-                                                    // Menentukan kelas badge berdasarkan status
-                                                    $statusClass = '';
-                                                    switch ($status) {
-                                                        case 'terverifikasi':
-                                                            $statusClass = 'badge-success';
-                                                            break;
-                                                        case 'pending':
-                                                            $statusClass = 'badge-warning';
-                                                            break;
-                                                        case 'belum_upload':
-                                                            $statusClass = 'badge-secondary';
-                                                            break;
-                                                        case 'ditolak':
-                                                            $statusClass = 'badge-danger';
-                                                            break;
-                                                    }
+                                                // Data status
+                                                $statuses = [
+                                                    '4' => 'Terverifikasi',
+                                                    '1' => 'Pending',
+                                                    '3' => 'Belum Upload',
+                                                    '2' => 'Ditolak'
+                                                ];
 
+                                                // Mapping status ke class CSS
+                                                $statusClasses = [
+                                                    '4' => 'badge-success',
+                                                    '1' => 'badge-warning',
+                                                    '3' => 'badge-secondary',
+                                                    '2' => 'badge-danger'
+                                                ];
+
+                                                foreach ($statuses as $status => $statusText): ?>
+                                                    <?php
                                                     // Data tiap dokumen
-                                                    $skripsi = $skripsiRow[$status] ?? 0;
-                                                    $pkl = $pklRow[$status] ?? 0;
-                                                    $toeic = $toeicRow[$status] ?? 0;
-                                                    $kompen = $kompenRow[$status] ?? 0;
-                                                    $kebenaran = $kebenaranRow[$status] ?? 0;
-                                                    $total = $skripsi + $pkl + $toeic + $kompen + $kebenaran;
+                                                    $penyerahanSkripsi = $penyerahanSkripsiRow[strtolower($statusText)] ?? 0;
+                                                    $penyerahanPkl = $penyerahanPklRow[strtolower($statusText)] ?? 0;
+                                                    $toeic = $toeicRow[strtolower($statusText)] ?? 0;
+                                                    $bebasKompen = $bebasKompenRow[strtolower($statusText)] ?? 0;
+                                                    $kebenaranData = $kebenaranDataRow[strtolower($statusText)] ?? 0;
+                                                    $total = $penyerahanSkripsi + $penyerahanPkl + $toeic + $bebasKompen + $kebenaranData;
 
-                                                    echo "<tr>
-                                                            <td class='status'>
-                                                                <span class='badge $statusClass p-2 rounded text-uppercase'
-                                                                    style='cursor: pointer;'
-                                                                    title='" . htmlspecialchars($status) . "'>
-                                                                    " . htmlspecialchars($status) . "
-                                                                </span>
-                                                            </td>
-                                                            <td>$skripsi</td>
-                                                            <td>$pkl</td>
-                                                            <td>$toeic</td>
-                                                            <td>$kompen</td>
-                                                            <td>$kebenaran</td>
-                                                            <td><strong>$total</strong></td>
-                                                        </tr>";
-                                                }
-                                                ?>
+                                                    // Tentukan class CSS untuk badge
+                                                    $statusClass = $statusClasses[$status] ?? 'badge-light';
+                                                    ?>
+                                                    <tr>
+                                                        <td class="status">
+                                                            <span
+                                                                class="badge <?= $statusClass ?> p-2 rounded text-uppercase"
+                                                                style="cursor: pointer;"
+                                                                title="<?= htmlspecialchars($statusText) ?>">
+                                                                <?= htmlspecialchars($statusText) ?>
+                                                            </span>
+                                                        </td>
+                                                        <td><?= $penyerahanSkripsi ?></td>
+                                                        <td><?= $penyerahanPkl ?></td>
+                                                        <td><?= $toeic ?></td>
+                                                        <td><?= $bebasKompen ?></td>
+                                                        <td><?= $kebenaranData ?></td>
+                                                        <td><strong><?= $total ?></strong></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>

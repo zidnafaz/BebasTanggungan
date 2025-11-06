@@ -1,4 +1,4 @@
-use Bebas_Tanggungan
+use Bebas_Tanggungan2;
 
 -- Insert Dummy Data Mahasiswa
 INSERT INTO mahasiswa (nim, nama_mahasiswa, nomor_telfon_mahasiswa, alamat_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, jenis_kelamin_mahasiswa, tahun_angkatan_mahasiswa, tahun_lulus_mahasiswa, tanggal_lahir_mahasiswa)
@@ -33,6 +33,10 @@ VALUES
 ('20230028', 'Bintang Rahardja', '081901234567', 'Jl. Mawar No. 28', 'Teknologi Informasi', 'D-IV Sistem Informasi Bisnis', 'L', '2021-08-01', '2025-08-01', '2003-04-01'),
 ('20230029', 'Cecilia Lestari', '081012345678', 'Jl. Melati No. 29', 'Teknologi Informasi', 'D-IV Sistem Informasi Bisnis', 'P', '2019-08-01', '2023-08-01', '2004-02-28'),
 ('20230030', 'David Kurniawan', '081123456789', 'Jl. Kenanga No. 30', 'Teknologi Informasi', 'D-IV Sistem Informasi Bisnis', 'L', '2021-08-01', '2025-08-01', '2004-12-05');
+
+INSERT INTO mahasiswa (nim, nama_mahasiswa, nomor_telfon_mahasiswa, alamat_mahasiswa, jurusan_mahasiswa, prodi_mahasiswa, jenis_kelamin_mahasiswa, tahun_angkatan_mahasiswa, tahun_lulus_mahasiswa, tanggal_lahir_mahasiswa)
+VALUES
+('20230000', 'Bahlil Maulana', '081234567890', 'Jl. Mawar No. 1', 'Teknologi Informasi', 'D-IV Sistem Informasi Bisnis', 'L', '2020-08-01', '2024-08-01', '2004-02-15');
 
 -- Dummy data for the [dbo].[admin] table
 INSERT INTO [dbo].[admin] (

@@ -1,6 +1,6 @@
-CREATE DATABASE Bebas_Tanggungan;
+CREATE DATABASE Bebas_Tanggungan2;
 
-use Bebas_Tanggungan
+use Bebas_Tanggungan2
 
 drop database Bebas_Tanggungan
 
@@ -10,8 +10,8 @@ CREATE TABLE [dbo].[mahasiswa] (
     [nama_mahasiswa]           NVARCHAR (50) NOT NULL,
     [nomor_telfon_mahasiswa]   NVARCHAR (20) NULL,
     [alamat_mahasiswa]         NVARCHAR (50) NULL,
-    [jurusan_mahasiswa]        NVARCHAR (20) NULL,
-    [prodi_mahasiswa]          NVARCHAR (20) NULL,
+    [jurusan_mahasiswa]        NVARCHAR (50) NULL,
+    [prodi_mahasiswa]          NVARCHAR (50) NULL,
     [jenis_kelamin_mahasiswa]  CHAR(1) CHECK (jenis_kelamin_mahasiswa IN ('L', 'P')),
     [tahun_angkatan_mahasiswa] DATE          NULL,
 	[tahun_lulus_mahasiswa]	   DATE          NULL,
@@ -333,7 +333,7 @@ SELECT * FROM [dbo].[adminPerpus_konfirmasi];
 SELECT * FROM [dbo].[adminlt6_konfirmasi];
 SELECT * FROM [dbo].[nomor_surat_rekomendasi];
 
-use Bebas_Tanggungan;
+use Bebas_Tanggungan2;
 
 SELECT * FROM dbo.admin
 delete from dbo.admin
@@ -342,8 +342,151 @@ delete from dbo.mahasiswa
 SELECT * FROM dbo.login
 delete from dbo.login where username = '20230009'
 
-SELECT status_pengumpulan_penyerahan_skripsi, keterangan_pengumpulan_penyerahan_skripsi FROM penyerahan_skripsi WHERE nim = ?
+SELECT status_pengumpulan_penyerahan_skripsi, keterangan_pengumpulan_penyerahan_skripsi FROM penyerahan_skripsi WHERE nim = '20230002';
 SELECT status_pengumpulan_penyerahan_pkl, keterangan_pengumpulan_penyerahan_pkl FROM penyerahan_pkl WHERE nim = ?
-SELECT status_pengumpulan_toeic, keterangan_pengumpulan_toeic FROM toeic WHERE nim = ?
+SELECT status_pengumpulan_toeic, keterangan_pengumpulan_toeic FROM toeic WHERE nim = '20230002';
 SELECT status_pengumpulan_bebas_kompen, keterangan_pengumpulan_bebas_kompen FROM bebas_kompen WHERE nim = ?
 SELECT status_pengumpulan_penyerahan_kebenaran_data, keterangan_pengumpulan_penyerahan_kebenaran_data FROM penyerahan_kebenaran_data WHERE nim = ?
+
+UPDATE penyerahan_kebenaran_data
+SET status_pengumpulan_penyerahan_kebenaran_data = '2'
+WHERE nim = '20230002';
+
+UPDATE penyerahan_skripsi
+SET status_pengumpulan_penyerahan_skripsi = '2'
+WHERE nim = '20230002';
+
+UPDATE bebas_kompen
+SET status_pengumpulan_bebas_kompen = '1'
+WHERE nim = '20230008';
+
+UPDATE d
+SET keterangan_pengumpulan_penyerahan_skripsi =
+CASE (ABS(CHECKSUM(NEWID())) % 4)
+WHEN 0 THEN 'lengkap'
+WHEN 1 THEN 'belum lengkap'
+WHEN 2 THEN 'perbaiki'
+ELSE 'upload'
+END
+FROM dbo.penyerahan_skripsi d;
+
+-- data_alumni
+UPDATE d
+SET status_pengumpulan_data_alumni = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.data_alumni d;
+
+-- skkm
+UPDATE d
+SET status_pengumpulan_skkm = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.skkm d;
+
+-- foto_ijazah
+UPDATE d
+SET status_pengumpulan_foto_ijazah = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.foto_ijazah d;
+
+-- ukt
+UPDATE d
+SET status_pengumpulan_ukt = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.ukt d;
+
+-- penyerahan_hardcopy
+UPDATE d
+SET status_pengumpulan_penyerahan_hardcopy = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.penyerahan_hardcopy d;
+
+-- tugas_akhir_softcopy
+UPDATE d
+SET status_pengumpulan_tugas_akhir_softcopy = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.tugas_akhir_softcopy d;
+
+-- bebas_pinjam_buku_perpustakaan
+UPDATE d
+SET status_pengumpulan_bebas_pinjam_buku_perpustakaan = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.bebas_pinjam_buku_perpustakaan d;
+
+-- hasil_kuisioner
+UPDATE d
+SET status_pengumpulan_hasil_kuisioner = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.hasil_kuisioner d;
+
+-- penyerahan_skripsi
+UPDATE d
+SET status_pengumpulan_penyerahan_skripsi = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.penyerahan_skripsi d;
+
+-- penyerahan_pkl
+UPDATE d
+SET status_pengumpulan_penyerahan_pkl = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.penyerahan_pkl d;
+
+-- toeic
+UPDATE d
+SET status_pengumpulan_toeic = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.toeic d;
+
+-- bebas_kompen
+UPDATE d
+SET status_pengumpulan_bebas_kompen = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.bebas_kompen d;
+
+-- penyerahan_kebenaran_data
+UPDATE d
+SET status_pengumpulan_penyerahan_kebenaran_data = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.penyerahan_kebenaran_data d;
+
+-- publikasi_jurnal
+UPDATE d
+SET status_pengumpulan_publikasi_jurnal = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.publikasi_jurnal d;
+
+-- aplikasi
+UPDATE d
+SET status_pengumpulan_aplikasi = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.aplikasi d;
+
+-- skripsi
+UPDATE d
+SET status_pengumpulan_skripsi = CASE (ABS(CHECKSUM(NEWID())) % 4) + 1
+WHEN 1 THEN '1' WHEN 2 THEN '2' WHEN 3 THEN '3' ELSE '4' END
+FROM dbo.skripsi d;
+
+UPDATE penyerahan_hardcopy
+SET status_pengumpulan_penyerahan_hardcopy = '3',
+keterangan_pengumpulan_penyerahan_hardcopy = COALESCE(keterangan_pengumpulan_penyerahan_hardcopy, 'belum upload')
+WHERE nim = '20230005';
+
+UPDATE tugas_akhir_softcopy
+SET status_pengumpulan_tugas_akhir_softcopy = '3',
+keterangan_pengumpulan_tugas_akhir_softcopy = COALESCE(keterangan_pengumpulan_tugas_akhir_softcopy, 'belum upload')
+WHERE nim = '20230005';
+
+UPDATE bebas_pinjam_buku_perpustakaan
+SET status_pengumpulan_bebas_pinjam_buku_perpustakaan = '3',
+keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan = COALESCE(keterangan_pengumpulan_bebas_pinjam_buku_perpustakaan, 'belum upload')
+WHERE nim = '20230005';
+
+UPDATE hasil_kuisioner
+SET status_pengumpulan_hasil_kuisioner = '3',
+keterangan_pengumpulan_hasil_kuisioner = COALESCE(keterangan_pengumpulan_hasil_kuisioner, 'belum upload')
+WHERE nim = '20230005';
+
+UPDATE penyerahan_skripsi
+SET status_pengumpulan_penyerahan_skripsi = '3',
+keterangan_pengumpulan_penyerahan_skripsi = COALESCE(keterangan_pengumpulan_penyerahan_skripsi, 'belum upload')
+WHERE nim = '20230005';

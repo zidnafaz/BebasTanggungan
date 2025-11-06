@@ -201,7 +201,6 @@ $resultUser = $admin->getAdminById($id);
                                 cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
                                         <th>NIM</th>
                                         <th>Nama Mahasiswa</th>
                                         <th>Status</th>
@@ -270,7 +269,6 @@ $resultUser = $admin->getAdminById($id);
                                         };
                                         ?>
                                         <tr>
-                                            <td><?= $no++ ?></td>
                                             <td><?= htmlspecialchars($nim) ?></td>
                                             <td><?= htmlspecialchars($nama) ?></td>
                                             <td class='status'>

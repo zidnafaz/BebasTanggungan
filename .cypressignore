@@ -1,0 +1,10 @@
+# Cypress
+test/cypress/videos
+test/cypress/screenshots
+test/cypress/downloads
+
+# Cypress binary
+test/cypress/cache
+
+# Test results
+test/cypress/results

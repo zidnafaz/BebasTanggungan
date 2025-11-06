@@ -1,5 +1,5 @@
 <?php
-$host   = "MYNARON"; // Ganti dengan nama server Anda
+$host   = "FAZA"; // Ganti dengan nama server Anda
 $connInfo = array(
     "Database" => "Bebas_Tanggungan", // Ganti dengan nama database Anda
     "UID" => "", // Ganti dengan username database Anda

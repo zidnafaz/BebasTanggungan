@@ -1,0 +1,71 @@
+{
+  "mahasiswa": {
+    "valid": {
+      "nim": "20230002",
+      "password": "20230002",
+      "nama": "Budi Santoso"
+    },
+    "invalid": {
+      "nim": "99999999",
+      "password": "wrongpassword"
+    }
+  },
+  "admin": {
+    "pusat": {
+      "username": "admin_pusat",
+      "password": "admin123"
+    },
+    "perpus": {
+      "username": "admin_perpus",
+      "password": "admin123"
+    },
+    "lt6": {
+      "username": "10230001",
+      "password": "admin",
+      "nama": "Ila"
+    },
+    "lt7": {
+      "username": "admin_lt7",
+      "password": "admin123"
+    }
+  },
+  "documents": {
+    "types": [
+      "aplikasi",
+      "bebas_kompen",
+      "bebas_pinjam_buku_perpustakaan",
+      "data_alumni",
+      "foto_ijazah",
+      "hasil_kuisioner",
+      "penyerahan_hardcopy",
+      "penyerahan_kebenaran_data",
+      "penyerahan_pkl",
+      "penyerahan_skripsi",
+      "publikasi_jurnal",
+      "skkm",
+      "skripsi",
+      "toeic",
+      "tugas_akhir_softcopy",
+      "ukt"
+    ],
+    "validFormats": [".pdf", ".jpg", ".jpeg", ".png"],
+    "testFiles": {
+      "penyerahan_kebenaran_data": "C:\\testing\\20230002_penyerahan_kebenaran_data.pdf",
+      "penyerahan_skripsi": "C:\\testing\\20230002_penyerahan_skripsi.pdf"
+    }
+  },
+  "messages": {
+    "login": {
+      "success": "Selamat Datang",
+      "failed": "Login gagal"
+    },
+    "upload": {
+      "success": "berhasil",
+      "failed": "gagal"
+    },
+    "verification": {
+      "success": "Status berhasil diperbarui!",
+      "declined": "Berkas Kurang"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 <?php
 class Koneksi {
-    private $host = "FAZA\MSSQLSERVERFAZA";
-    private $dbName = "Bebas_Tanggungan";
+    private $host = "FAZA";
+    private $dbName = "Bebas_Tanggungan2";
     private $user = "";
     private $password = "";
     private $conn;
